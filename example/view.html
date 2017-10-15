@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <script src="/mu.js"></script>
+        <!-- <link rel="stylesheet" href="css/main.css"> -->
+        <!-- <link rel="icon" href="images/favicon.png"> -->
+    </head>
+
+    <body mu-root class="foo" data-tag="non">
+        <div class="theView">
+            <div class="bindTest"></div>
+            <img class="imgTest">
+            <input type="text" name="lastname" class="input">
+        </div>
+        <section class="theList">
+
+        </section>
+        <script>
+         let person = new MuObservableObject({props: ['firstName','lastName','url'],
+                                              derived: {
+                                                  fullName: {
+                                                      deps: ['firstName','lastName'],
+                                                      fn: function(){
+                                                          return `${this.firstName} ${this.lastName}`
+                                                      }
+                                                  }
+                                              }})
+
+         let y = new person({firstName: 'tom',
+                             lastName: 'jones',
+                             'url': 'https://www.gifs.net/Animation11/Creatures_and_Cartoons/Smiles/small_smiley.gif'})
+         let z = new person({firstName: 'jim',
+                             lastName: 'smith',
+                             'url': 'https://www.gifs.net/Animation11/Creatures_and_Cartoons/Smiles/small_smiley.gif'})
+
+         let myCollection = new MuCollection({
+             idField: 'firstName',
+             contents: [y,z]
+         })
+
+         let myNodeManager = new MuNodeManager()
+         myNodeManager.addAndRemove('theView','.theView')
+         myNodeManager.add('theList','.theList',undefined,false)
+
+         let myView = new muView({template: myNodeManager.getCurried('theView'),
+                                  initialRender: true,
+                                  references: {
+                                      'theImg': '.imgTest'
+                                  },
+                                  events: {
+                                      'click .imgTest': (e)=>{console.log('img clicked',e)}
+                                  },
+                                  bindings: {
+                                      fullName: {
+                                          selector: '.bindTest',
+                                          type: 'text'
+                                      },
+                                      lastName: {
+                                          selector: '.input',
+                                          type: 'value'
+                                      },
+                                      url: {
+                                          selector: '.imgTest',
+                                          type: 'attribute',
+                                          name: 'src'
+                                      }
+                                  }})
+
+         let listView = new muView({
+             template: myNodeManager.getCurried('theList',false)
+         })
+         let aCollection = listView({collection: myCollection,
+                                     collectionView: myView})
+
+         let howManyTimes = this.settings.getDefault('howManyTimes') || 10
+
+         for (var i = 0; i > ; i++){
+
+         }
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <script src="/mu.js"></script>
+        <!-- <link rel="stylesheet" href="css/main.css"> -->
+        <!-- <link rel="icon" href="images/favicon.png"> -->
+    </head>
+
+    <body mu-root class="foo" data-tag="non">
+        <div class="test">one</div>
+        <div class="test">two</div>
+        <div mu-page="main" id="blue">
+            <div class="bindTest">should be seth later</div>
+            <button id="hideStuff">Hello</button>
+            <div class="hideable">This can vanish and appear</div>
+        </div>
+        <div mu-page="secondary">
+            <div class="foo bar">
+                Blurch
+            </div>
+        </div>
+        <script>
+         let person = new MuObservableObject({props: ['firstName','lastName'],
+                                       derived: {
+                                           fullName: {
+                                               deps: ['firstName','lastName'],
+                                               fn: function(){
+                                                   return `${this.firstName} ${this.lastName}`
+                                               }
+                                           }
+                                       }})
+         let z = new person({firstName: 'jim', lastName: 'smith'})
+
+         /* let k = 0
+          * let myView = new MuView({root: '#blue',
+          *                          model: z,
+          *                          bindings: {
+          *                              firstName: {
+          *                                  selector: '.bindTest',
+          *                                  where: 'text'
+          *                              }
+          *                          },
+          *                          references: {
+          *                              foo: '#hideStuff',
+          *                              hideable: '.hideable'
+          *                          },
+          *                          events: {
+          *                              'click #hideStuff': function (e) {
+          *                                  this.rootWrapped.append(`<div class="test">${k}</div>`)
+          *                                  k++
+          *                                  this.hideable.toggle()
+          *                              },
+          *                              'click .test': function (e) {
+          *                                  console.log('TEST',e.target.innerText)
+          *                              }
+          *                          }})*/
+         /*         let stateManagerOpts = {
+             initialState: 'green',
+             states: {
+                 green: {
+                     onEnter: function(){
+                         console.log('entered')
+                     },
+                     report: function(){
+                         this.emit('report',()=>{
+                             this.transition('blue')
+                         })
+                     },
+                     onExit: function(){
+                         console.log('exiting')
+                     }
+                 },
+                 blue: {
+                     onEnter: function(){
+                         console.log('blue entered')
+                     },
+                     another: 'red'
+                 },
+                 red: {
+                     onEnterxb: function(){
+                         console.log('entered red')
+                     }
+                 }
+             },
+             start: function() {
+                 this.transition('green')
+             },
+             classDef: MuStateMachine
+
+         }
+         let mu
+         document.addEventListener('DOMContentLoaded',()=>{
+             mu = new MuManager()
+             mu.addModule('pageManager', {classDef: MuPageManager})
+             mu.addModule('stateMachine', stateManagerOpts)
+             mu.stateMachine.on('transition',(from,to)=>{console.log(from,'=>',to)})
+         }) */
+        </script>
+    </body>
+
+</html>
