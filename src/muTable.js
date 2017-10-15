@@ -10,8 +10,8 @@ class MuTable {
             headerKeys: config.headerKeys,
 
         })
-        let nextControlClickString = `click .${this.cfg.tableCfg.controlClass} button.next`
-        console.log(nextControlClickString)
+
+
         let viewConstructor = muView({
             template: this.tableTemplate(),
             references: {
@@ -60,7 +60,11 @@ class MuTable {
 
                     if (config.rows.getPageSize != e.target.value) {
                         config.rows.setPageSize(e.target.value)
+                        config.rows.currentPage()
+                        console.log(this.pageCount.value())
                         this.pageCount.value(config.rows.currentPageNumber())
+
+
                     }
                 }
 
@@ -95,6 +99,7 @@ class MuTable {
         muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el)
             .value(config.rows.getPageSize())
         this.view.render()
+        this.el = this.view.el
         this.paginatorControls = this.view.subViews[0].collection
     }
 

@@ -86,7 +86,6 @@ class MuPagedCollection extends MuCollection {
     }
 
     changeHandler(event,data){
-        console.log('change')
         this.paginator.paginate = undefined
         this.emit('restructure',this.currentPage())
     }

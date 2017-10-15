@@ -50,7 +50,7 @@ function MuObservableObject(opts) {
                     if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
                         return this[key]
                     }
-                    console.log('get',key,this._state[key])
+
                     // else if (derivedKeys.includes(key)) {
                     //     return derivedProps[key]
                     // }

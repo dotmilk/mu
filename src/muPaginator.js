@@ -29,6 +29,7 @@ class MuPaginator {
     }
 
     getPage(pageNumber = this.currentPage) {
+        this.currentPage = pageNumber
         let page = []
         let startingIndex = (pageNumber - 1) * this.pageSize
         if (!this.paginate) {

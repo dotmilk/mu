@@ -100,7 +100,7 @@ class MuWrapperView {
     init(){}
     render(){}
     remove(){
-        this.view
+        this.view.remove()
     }
 }
 
