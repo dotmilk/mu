@@ -264,9 +264,6 @@ function muDom(s,c) {
                 }
             })
             return this
-        },
-        debug(){
-            console.log(this.constructor('div',document))
         }
     }
 
@@ -505,19 +502,27 @@ class MuCollection extends MuEvent {
         }
     }
 
-    add(items) {
+    addBulk(items) {
+        this.add(items,true)
+    }
+
+    add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
         for (let item of items) {
             //item = new this.model(item)
-            let old = this.collection[item[this.idField]]
-            this.collection[item[this.idField]] = item
+            let old = this.collection[item[this.idField] || item]
+            this.collection[item[this.idField] || item] = item
             if (old) {
                 this.emit('replace',item[this.idField])
-                this.collection[item[this.idField]] = item
+                this.collection[item[this.idField] || item] = item
             } else {
-                this.idx.push(item[this.idField])
-                this.emit('add',item[this.idField])
+                this.idx.push(item[this.idField] || item)
+                if (!bulk) {this.emit('add',item[this.idField] || item)}
             }
+        }
+
+        if (bulk) {
+            this.emit('bulk')
         }
     }
 
@@ -552,24 +557,22 @@ class MuCollection extends MuEvent {
         }
     }
 
-    reset(items = []){
+    reset(items = [],bulk){
         let old = Object.assign({},this.collection)
         this.remove(this.idx.slice())
         this.emit('reset',old)
-        this.add(items)
+        this.add(items,bulk)
     }
 }
 
 class MuPagedCollection extends MuCollection {
     constructor(opts){
         super(opts)
-        let metaHandler = (event,data) => {
-            this.emit('restructure',data)
-        }
         this.paginated = true
         this.on('add',this.changeHandler)
+        this.on('bulk',this.changeHandler)
         this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 3, data: this.idx})
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16, data: this.idx})
     }
 
     changeHandler(event,data){
@@ -956,7 +959,9 @@ class MuCollectionView {
     }
 
     init(){
+        console.log(this)
         this.collection.on('add',(idx)=>{
+            console.log('added')
             let item = this.collection.get(idx)
             let view = this.view(Object.assign({model: item.on ? item : new this.modelWrapper(item)},this.viewOptions))
 
@@ -996,18 +1001,12 @@ class MuCollectionView {
     }
 }
 
-class MuPaginatedCollectionView {
-    constructor({collection,el,view,parent,viewOptions={},lookup}){
-        this.collection = collection
-        this.el = el
-        this.rootWrapped = muDom(el)
-        this.view = view
-        this.parent = parent
-        this.viewOptions = viewOptions
-        this.lookup = lookup
-        Object.assign(this.viewOptions,{autoRender: true})
-        this.collectionViews = {}
-        this.modelWrapper = MuObservableObject({})
+class MuPaginatedCollectionView extends MuCollectionView{
+    constructor(opts){
+        super(opts)
+        console.log('right view')
+
+        this.lookup = opts.lookup
     }
 
     init(){
@@ -1015,6 +1014,7 @@ class MuPaginatedCollectionView {
             this.rootWrapped.clear()
             page.forEach((idx)=>{
                 let item = this.collection.get(idx)
+
                 item = this.lookup ? this.lookup(item) : item
 
                 let view = this.view(Object.assign({model: item.on ? item :
@@ -1043,9 +1043,7 @@ class MuWrapperView {
 
     init(){}
     render(){}
-    remove(){
-        this.view.remove()
-    }
+    remove(){}
 }
 
 function muView(op) {
@@ -1219,19 +1217,21 @@ function muView(op) {
             }
         }
 
-        addCollection({collection, view, target, viewOptions}) {
+        addCollection({collection, view, target, viewOptions, lookup}) {
             let vc
             if (collection.paginated) {
                 vc = new MuPaginatedCollectionView({
                     collection: collection,
                     el: this.rootWrapped.find(target).elements[0],
-                    view: view
+                    view: view,
+                    lookup: lookup
                 })
             } else {
                 vc = new MuCollectionView({
                     collection: collection,
                     el: this.rootWrapped.find(target).elements[0],
-                    view: view
+                    view: view,
+                    lookup: lookup
                 })
             }
 
@@ -1573,8 +1573,9 @@ class MuSelects {
     }
 }
 
-class MuTable {
+class MuTable extends MuEvent{
     constructor(config){
+        super()
         this.cfg = config = Object.assign(this.defaults(),config)
 
         let tableMetaModelConstructor = MuObservableObject({
@@ -1585,7 +1586,6 @@ class MuTable {
             headerKeys: config.headerKeys,
 
         })
-
 
         let viewConstructor = muView({
             template: this.tableTemplate(),
@@ -1619,6 +1619,15 @@ class MuTable {
                 [`click .${this.cfg.tableCfg.controlClass} button.last`]: function (e){
                     config.rows.lastPage()
                     this.pageCount.value(config.rows.currentPageNumber())
+                },
+                [`click .${this.cfg.tableCfg.tableClass} tbody td`]: (e)=>{
+
+                    console.log(e.target.parentNode)
+                    if (this.cfg.markSelection) {
+                        muDom(e.target.parentNode).addClass('selected')
+                            .siblings().removeClass('selected')
+                    }
+                    this.emit('selection',e.target.parentNode.getAttribute('muid'))
                 },
                 [`change .${this.cfg.tableCfg.controlClass} input.pagerInput`]: function(e){
                     if (e.target.value > config.rows.maxPage()) {
@@ -1668,11 +1677,16 @@ class MuTable {
             view: rowCollectionView,
             collection: config.rows,
             target: 'tbody',
+            lookup: config.lookup,
         })
+
         muDom(`.${this.cfg.tableCfg.controlClass} input.pagerInput`,this.view.el)
             .value(config.rows.currentPageNumber())
         muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el)
             .value(config.rows.getPageSize())
+        if (this.cfg.fixedPageSize) {
+            muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el).toggle()
+        }
         this.view.render()
         this.el = this.view.el
         this.paginatorControls = this.view.subViews[0].collection
@@ -1712,11 +1726,12 @@ class MuTable {
     }
 
     rowTemplate(){
-        return ()=>{
+        let field = this.cfg.rows.idField
+        return function (foo){
             return new MuTagen()
-                .tag('tr')
+                .tag('tr').attribute('muId','id')
                 .compile()
-                .render()
+                .render({id: this.model[field]})
         }
     }
 

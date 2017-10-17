@@ -157,9 +157,6 @@ function muDom(s,c) {
                 }
             })
             return this
-        },
-        debug(){
-            console.log(this.constructor('div',document))
         }
     }
 

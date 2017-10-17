@@ -17,6 +17,7 @@
         <script>
          let rows = new MuPagedCollection({
              idField: 'id',
+             pageSize: 4
          })
 
          let tableTest = new MuTable({
@@ -26,7 +27,9 @@
                  age: 'Age'
              },
              headerKeys: ['firstName','lastName','age'],
-             rows: rows
+             rows: rows,
+             markSelection: true,
+             fixedPageSize: true
          })
 
          /* rows.add({id: 1, firstName: 'Seth', lastName: 'Smith', age: 23})
@@ -51,6 +54,9 @@
                    {id: 9, firstName: 'Jimmy', lastName: 'Miller', age: 22},
                    {id: 10, firstName: 'Eric', lastName: 'Wilson', age: 17}])
          document.querySelector('body').appendChild(tableTest.view.el)
+         tableTest.on('selection',(id)=>{
+             console.log(`${id} selected`)
+         })
         </script>
     </body>
 

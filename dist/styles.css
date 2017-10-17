@@ -173,6 +173,12 @@
   text-align: left;
   padding: 0.5rem;
 }
+.muTable table tbody tr.selected:hover {
+  background-color: #7C8AA5;
+}
+.muTable table tbody tr.selected {
+  background-color: #7C8AA5;
+}
 .muTable table tbody tr:hover {
   background-color: #DADADA;
 }
