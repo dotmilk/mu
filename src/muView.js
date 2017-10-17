@@ -12,7 +12,9 @@ class MuCollectionView {
     }
 
     init(){
+        console.log(this)
         this.collection.on('add',(idx)=>{
+            console.log('added')
             let item = this.collection.get(idx)
             let view = this.view(Object.assign({model: item.on ? item : new this.modelWrapper(item)},this.viewOptions))
 
@@ -52,18 +54,12 @@ class MuCollectionView {
     }
 }
 
-class MuPaginatedCollectionView {
-    constructor({collection,el,view,parent,viewOptions={},lookup}){
-        this.collection = collection
-        this.el = el
-        this.rootWrapped = muDom(el)
-        this.view = view
-        this.parent = parent
-        this.viewOptions = viewOptions
-        this.lookup = lookup
-        Object.assign(this.viewOptions,{autoRender: true})
-        this.collectionViews = {}
-        this.modelWrapper = MuObservableObject({})
+class MuPaginatedCollectionView extends MuCollectionView{
+    constructor(opts){
+        super(opts)
+        console.log('right view')
+
+        this.lookup = opts.lookup
     }
 
     init(){
@@ -71,6 +67,7 @@ class MuPaginatedCollectionView {
             this.rootWrapped.clear()
             page.forEach((idx)=>{
                 let item = this.collection.get(idx)
+
                 item = this.lookup ? this.lookup(item) : item
 
                 let view = this.view(Object.assign({model: item.on ? item :
@@ -99,9 +96,7 @@ class MuWrapperView {
 
     init(){}
     render(){}
-    remove(){
-        this.view.remove()
-    }
+    remove(){}
 }
 
 function muView(op) {
@@ -275,19 +270,21 @@ function muView(op) {
             }
         }
 
-        addCollection({collection, view, target, viewOptions}) {
+        addCollection({collection, view, target, viewOptions, lookup}) {
             let vc
             if (collection.paginated) {
                 vc = new MuPaginatedCollectionView({
                     collection: collection,
                     el: this.rootWrapped.find(target).elements[0],
-                    view: view
+                    view: view,
+                    lookup: lookup
                 })
             } else {
                 vc = new MuCollectionView({
                     collection: collection,
                     el: this.rootWrapped.find(target).elements[0],
-                    view: view
+                    view: view,
+                    lookup: lookup
                 })
             }
 

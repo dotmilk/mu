@@ -153,6 +153,7 @@
       -webkit-appearance: none;
       margin: 0;
     }
+
     display: flex;
     font-size: 1.4rem;
     height: 2rem;
@@ -179,6 +180,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1rem;
+
     thead {
       background-color: #c8c8c8;
       th {
@@ -189,6 +191,12 @@
     tbody {
 
       tr {
+        &.selected:hover {
+          background-color: #7C8AA5;
+        }
+        &.selected {
+          background-color: #7C8AA5;
+        }
         &:hover {
           background-color: @tableWrapperColorDark;
         }

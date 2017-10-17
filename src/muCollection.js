@@ -18,19 +18,27 @@ class MuCollection extends MuEvent {
         }
     }
 
-    add(items) {
+    addBulk(items) {
+        this.add(items,true)
+    }
+
+    add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
         for (let item of items) {
             //item = new this.model(item)
-            let old = this.collection[item[this.idField]]
-            this.collection[item[this.idField]] = item
+            let old = this.collection[item[this.idField] || item]
+            this.collection[item[this.idField] || item] = item
             if (old) {
                 this.emit('replace',item[this.idField])
-                this.collection[item[this.idField]] = item
+                this.collection[item[this.idField] || item] = item
             } else {
-                this.idx.push(item[this.idField])
-                this.emit('add',item[this.idField])
+                this.idx.push(item[this.idField] || item)
+                if (!bulk) {this.emit('add',item[this.idField] || item)}
             }
+        }
+
+        if (bulk) {
+            this.emit('bulk')
         }
     }
 
@@ -65,24 +73,22 @@ class MuCollection extends MuEvent {
         }
     }
 
-    reset(items = []){
+    reset(items = [],bulk){
         let old = Object.assign({},this.collection)
         this.remove(this.idx.slice())
         this.emit('reset',old)
-        this.add(items)
+        this.add(items,bulk)
     }
 }
 
 class MuPagedCollection extends MuCollection {
     constructor(opts){
         super(opts)
-        let metaHandler = (event,data) => {
-            this.emit('restructure',data)
-        }
         this.paginated = true
         this.on('add',this.changeHandler)
+        this.on('bulk',this.changeHandler)
         this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 3, data: this.idx})
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16, data: this.idx})
     }
 
     changeHandler(event,data){

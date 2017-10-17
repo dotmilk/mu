@@ -1,5 +1,6 @@
-class MuTable {
+class MuTable extends MuEvent{
     constructor(config){
+        super()
         this.cfg = config = Object.assign(this.defaults(),config)
 
         let tableMetaModelConstructor = MuObservableObject({
@@ -10,7 +11,6 @@ class MuTable {
             headerKeys: config.headerKeys,
 
         })
-
 
         let viewConstructor = muView({
             template: this.tableTemplate(),
@@ -44,6 +44,15 @@ class MuTable {
                 [`click .${this.cfg.tableCfg.controlClass} button.last`]: function (e){
                     config.rows.lastPage()
                     this.pageCount.value(config.rows.currentPageNumber())
+                },
+                [`click .${this.cfg.tableCfg.tableClass} tbody td`]: (e)=>{
+
+                    console.log(e.target.parentNode)
+                    if (this.cfg.markSelection) {
+                        muDom(e.target.parentNode).addClass('selected')
+                            .siblings().removeClass('selected')
+                    }
+                    this.emit('selection',e.target.parentNode.getAttribute('muid'))
                 },
                 [`change .${this.cfg.tableCfg.controlClass} input.pagerInput`]: function(e){
                     if (e.target.value > config.rows.maxPage()) {
@@ -93,11 +102,16 @@ class MuTable {
             view: rowCollectionView,
             collection: config.rows,
             target: 'tbody',
+            lookup: config.lookup,
         })
+
         muDom(`.${this.cfg.tableCfg.controlClass} input.pagerInput`,this.view.el)
             .value(config.rows.currentPageNumber())
         muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el)
             .value(config.rows.getPageSize())
+        if (this.cfg.fixedPageSize) {
+            muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el).toggle()
+        }
         this.view.render()
         this.el = this.view.el
         this.paginatorControls = this.view.subViews[0].collection
@@ -137,11 +151,12 @@ class MuTable {
     }
 
     rowTemplate(){
-        return ()=>{
+        let field = this.cfg.rows.idField
+        return function (foo){
             return new MuTagen()
-                .tag('tr')
+                .tag('tr').attribute('muId','id')
                 .compile()
-                .render()
+                .render({id: this.model[field]})
         }
     }
 
