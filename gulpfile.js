@@ -4,22 +4,11 @@ let less = require('gulp-less')
 let path = require('path')
 
 gulp.task('script', function() {
-    return gulp.src(['./src/muMultiInherit.js',
-                     './src/muPaginator.js',
-                     './src/muCss.js',
-                     './src/muDom.js',
-                     './src/muNodeManager.js',
-                     './src/muPage.js',
-                     './src/muEvent.js',
-                     './src/muObservableObject.js',
-                     './src/muCollection.js',
-                     './src/muStateMachine.js',
-                     './src/muPageManager.js',
-                     './src/muManager.js',
-                     './src/muTagen.js',
-                     './src/muView.js',
-                     './src/muSelects.js',
-                     './src/muTable.js'])
+    return gulp.src(['./src/dom/*.js',
+                     './src/util/*.js',
+                     './src/app/*.js',
+                     './src/core/*.js',
+                     './src/widgets/*.js'])
         .pipe(concat('mu.js'))
         .pipe(gulp.dest('./dist/'))
         .pipe(gulp.dest('./example/'))
@@ -43,7 +32,7 @@ gulp.task('css', function() {
 })
 
 gulp.task('watch', function() {
-    let watcher = gulp.watch('./src/*.js',['script','muDom'])
+    let watcher = gulp.watch('./src/**/*.js',['script','muDom'])
     gulp.watch('./src/*.less',['css'])
     watcher.on('change',()=>{
         console.log('Change detected')

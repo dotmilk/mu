@@ -1,110 +1,3 @@
-let muMultiInherit = (baseClass, ...mixins) => {
-    class base extends baseClass {
-        constructor (...args) {
-            super(...args);
-            mixins.forEach((mixin) => {
-                copyProps(this,(new mixin));
-            });
-        }
-    }
-    let copyProps = (target, source) => {  // this function copies all properties and symbols, filtering out some special ones
-        Object.getOwnPropertyNames(source)
-            .concat(Object.getOwnPropertySymbols(source))
-            .forEach((prop) => {
-                if (!prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/))
-                    Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop));
-            })
-    }
-    mixins.forEach((mixin) => { // outside contructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
-        copyProps(base.prototype, mixin.prototype);
-        copyProps(base, mixin);
-    });
-    return base;
-}
-
-class MuPaginator {
-    constructor({pageSize, data}) {
-        if (!Array.isArray(data)) {
-            throw "Data must be array"
-        }
-        this.data = data
-        this.pageSize = pageSize
-        this.currentPage = 1
-    }
-
-    * paginator(start) {
-        let newIndex
-        let doIt
-        for (let i = start || 0; true; i++) {
-            if (i - start == this.pageSize || doIt) {
-                doIt = false
-                newIndex = yield 'PaGeDoNe'
-                if (newIndex || newIndex == 0) {
-                    start = newIndex
-                    i = newIndex - 1
-                }
-            }
-            if (this.data[i] || this.data[i] == 0 || this.data[i] == false) {
-                yield this.data[i]
-            } else {
-                doIt = true
-            }
-        }
-    }
-
-    getPage(pageNumber = this.currentPage) {
-        this.currentPage = pageNumber
-        let page = []
-        let startingIndex = (pageNumber - 1) * this.pageSize
-        if (!this.paginate) {
-            this.paginate = this.paginator(startingIndex)
-        } else {
-            this.paginate.next(startingIndex).value
-        }
-        let val
-        while (true) {
-            val = this.paginate.next().value
-            if (val == 'PaGeDoNe') { break }
-            page.push(val)
-        }
-        return page
-    }
-
-    maxPage() {
-        return Math.ceil(this.data.length/this.pageSize)
-    }
-
-    isLastPage() {
-        return !(this.maxPage() > this.currentPage)
-    }
-
-    lastPage() {
-        this.currentPage = Math.ceil(this.data.length/this.pageSize)
-        return this.getPage()
-    }
-
-    firstPage() {
-        this.currentPage = 1
-        return this.getPage()
-    }
-
-    nextPage() {
-        if (!this.isLastPage()) {
-            this.currentPage++
-        }
-        return this.getPage()
-    }
-
-    previousPage() {
-        this.currentPage--
-        if (this.currentPage < 1) {
-            this.currentPage = 1
-        }
-        return this.getPage()
-    }
-
-}
-
 function muCss(style,id) {
     let sheet = document.createElement('style')
     if (id) {
@@ -311,6 +204,206 @@ function muDom(s,c) {
 
 }
 
+let parser = new DOMParser()
+class MuTagen {
+    constructor(fullPrefix,parent) {
+        this.fullPrefix = fullPrefix || []
+        this.parent = parent
+        this.children = []
+        this.elem
+        this.attributes = []
+        this.compiledString
+        this.template
+        this.innerText
+        return this
+    }
+
+    tag(name,prefix) {
+        /*
+          If there is already a tag in 'this' make a new instance and pass it intended tag
+         */
+        if (this.elem) {
+            let childPrefix
+            if (this.fullPrefix.length) {
+                childPrefix = [].concat(this.fullPrefix)
+                childPrefix.push(prefix)
+            } else if (prefix) {
+                //console.log('no current prefix, creating new one',prefix)
+                childPrefix = [prefix]
+            }
+
+            //console.log(this.fullPrefix,childPrefix)
+
+            let child = new MuTagen(childPrefix,this).tag(name)
+            this.children.push(child)
+            return child
+
+        }
+
+        if (prefix) {
+            //console.log('ddd')
+            this.fullPrefix.push(prefix)
+        }
+        //this.fullPrefix = prefix
+        this.elem = {
+            open: `<${name}`,
+            afterOpen: '>',
+            close: `</${name}>`
+        }
+        return this
+    }
+
+    attribute(name,prop = name) {
+        if (!(name in this.attributes)) {
+            // todo maybe filter out undefined things
+            this.attributes.push([name,prop])
+        }
+        return this
+    }
+
+    class(prop = 'class') {
+        return this.attribute('class',prop)
+    }
+
+    id(prop = 'id') {
+        return this.attributes('id',prop)
+    }
+
+    text(prop = 'text') {
+        this.innerText = prop
+        return this
+    }
+
+    close() {
+        if (this.parent) {
+            return this.parent
+        }
+        return this
+    }
+
+    closeAll() {
+        let parent = this.parent
+        while (parent.parent) {
+            parent = parent.parent
+        }
+        return parent
+    }
+
+    compileAttributes() {
+        let out = ''
+        for (let attr of this.attributes) {
+            //console.log(attr)
+            out += ` ${attr[0]}="`
+            out += '${'
+            if (this.fullPrefix.length) {
+                out += `opts.${this.fullPrefix.join('.')}["${attr[1]}"]`
+            } else {
+                out += `opts.${attr[1]}`
+            }
+
+            out += '}"'
+        }
+        return out
+    }
+
+    compile(down) {
+        let childrenString
+        let attributes = ''
+
+        if (this.parent && !down) {
+            return this.parent.compile()
+        }
+
+        let childTmp = this.children.map((child)=>{
+            child.compile(true)
+            return child.compiledString
+        })
+
+        attributes = this.compileAttributes()
+        //console.log('attr',attributes)
+        childrenString = childTmp.join('')
+        if (this.innerText) {
+            this.compiledString = this.elem.open +
+                attributes +
+                this.elem.afterOpen +
+                '${opts['+ `'${this.innerText}'` +']}' +
+                childrenString +
+                this.elem.close
+        } else {
+            this.compiledString = this.elem.open +
+                attributes + this.elem.afterOpen +
+                childrenString + this.elem.close
+        }
+
+        this.template = new Function('opts',`return \`${this.compiledString}\``)
+        return this
+    }
+
+    render(opts) {
+        if (!this.template) { throw 'No template compiled'}
+        //console.log(parser.parseFromString(this.template(opts), 'text/html'))
+        // return parser.parseFromString(this.template(opts), 'text/html')
+        //     .querySelector('body')
+        //     .firstChild
+        // allows generation of th and other tags that normally vanish out of the fragment
+        return document.createRange()
+            .createContextualFragment(`<template>${this.template(opts)}</template>`)
+            .children[0].content.children[0]
+    }
+
+}
+
+class MuEvent {
+    constructor(){
+        this._events = {}
+    }
+
+    on(event, fn) {
+        this._events[event] = this._events[event] || []
+        this._events[event].push(fn)
+    }
+
+    removeListener(event, fn) {
+        if (! (event in this._events)) {return}
+        this._events[event].splice(this._events[event].indexOf(fn),1)
+    }
+
+    clearListeners() {
+        this._events = []
+    }
+
+    emit(event) {
+        if (! (event in this._events)) {return}
+        for (let listener of this._events[event]) {
+            listener.apply(this,Array.prototype.slice.call(arguments, 1))
+        }
+    }
+}
+
+let muMultiInherit = (baseClass, ...mixins) => {
+    class base extends baseClass {
+        constructor (...args) {
+            super(...args);
+            mixins.forEach((mixin) => {
+                copyProps(this,(new mixin));
+            });
+        }
+    }
+    let copyProps = (target, source) => {  // this function copies all properties and symbols, filtering out some special ones
+        Object.getOwnPropertyNames(source)
+            .concat(Object.getOwnPropertySymbols(source))
+            .forEach((prop) => {
+                if (!prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/))
+                    Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop));
+            })
+    }
+    mixins.forEach((mixin) => { // outside contructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
+        copyProps(base.prototype, mixin.prototype);
+        copyProps(base, mixin);
+    });
+    return base;
+}
+
 class MuNodeManager {
     constructor(){
         this.nodes = {}
@@ -343,6 +436,111 @@ class MuNodeManager {
     }
 }
 
+class MuPaginator {
+    constructor({pageSize, data}) {
+        if (!Array.isArray(data)) {
+            throw "Data must be array"
+        }
+        this.data = data
+        this.pageSize = pageSize
+        this.currentPage = 1
+    }
+
+    * paginator(start) {
+        let newIndex
+        let doIt
+        for (let i = start || 0; true; i++) {
+            if (i - start == this.pageSize || doIt) {
+                doIt = false
+                newIndex = yield 'PaGeDoNe'
+                if (newIndex || newIndex == 0) {
+                    start = newIndex
+                    i = newIndex - 1
+                }
+            }
+            if (this.data[i] || this.data[i] == 0 || this.data[i] == false) {
+                yield this.data[i]
+            } else {
+                doIt = true
+            }
+        }
+    }
+
+    getPage(pageNumber = this.currentPage) {
+        this.currentPage = pageNumber
+        let page = []
+        let startingIndex = (pageNumber - 1) * this.pageSize
+        if (!this.paginate) {
+            this.paginate = this.paginator(startingIndex)
+        } else {
+            this.paginate.next(startingIndex).value
+        }
+        let val
+        while (true) {
+            val = this.paginate.next().value
+            if (val == 'PaGeDoNe') { break }
+            page.push(val)
+        }
+        return page
+    }
+
+    maxPage() {
+        return Math.ceil(this.data.length/this.pageSize)
+    }
+
+    isLastPage() {
+        return !(this.maxPage() > this.currentPage)
+    }
+
+    lastPage() {
+        this.currentPage = Math.ceil(this.data.length/this.pageSize)
+        return this.getPage()
+    }
+
+    firstPage() {
+        this.currentPage = 1
+        return this.getPage()
+    }
+
+    nextPage() {
+        if (!this.isLastPage()) {
+            this.currentPage++
+        }
+        return this.getPage()
+    }
+
+    previousPage() {
+        this.currentPage--
+        if (this.currentPage < 1) {
+            this.currentPage = 1
+        }
+        return this.getPage()
+    }
+
+}
+
+class MuManager extends MuEvent {
+    constructor(opts = {}) {
+        super()
+    }
+
+    add(name,opts = {}) {
+        if (opts['classDef'] && typeof opts['classDef'] === 'function') {
+            let fn = opts['classDef']
+            // clear classDef so rest of opts can be passed to fn
+            delete opts.classDef
+            this[name] = new fn(opts)
+        } else {
+            this[name] = opts
+        }
+    }
+
+    get(name){
+        return this[name]
+    }
+
+}
+
 window.MuPage = class MuPage {
     constructor(opts) {
         this.pageName = opts.pageName
@@ -353,133 +551,141 @@ window.MuPage = class MuPage {
     onHide() {}
 }
 
-class MuEvent {
-    constructor(){
-        this._events = {}
-    }
+class MuPageManager extends MuEvent {
+    constructor(opts = {}) {
+        super()
+        this.pages = {}
+        this.loaded = []
+        this.currentPage = undefined
+        this.context = opts['context'] || document
+        this.rootName = opts['root'] || 'mu-root'
+        this.root = muDom(`[${this.rootName}]`).elements[0]
 
-    on(event, fn) {
-        this._events[event] = this._events[event] || []
-        this._events[event].push(fn)
-    }
+        this.pageAttributeName = opts['pageAttribute'] || 'mu-page'
+        this.pageAttribute = `[${this['pageAttributeName']}]`
 
-    removeListener(event, fn) {
-        if (! (event in this._events)) {return}
-        this._events[event].splice(this._events[event].indexOf(fn),1)
-    }
-
-    clearListeners() {
-        this._events = []
-    }
-
-    emit(event) {
-        if (! (event in this._events)) {return}
-        for (let listener of this._events[event]) {
-            listener.apply(this,Array.prototype.slice.call(arguments, 1))
-        }
-    }
-}
-
-function arrayClone(a) {
-    return [].concat[a]
-}
-
-function objectClone(o) {
-    return JSON.parse(JSON.stringify(o))
-}
-
-function MuObservableObject(opts) {
-
-    let internalProps = Object.keys(MuEvent.__proto__)
-
-    internalProps.push('_eventsCount')
-    internalProps.push('_state')
-    let namedProps = opts.props || []
-    let derivedProps = opts.derived || {}
-    let derivedKeys = Object.keys(derivedProps)
-
-    class State extends MuEvent {
-        constructor(data) {
-            super()
-            this._state = {}
-            // later filter this for known props if opt set for such
-            Object.assign(this._state,data)
-            this.on('change',function (changed){
-                this.emit(`change:${changed.key}`,changed.value,changed.old)
-            })
-
-            let out =  new Proxy(this,{
-                set: (target, key, value) => {
-
-                    if (internalProps.includes(key)) {
-                        this[key] = value
-                        return true
-                    }
-                    // lets avoid sending out an old value by reference
-                    let old
-                    if (Array.isArray(this._state[key])) {
-                        old = arrayClone(this._state[key])
-                    } else if (typeof(this._state[key]) === 'object') {
-                        old = objectClone(this._state[key])
-                    } else {
-                        old = this._state[key]
-                    }
-                    this._state[key] = value
-                    this.emit('change',{key: key, value: value, old: old},target)
-                    return true
-                },
-                get: (target, key, value) => {
-                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
-                        return this[key]
-                    }
-
-                    // else if (derivedKeys.includes(key)) {
-                    //     return derivedProps[key]
-                    // }
-                    return this._state[key] ? this._state[key] : data[key]
-                }
-            })
-            // we must refer to 'out' since we need the traps
-            // set up before we can register the derived listeners
-            for (let d in derivedProps) {
-
-                let fn = derivedProps[d]['fn']
-
-                if (fn && typeof fn === 'function') {
-
-                    for (let k of derivedProps[d]['deps']) {
-                        out.on(`change:${k}`,(newV,oldV)=>{
-                            if (newV !== oldV) {
-                                out[d] = fn.apply(out._state)
-                            }
-                        })
-                    }
-                    out[d] = fn.apply(out._state)
-
-                }
+        this.controllerAttributeName = opts['controllerAttribute'] || 'mu-controller'
+        muDom(this.pageAttribute, this.context).each((el)=>{
+            let name = el.getAttribute(this.pageAttributeName)
+            let controllerName = el.getAttribute(this.controllerAttributeName)
+            let PageClass
+            if (!name || name == '') {
+                throw "Pages must be named"
             }
-            return out
+            if (this.pages[name]) {
+                throw `${name} already exists as page name`
+            }
+            this.pages[name] = {}
+            this.pages[name]['dom'] = el.cloneNode(true)
+            el.parentNode.removeChild(el)
+
+            if (controllerName && window[controllerName]) {
+                PageClass = window[controllerName]
+            } else {
+                PageClass = MuPage
+            }
+            this.pages[name]['controller'] = new PageClass(Object.assign({
+                pageManager: this,
+                pageName: name
+            },opts.options || {}))
+            this.on(`load:${name}`,(page)=>{
+                this.getController(name).onLoad(page)
+            })
+            this.on(`hide:${name}`,this.getController(name).onHide)
+            this.on(`show:${name}`,this.getController(name).onShow)
+        })
+    }
+
+    getAttributes(name) {
+        let ref = this.getDOM(name)
+        if (!ref) { return ref }
+        return Array.from(ref.attributes)
+    }
+
+    getDOM(name) {
+        return this.pages[name]['dom']
+    }
+
+    getController(name){
+        return this.pages[name]['controller']
+    }
+
+    load(name) {
+
+        let old
+        let newEl = this.getDOM(name)
+        if (this.currentPage) {
+            old = muDom(`[${this.pageAttributeName}=${this.currentPage}]`,this.context)
+        }
+        if (old) {
+            old.swap(newEl)
+            this.emit(`hide:${name}`,this.getDOM(this.currentPage))
+        } else {
+            this.root.appendChild(newEl)
         }
 
-        static props() {
-            return Reflect.ownKeys(namedProps) || {}
+        this.currentPage = name
+        if (! this.loaded.includes(name)) {
+            this.emit(`load:${name}`,this.getDOM(this.currentPage))
+            this.loaded.push(name)
+        } else {
+            this.emit(`show:${name}`,this.getDOM(this.currentPage))
         }
 
-        static derivedProps() {
-            return Reflect.ownKeys(derivedProps) || {}
+
+    }
+
+}
+
+class MuState {
+    constructor(){}
+    onEnter(){}
+    onExit(){}
+}
+
+class MuStateMachine extends MuEvent {
+    constructor(opts){
+        super()
+        Object.assign(this,opts)
+        if (!this.states) {
+            throw 'State machine lacking state definitions'
+        }
+        if (!this.catchAll) {
+            this.catchAll = function(){}
+        }
+        if (!this.states['uninitialized']) {
+            this.states['uninitialized'] = new MuState()
+        }
+        this.currentState = 'uninitialized'
+        this.initialState = this.initialState || 'unitialized'
+        this.transition(this.initialState)
+    }
+
+    transition(name) {
+        let old = this.currentState
+        let args = Array.prototype.slice.call(arguments, 1)
+        if (old) {
+            this.handle('onExit')
         }
 
-        static dump(instance) {
-            return instance._state
-        }
-
-        toJSON() {
-            return this._state
+        if (name && this.states[name]) {
+            this.currentState = name
+            this.handle('onEnter')
+            this.emit('transition',old,name)
         }
 
     }
 
-    return State
+    handle(name) {
+        let state = this.states[this.currentState]
+        if (typeof state[name] === 'string') {
+            this.transition(state[name])
+            return
+        }
+        let fn = state[name] || state['*'] || this.catchAll
+        Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
+    }
+
 }
 
 class MuCollection extends MuEvent {
@@ -637,312 +843,106 @@ class MuPagedCollection extends MuCollection {
 
 }
 
-class MuState {
-    constructor(){}
-    onEnter(){}
-    onExit(){}
+function arrayClone(a) {
+    return [].concat[a]
 }
 
-class MuStateMachine extends MuEvent {
-    constructor(opts){
-        super()
-        Object.assign(this,opts)
-        if (!this.states) {
-            throw 'State machine lacking state definitions'
-        }
-        if (!this.catchAll) {
-            this.catchAll = function(){}
-        }
-        if (!this.states['uninitialized']) {
-            this.states['uninitialized'] = new MuState()
-        }
-        this.currentState = 'uninitialized'
-        this.initialState = this.initialState || 'unitialized'
-        this.transition(this.initialState)
-    }
-
-    transition(name) {
-        let old = this.currentState
-        let args = Array.prototype.slice.call(arguments, 1)
-        if (old) {
-            this.handle('onExit')
-        }
-
-        if (name && this.states[name]) {
-            this.currentState = name
-            this.handle('onEnter')
-            this.emit('transition',old,name)
-        }
-
-    }
-
-    handle(name) {
-        let state = this.states[this.currentState]
-        if (typeof state[name] === 'string') {
-            this.transition(state[name])
-            return
-        }
-        let fn = state[name] || state['*'] || this.catchAll
-        Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
-    }
-
+function objectClone(o) {
+    return JSON.parse(JSON.stringify(o))
 }
 
-class MuPageManager extends MuEvent {
-    constructor(opts = {}) {
-        super()
-        this.pages = {}
-        this.loaded = []
-        this.currentPage = undefined
-        this.context = opts['context'] || document
-        this.rootName = opts['root'] || 'mu-root'
-        this.root = muDom(`[${this.rootName}]`).elements[0]
+function MuObservableObject(opts) {
 
-        this.pageAttributeName = opts['pageAttribute'] || 'mu-page'
-        this.pageAttribute = `[${this['pageAttributeName']}]`
+    let internalProps = Object.keys(MuEvent.__proto__)
 
-        this.controllerAttributeName = opts['controllerAttribute'] || 'mu-controller'
-        muDom(this.pageAttribute, this.context).each((el)=>{
-            let name = el.getAttribute(this.pageAttributeName)
-            let controllerName = el.getAttribute(this.controllerAttributeName)
-            let PageClass
-            if (!name || name == '') {
-                throw "Pages must be named"
-            }
-            if (this.pages[name]) {
-                throw `${name} already exists as page name`
-            }
-            this.pages[name] = {}
-            this.pages[name]['dom'] = el.cloneNode(true)
-            el.parentNode.removeChild(el)
+    internalProps.push('_eventsCount')
+    internalProps.push('_state')
+    let namedProps = opts.props || []
+    let derivedProps = opts.derived || {}
+    let derivedKeys = Object.keys(derivedProps)
 
-            if (controllerName && window[controllerName]) {
-                PageClass = window[controllerName]
-            } else {
-                PageClass = MuPage
-            }
-            this.pages[name]['controller'] = new PageClass(Object.assign({
-                pageManager: this,
-                pageName: name
-            },opts.options || {}))
-            this.on(`load:${name}`,(page)=>{
-                this.getController(name).onLoad(page)
+    class State extends MuEvent {
+        constructor(data) {
+            super()
+            this._state = {}
+            // later filter this for known props if opt set for such
+            Object.assign(this._state,data)
+            this.on('change',function (changed){
+                this.emit(`change:${changed.key}`,changed.value,changed.old)
             })
-            this.on(`hide:${name}`,this.getController(name).onHide)
-            this.on(`show:${name}`,this.getController(name).onShow)
-        })
-    }
 
-    getAttributes(name) {
-        let ref = this.getDOM(name)
-        if (!ref) { return ref }
-        return Array.from(ref.attributes)
-    }
+            let out =  new Proxy(this,{
+                set: (target, key, value) => {
 
-    getDOM(name) {
-        return this.pages[name]['dom']
-    }
+                    if (internalProps.includes(key)) {
+                        this[key] = value
+                        return true
+                    }
+                    // lets avoid sending out an old value by reference
+                    let old
+                    if (Array.isArray(this._state[key])) {
+                        old = arrayClone(this._state[key])
+                    } else if (typeof(this._state[key]) === 'object') {
+                        old = objectClone(this._state[key])
+                    } else {
+                        old = this._state[key]
+                    }
+                    this._state[key] = value
+                    this.emit('change',{key: key, value: value, old: old},target)
+                    return true
+                },
+                get: (target, key, value) => {
+                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
+                        return this[key]
+                    }
 
-    getController(name){
-        return this.pages[name]['controller']
-    }
+                    // else if (derivedKeys.includes(key)) {
+                    //     return derivedProps[key]
+                    // }
+                    return this._state[key] ? this._state[key] : data[key]
+                }
+            })
+            // we must refer to 'out' since we need the traps
+            // set up before we can register the derived listeners
+            for (let d in derivedProps) {
 
-    load(name) {
+                let fn = derivedProps[d]['fn']
 
-        let old
-        let newEl = this.getDOM(name)
-        if (this.currentPage) {
-            old = muDom(`[${this.pageAttributeName}=${this.currentPage}]`,this.context)
-        }
-        if (old) {
-            old.swap(newEl)
-            this.emit(`hide:${name}`,this.getDOM(this.currentPage))
-        } else {
-            this.root.appendChild(newEl)
-        }
+                if (fn && typeof fn === 'function') {
 
-        this.currentPage = name
-        if (! this.loaded.includes(name)) {
-            this.emit(`load:${name}`,this.getDOM(this.currentPage))
-            this.loaded.push(name)
-        } else {
-            this.emit(`show:${name}`,this.getDOM(this.currentPage))
-        }
+                    for (let k of derivedProps[d]['deps']) {
+                        out.on(`change:${k}`,(newV,oldV)=>{
+                            if (newV !== oldV) {
+                                out[d] = fn.apply(out._state)
+                            }
+                        })
+                    }
+                    out[d] = fn.apply(out._state)
 
-
-    }
-
-}
-
-class MuManager extends MuEvent {
-    constructor(opts = {}) {
-        super()
-    }
-
-    add(name,opts = {}) {
-        if (opts['classDef'] && typeof opts['classDef'] === 'function') {
-            let fn = opts['classDef']
-            // clear classDef so rest of opts can be passed to fn
-            delete opts.classDef
-            this[name] = new fn(opts)
-        } else {
-            this[name] = opts
-        }
-    }
-
-    get(name){
-        return this[name]
-    }
-
-}
-
-let parser = new DOMParser()
-class MuTagen {
-    constructor(fullPrefix,parent) {
-        this.fullPrefix = fullPrefix || []
-        this.parent = parent
-        this.children = []
-        this.elem
-        this.attributes = []
-        this.compiledString
-        this.template
-        this.innerText
-        return this
-    }
-
-    tag(name,prefix) {
-        /*
-          If there is already a tag in 'this' make a new instance and pass it intended tag
-         */
-        if (this.elem) {
-            let childPrefix
-            if (this.fullPrefix.length) {
-                childPrefix = [].concat(this.fullPrefix)
-                childPrefix.push(prefix)
-            } else if (prefix) {
-                //console.log('no current prefix, creating new one',prefix)
-                childPrefix = [prefix]
+                }
             }
-
-            //console.log(this.fullPrefix,childPrefix)
-
-            let child = new MuTagen(childPrefix,this).tag(name)
-            this.children.push(child)
-            return child
-
+            return out
         }
 
-        if (prefix) {
-            //console.log('ddd')
-            this.fullPrefix.push(prefix)
-        }
-        //this.fullPrefix = prefix
-        this.elem = {
-            open: `<${name}`,
-            afterOpen: '>',
-            close: `</${name}>`
-        }
-        return this
-    }
-
-    attribute(name,prop = name) {
-        if (!(name in this.attributes)) {
-            // todo maybe filter out undefined things
-            this.attributes.push([name,prop])
-        }
-        return this
-    }
-
-    class(prop = 'class') {
-        return this.attribute('class',prop)
-    }
-
-    id(prop = 'id') {
-        return this.attributes('id',prop)
-    }
-
-    text(prop = 'text') {
-        this.innerText = prop
-        return this
-    }
-
-    close() {
-        if (this.parent) {
-            return this.parent
-        }
-        return this
-    }
-
-    closeAll() {
-        let parent = this.parent
-        while (parent.parent) {
-            parent = parent.parent
-        }
-        return parent
-    }
-
-    compileAttributes() {
-        let out = ''
-        for (let attr of this.attributes) {
-            //console.log(attr)
-            out += ` ${attr[0]}="`
-            out += '${'
-            if (this.fullPrefix.length) {
-                out += `opts.${this.fullPrefix.join('.')}["${attr[1]}"]`
-            } else {
-                out += `opts.${attr[1]}`
-            }
-
-            out += '}"'
-        }
-        return out
-    }
-
-    compile(down) {
-        let childrenString
-        let attributes = ''
-
-        if (this.parent && !down) {
-            return this.parent.compile()
+        static props() {
+            return Reflect.ownKeys(namedProps) || {}
         }
 
-        let childTmp = this.children.map((child)=>{
-            child.compile(true)
-            return child.compiledString
-        })
-
-        attributes = this.compileAttributes()
-        //console.log('attr',attributes)
-        childrenString = childTmp.join('')
-        if (this.innerText) {
-            this.compiledString = this.elem.open +
-                attributes +
-                this.elem.afterOpen +
-                '${opts['+ `'${this.innerText}'` +']}' +
-                childrenString +
-                this.elem.close
-        } else {
-            this.compiledString = this.elem.open +
-                attributes + this.elem.afterOpen +
-                childrenString + this.elem.close
+        static derivedProps() {
+            return Reflect.ownKeys(derivedProps) || {}
         }
 
-        this.template = new Function('opts',`return \`${this.compiledString}\``)
-        return this
+        static dump(instance) {
+            return instance._state
+        }
+
+        toJSON() {
+            return this._state
+        }
+
     }
 
-    render(opts) {
-        if (!this.template) { throw 'No template compiled'}
-        //console.log(parser.parseFromString(this.template(opts), 'text/html'))
-        // return parser.parseFromString(this.template(opts), 'text/html')
-        //     .querySelector('body')
-        //     .firstChild
-        // allows generation of th and other tags that normally vanish out of the fragment
-        return document.createRange()
-            .createContextualFragment(`<template>${this.template(opts)}</template>`)
-            .children[0].content.children[0]
-    }
-
+    return State
 }
 
 class MuCollectionView {
@@ -1046,9 +1046,7 @@ class MuWrapperView {
     remove(){}
 }
 
-function muView(op) {
-
-    class MuView extends MuEvent {
+class MuView extends MuEvent {
         constructor(opts = {}){
             super()
             this.isMuView = true
@@ -1284,6 +1282,9 @@ function muView(op) {
 
     }
 
+
+// Use to create view factory
+function muView(op) {
     return (o)=>{
         Object.assign(o,op)
         return new MuView(o)

@@ -99,9 +99,7 @@ class MuWrapperView {
     remove(){}
 }
 
-function muView(op) {
-
-    class MuView extends MuEvent {
+class MuView extends MuEvent {
         constructor(opts = {}){
             super()
             this.isMuView = true
@@ -337,6 +335,9 @@ function muView(op) {
 
     }
 
+
+// Use to create view factory
+function muView(op) {
     return (o)=>{
         Object.assign(o,op)
         return new MuView(o)
