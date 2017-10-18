@@ -75,5 +75,7 @@ class MuPaginatedCollectionView extends MuCollectionView{
         this.collection.on('restructure',handler)
     }
     render(){}
-    remove(){}
+    remove(){
+        super.remove()
+    }
 }

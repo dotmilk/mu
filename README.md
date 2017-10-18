@@ -7,11 +7,14 @@
 <dt><a href="#MuPaginatedCollectionView">MuPaginatedCollectionView</a> ⇐ <code><a href="#MuCollectionView">MuCollectionView</a></code></dt>
 <dd><p>View wrapper for a paginated collection</p>
 </dd>
-<dt><a href="#MuWrapperView">MuWrapperView</a> ⇐ <code>MuEvent</code></dt>
+<dt><a href="#MuWrapperView">MuWrapperView</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>Abstract class for wrapping more complex constructs.</p>
 </dd>
-<dt><a href="#MuView">MuView</a> ⇐ <code>MuEvent</code></dt>
+<dt><a href="#MuView">MuView</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>Main class for for a &#39;view&#39;, examples in example folder</p>
+</dd>
+<dt><a href="#MuEvent">MuEvent</a></dt>
+<dd><p>Very simple no frills Event Emitter so to speak, might add emitter.once later</p>
 </dd>
 </dl>
 
@@ -94,17 +97,21 @@ Stub function, extending class must implement
 **Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
 <a name="MuWrapperView"></a>
 
-## MuWrapperView ⇐ <code>MuEvent</code>
+## MuWrapperView ⇐ [<code>MuEvent</code>](#MuEvent)
 Abstract class for wrapping more complex constructs.
 
 **Kind**: global class  
-**Extends**: <code>MuEvent</code>  
+**Extends**: [<code>MuEvent</code>](#MuEvent)  
 
-* [MuWrapperView](#MuWrapperView) ⇐ <code>MuEvent</code>
+* [MuWrapperView](#MuWrapperView) ⇐ [<code>MuEvent</code>](#MuEvent)
     * [new MuWrapperView(options)](#new_MuWrapperView_new)
     * [.init()](#MuWrapperView+init)
     * [.render()](#MuWrapperView+render)
     * [.remove()](#MuWrapperView+remove)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="new_MuWrapperView_new"></a>
 
@@ -136,21 +143,66 @@ Stub function, extending class may implement
 Stub function, extending class must implement
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+<a name="MuEvent+on"></a>
+
+### muWrapperView.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muWrapperView.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muWrapperView.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+<a name="MuEvent+emit"></a>
+
+### muWrapperView.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
+
 <a name="MuView"></a>
 
-## MuView ⇐ <code>MuEvent</code>
+## MuView ⇐ [<code>MuEvent</code>](#MuEvent)
 Main class for for a 'view', examples in example folder
 
 **Kind**: global class  
-**Extends**: <code>MuEvent</code>  
+**Extends**: [<code>MuEvent</code>](#MuEvent)  
 
-* [MuView](#MuView) ⇐ <code>MuEvent</code>
+* [MuView](#MuView) ⇐ [<code>MuEvent</code>](#MuEvent)
     * [new MuView(options)](#new_MuView_new)
     * [.references(references)](#MuView+references)
     * [.parseBindings(bindings)](#MuView+parseBindings)
     * [.bindings(bindings)](#MuView+bindings)
     * [.events()](#MuView+events)
     * [.addCollection(options)](#MuView+addCollection)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="new_MuView_new"></a>
 
@@ -263,6 +315,113 @@ Adds a collection as a subview of this view, wrapping it in either a
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Set of options for the collection |
+
+<a name="MuEvent+on"></a>
+
+### muView.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muView.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muView.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+<a name="MuEvent+emit"></a>
+
+### muView.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
+
+<a name="MuEvent"></a>
+
+## MuEvent
+Very simple no frills Event Emitter so to speak, might add emitter.once later
+
+**Kind**: global class  
+
+* [MuEvent](#MuEvent)
+    * [new MuEvent()](#new_MuEvent_new)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
+
+<a name="new_MuEvent_new"></a>
+
+### new MuEvent()
+Takes no arguments
+
+**Example**  
+```js
+let emitter = new MuEvent()
+emitter.on('whatever',()=>{console.log(whatever)})
+emitter.emit('whatever')
+```
+<a name="MuEvent+on"></a>
+
+### muEvent.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuEvent</code>](#MuEvent)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muEvent.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuEvent</code>](#MuEvent)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muEvent.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuEvent</code>](#MuEvent)  
+<a name="MuEvent+emit"></a>
+
+### muEvent.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuEvent</code>](#MuEvent)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
 
 <a name="muView"></a>
 
