@@ -96,7 +96,7 @@ myView.aBtn.on('click',()=>{console.log('button clicked')})
 <a name="MuView+parseBindings"></a>
 
 ### muView.parseBindings(bindings)
-Checks for special case of '*' right now. In the future, there might be more.
+Checks for special case of '\*' right now. In the future, there might be more.
 '*' creates a new essentially derived property on the 'model' passed in.
 Naming said property according to the 'name' key, based of some property
 of the model 'prop' which should be an array. Essentially flattening a sequence
