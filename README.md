@@ -131,7 +131,7 @@ the resulting mapped array, see rowCollectionView in muTable for use. Called int
 Method for binding changes in the model to actions, called internally.
 Currently accepts text, html, attribute and value actions on
 changed model prop. As well as special case '\*' which is mentioned
-in documentation for [MuView.parseBindings](MuView.parseBindings).
+in documentation for [parseBindings](#MuView+parseBindings).
 
 Empty string selector is view.el. Selector is required to exist.
 
