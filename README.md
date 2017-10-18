@@ -5,7 +5,7 @@
 <dd><p>Abstract class for wrapping more complex constructs.</p>
 </dd>
 <dt><a href="#MuView">MuView</a> ⇐ <code>MuEvent</code></dt>
-<dd><p>Main class for for a &#39;view</p>
+<dd><p>Main class for for a &#39;view&#39;</p>
 </dd>
 </dl>
 
@@ -56,7 +56,7 @@ Stub function, extending class must implement
 <a name="MuView"></a>
 
 ## MuView ⇐ <code>MuEvent</code>
-Main class for for a 'view
+Main class for for a 'view'
 
 **Kind**: global class  
 **Extends**: <code>MuEvent</code>  
@@ -67,5 +67,9 @@ Main class for for a 'view
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | various options |
-|  | <code>function</code> \| <code>string</code> | Template to become this.el |
+| options.template | <code>function</code> \| <code>String</code> | Template to become this.el |
+| options.model | <code>MuModel</code> | Model that bindings will use |
+| options.bindings | <code>Object</code> | An object with model properties to watch as keys |
+| options.events | <code>Object</code> | An object with 'eventtype element > .foo' as keys            and fn as value, to be bound to this.el |
+| options.autoRender | <code>Boolean</code> | Call render at end of constructor |
 

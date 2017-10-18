@@ -917,7 +917,7 @@ class MuView extends MuEvent {
             this._references = opts.references || {}
             this._bindings = opts.bindings || {}
             this._events = opts.events || {}
-            this._boundEvents = this._boundEvents || {}
+            this._boundEvents = {}
             this.rootWrapped = muDom(this.template)
             this.root = this.el = this.rootWrapped.elements[0]
             this.references()

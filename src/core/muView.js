@@ -22,13 +22,18 @@ class MuWrapperView extends MuEvent{
     remove(){ throw 'Remove not overridden'}
 }
 
-/** Main class for for a 'view
+/** Main class for for a 'view'
     @extends MuEvent
  */
 class MuView extends MuEvent {
         /**
            @param {Object} options - various options
-           @param {(function|string)} - Template to become this.el
+           @param {(Function|String)} options.template - Template to become this.el
+           @param {MuModel} options.model - Model that bindings will use
+           @param {Object} options.bindings - An object with model properties to watch as keys
+           @param {Object} options.events - An object with 'eventtype element > .foo' as keys
+           and fn as value, to be bound to this.el
+           @param {Boolean} options.autoRender - Call render at end of constructor
          */
         constructor(opts = {}){
             super()
@@ -47,7 +52,7 @@ class MuView extends MuEvent {
             this._references = opts.references || {}
             this._bindings = opts.bindings || {}
             this._events = opts.events || {}
-            this._boundEvents = this._boundEvents || {}
+            this._boundEvents = {}
             this.rootWrapped = muDom(this.template)
             this.root = this.el = this.rootWrapped.elements[0]
 
