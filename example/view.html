@@ -30,24 +30,16 @@
                                                   }
                                               }})
 
-         let y = new person({firstName: 'tom',
-                             lastName: 'jones',
-                             'url': 'https://www.gifs.net/Animation11/Creatures_and_Cartoons/Smiles/small_smiley.gif'})
          let z = new person({firstName: 'jim',
                              lastName: 'smith',
                              'url': 'https://www.gifs.net/Animation11/Creatures_and_Cartoons/Smiles/small_smiley.gif'})
 
-         let myCollection = new MuCollection({
-             idField: 'firstName',
-             contents: [y,z]
-         })
-
          let myNodeManager = new MuNodeManager()
          myNodeManager.addAndRemove('theView','.theView')
-         myNodeManager.add('theList','.theList',undefined,false)
 
-         let myView = new muView({template: myNodeManager.getCurried('theView'),
-                                  initialRender: true,
+         let myView = new MuView({template: myNodeManager.getCurried('theView'),
+                                  autoRender: true,
+                                  model: z,
                                   references: {
                                       'theImg': '.imgTest'
                                   },
@@ -70,17 +62,7 @@
                                       }
                                   }})
 
-         let listView = new muView({
-             template: myNodeManager.getCurried('theList',false)
-         })
-         let aCollection = listView({collection: myCollection,
-                                     collectionView: myView})
-
-         let howManyTimes = this.settings.getDefault('howManyTimes') || 10
-
-         for (var i = 0; i > ; i++){
-
-         }
+         document.querySelector('body').appendChild(myView.el)
         </script>
     </body>
 

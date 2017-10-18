@@ -31,7 +31,7 @@ class MuView extends MuEvent {
            @param {(Function|String)} options.template - Template to become this.el
            @param {MuModel} options.model - Model that bindings will use
            @param {Object} options.bindings - An object with model properties to watch as keys
-           @param {Object} options.events - An object with 'eventtype element > .foo' as keys
+           @param {Object} options.events - An object with 'event-type element > .foo' as keys
            and fn as value, to be bound to this.el
            @param {Boolean} options.autoRender - Call render at end of constructor
          */
@@ -61,15 +61,18 @@ class MuView extends MuEvent {
             if (opts.autoRender) {
                 this.render()
             }
-            //this.render()
         }
 
-        /*
-          Handle:
-          A selector
-          muDom instance
-          Bare element
-          {foo: '#foo'} = this.foo element reference to avoid later dom queries
+        /**
+           @param {Object} references - An object describing dom references
+           bound to 'this', and the selectors to use. Called internally.
+           The references are mainly  used inside of your event bindings,
+           for easy access without excessive dom queries.
+           Will handle a selector or muDom instance.
+
+           @example
+           myView.references({aBtn: 'button #myButton})
+           myView.aBtn.on('click',()=>{console.log('button clicked')})
         */
         references(refs = this._references){
             if (refs) {

@@ -60,6 +60,11 @@ Main class for for a 'view'
 
 **Kind**: global class  
 **Extends**: <code>MuEvent</code>  
+
+* [MuView](#MuView) ⇐ <code>MuEvent</code>
+    * [new MuView(options)](#new_MuView_new)
+    * [.references(references)](#MuView+references)
+
 <a name="new_MuView_new"></a>
 
 ### new MuView(options)
@@ -70,6 +75,20 @@ Main class for for a 'view'
 | options.template | <code>function</code> \| <code>String</code> | Template to become this.el |
 | options.model | <code>MuModel</code> | Model that bindings will use |
 | options.bindings | <code>Object</code> | An object with model properties to watch as keys |
-| options.events | <code>Object</code> | An object with 'eventtype element > .foo' as keys            and fn as value, to be bound to this.el |
+| options.events | <code>Object</code> | An object with 'event-type element > .foo' as keys            and fn as value, to be bound to this.el |
 | options.autoRender | <code>Boolean</code> | Call render at end of constructor |
 
+<a name="MuView+references"></a>
+
+### muView.references(references)
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| references | <code>Object</code> | An object describing dom references            bound to 'this', and the selectors to use. Called internally.            The references are mainly  used inside of your event bindings,            for easy access without excessive dom queries.            Will handle a selector or muDom instance. |
+
+**Example**  
+```js
+myView.references({aBtn: 'button #myButton})
+           myView.aBtn.on('click',()=>{console.log('button clicked')})
+```
