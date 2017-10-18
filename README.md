@@ -18,22 +18,22 @@ Abstract class for wrapping more complex constructs.
 **Extends**: <code>MuEvent</code>  
 
 * [MuWrapperView](#MuWrapperView) ⇐ <code>MuEvent</code>
-    * [new MuWrapperView(options, el, parent)](#new_MuWrapperView_new)
+    * [new MuWrapperView(options)](#new_MuWrapperView_new)
     * [.init()](#MuWrapperView+init)
     * [.render()](#MuWrapperView+render)
     * [.remove()](#MuWrapperView+remove)
 
 <a name="new_MuWrapperView_new"></a>
 
-### new MuWrapperView(options, el, parent)
+### new MuWrapperView(options)
 Should only be called by super in extending class
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | References to parent and root el |
-| el |  | The node this view manipulates |
-| parent |  | The view rendering this |
+| options.el |  | The node this view manipulates |
+| options.parent |  | The view rendering this |
 
 <a name="MuWrapperView+init"></a>
 
@@ -60,3 +60,12 @@ Main class for for a 'view
 
 **Kind**: global class  
 **Extends**: <code>MuEvent</code>  
+<a name="new_MuView_new"></a>
+
+### new MuView(options)
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | various options |
+|  | <code>function</code> \| <code>string</code> | Template to become this.el |
+

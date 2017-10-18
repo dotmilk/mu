@@ -3,10 +3,10 @@
  */
 class MuWrapperView extends MuEvent{
     /**
-     * Should only be called by super in extending class
-     * @param {Object} options - References to parent and root el
-     * @param el - The node this view manipulates
-     * @param parent - The view rendering this
+       Should only be called by super in extending class
+       @param {Object} options - References to parent and root el
+       @param options.el - The node this view manipulates
+       @param options.parent - The view rendering this
      */
     constructor({el,parent}) {
         super()
@@ -23,11 +23,12 @@ class MuWrapperView extends MuEvent{
 }
 
 /** Main class for for a 'view
- * @extends MuEvent
+    @extends MuEvent
  */
 class MuView extends MuEvent {
         /**
-
+           @param {Object} options - various options
+           @param {(function|string)} - Template to become this.el
          */
         constructor(opts = {}){
             super()
