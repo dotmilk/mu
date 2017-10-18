@@ -64,7 +64,7 @@ Main class for for a 'view'
 * [MuView](#MuView) ⇐ <code>MuEvent</code>
     * [new MuView(options)](#new_MuView_new)
     * [.references(references)](#MuView+references)
-    * [.parseBindings()](#MuView+parseBindings)
+    * [.parseBindings(bindings)](#MuView+parseBindings)
 
 <a name="new_MuView_new"></a>
 
@@ -95,5 +95,19 @@ myView.aBtn.on('click',()=>{console.log('button clicked')})
 ```
 <a name="MuView+parseBindings"></a>
 
-### muView.parseBindings()
+### muView.parseBindings(bindings)
+Checks for special case of '*' right now. In the future, there might be more.
+'*' creates a new essentially derived property on the 'model' passed in.
+Naming said property according to the 'name' key, based of some property
+of the model 'prop' which should be an array. Essentially flattening a sequence
+of model properties to an array: [key1,key2] comes out ['foo','bar'] of a
+model {key1: 'foo', key2: 'bar', key3: 'baz'} this array is added to the bindings
+['foo','bar'] and if [key1,key2] is changed then the binding is called again with
+the resulting mapped array, see rowCollectionView in muTable for use. Called internally.
+
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bindings | <code>Object</code> | list of bindings defaults to this._bindings |
+
