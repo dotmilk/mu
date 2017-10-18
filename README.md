@@ -5,7 +5,7 @@
 <dd><p>Abstract class for wrapping more complex constructs.</p>
 </dd>
 <dt><a href="#MuView">MuView</a> ⇐ <code>MuEvent</code></dt>
-<dd><p>Main class for for a &#39;view&#39;</p>
+<dd><p>Main class for for a &#39;view&#39;, examples in example folder</p>
 </dd>
 </dl>
 
@@ -56,7 +56,7 @@ Stub function, extending class must implement
 <a name="MuView"></a>
 
 ## MuView ⇐ <code>MuEvent</code>
-Main class for for a 'view'
+Main class for for a 'view', examples in example folder
 
 **Kind**: global class  
 **Extends**: <code>MuEvent</code>  
@@ -65,6 +65,7 @@ Main class for for a 'view'
     * [new MuView(options)](#new_MuView_new)
     * [.references(references)](#MuView+references)
     * [.parseBindings(bindings)](#MuView+parseBindings)
+    * [.bindings(bindings)](#MuView+bindings)
 
 <a name="new_MuView_new"></a>
 
@@ -79,6 +80,18 @@ Main class for for a 'view'
 | options.events | <code>Object</code> | An object with 'event-type element > .foo' as keys and fn as value, to be bound to this.el |
 | options.autoRender | <code>Boolean</code> | Call render at end of constructor |
 
+**Example**  
+```js
+let myView = new MuView({bindings: {foo: {valid action schema}...},
+model: someModelWithFoo,
+events: {'click some selector that exists within this.el': someFn},
+references: {aDomRef: '.bar'}})
+
+someModelWithFoo.foo = 'bar'
+// result is action schema is called with new value of someModelWithFoo.foo
+// clicking on element inside view.el with 'some selector that exists within this.el'
+// calls someFn, someFn might use this.aDomRef to manipulate something
+```
 <a name="MuView+references"></a>
 
 ### muView.references(references)
@@ -109,5 +122,20 @@ the resulting mapped array, see rowCollectionView in muTable for use. Called int
 
 | Param | Type | Description |
 | --- | --- | --- |
-| bindings | <code>Object</code> | list of bindings defaults to this._bindings |
+| bindings | <code>Object</code> | List of bindings defaults to this._bindings |
 
+<a name="MuView+bindings"></a>
+
+### muView.bindings(bindings)
+Method for binding changes in the model to actions
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bindings | <code>Object</code> | List of model props to bind to actions |
+
+**Example**  
+```js
+let myView =
+```
