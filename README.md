@@ -13,7 +13,8 @@
 
 <dl>
 <dt><a href="#muView">muView()</a></dt>
-<dd><p>Factory function for <a href="#MuView">MuView</a></p>
+<dd><p>Factory function for <a href="#MuView">MuView</a>, uses currying to allow you to
+have default options, calling result with final options to produce instances.</p>
 </dd>
 </dl>
 
@@ -175,6 +176,13 @@ myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
 <a name="muView"></a>
 
 ## muView()
-Factory function for [MuView](#MuView)
+Factory function for [MuView](#MuView), uses currying to allow you to
+have default options, calling result with final options to produce instances.
 
 **Kind**: global function  
+**Example**  
+```js
+let personView = muView({template: '<div></div>'})
+let personOne = personView({model: personOneModel })
+let personTwo = personView({model: personTwoModel })
+```
