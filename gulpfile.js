@@ -49,6 +49,7 @@ gulp.task('docs', function () {
     const fs = require('fs-then-native')
     const jsdoc2md = require('jsdoc-to-markdown')
 
-    return jsdoc2md.render({ files: './src/**/*.js' })
+    return jsdoc2md.render({ files: './src/**/*.js',
+                             template: fs.readFileSync('README.hbs','utf8')})
         .then(output => fs.writeFile('./README.md', output))
 })

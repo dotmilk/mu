@@ -1,3 +1,10 @@
+# Mu
+
+A few frills anti-framework for use in electron, no thought or care has been given to any other
+environment.
+
+* * *
+
 ## Classes
 
 <dl>
@@ -437,3 +444,7 @@ let personView = muView({template: '<div></div>'})
 let personOne = personView({model: personOneModel })
 let personTwo = personView({model: personTwoModel })
 ```
+
+* * *
+
+&copy; 2016-2017 Seth Price
