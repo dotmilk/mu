@@ -269,6 +269,9 @@ class MuView extends MuEvent {
      * @param {Object} options.viewOptions - Merged before view is instantiated per item
      * @param {Function} options.lookup - If present is called with value of item, what it returns
      * is used in place of item for view per item
+     * @param {String} options.target - IF supplied must be selector of some node in parent
+     * @example
+     * myView.addCollection({view: someView, collection someCollection, target: 'div.foo'})
      */
     addCollection({collection, view, target, viewOptions, lookup}) {
         let vc
@@ -292,7 +295,10 @@ class MuView extends MuEvent {
 
         this.registerSubview(vc)
     }
-
+    /**
+     * Registers a subview that knows where to insert itself into this view
+     * @param {MuWrapperView} view - A wrapped view of some kind
+     */
     registerSubview(view) {
         this.subViews = this.subViews || []
         this.subViews.push(view)
@@ -300,8 +306,10 @@ class MuView extends MuEvent {
         if (!view.parent) { view.parent = this}
         return view
     }
-
-    renderSubviews(v) {
+    /**
+     * Attempts to call render on all subviews
+     */
+    renderSubviews() {
         if (this.subViews && this.subViews.length) {
 
             this.subViews.forEach((sv)=>{
@@ -312,26 +320,23 @@ class MuView extends MuEvent {
             })
         }
     }
-
+    /**
+     * Attempts to remove first all subviews and then self from the dom
+     */
     remove(){
         if (this.subViews && this.subViews.length) {
             this.subViews.forEach((sv)=>{
                 sv.remove()
             })
-
-            this.subViews = []
-        }
-
-        if (this.model && this.model.on) {
-            console.log(this.model)
-            this.model.clearListeners()
         }
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
         }
     }
-
-    render(v){
+    /**
+     * Slaps events and model bindings onto this.el and then renders subviews
+     */
+    render(){
         this.events()
         this.bindings()
         this.renderSubviews()

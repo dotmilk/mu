@@ -768,7 +768,7 @@ class MuView extends MuEvent {
         if (!view.parent) { view.parent = this}
         return view
     }
-    renderSubviews(v) {
+    renderSubviews() {
         if (this.subViews && this.subViews.length) {
             this.subViews.forEach((sv)=>{
                 if (sv.init) {
@@ -783,17 +783,12 @@ class MuView extends MuEvent {
             this.subViews.forEach((sv)=>{
                 sv.remove()
             })
-            this.subViews = []
-        }
-        if (this.model && this.model.on) {
-            console.log(this.model)
-            this.model.clearListeners()
         }
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
         }
     }
-    render(v){
+    render(){
         this.events()
         this.bindings()
         this.renderSubviews()

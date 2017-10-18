@@ -1,7 +1,7 @@
 # Mu
 
 A few frills anti-framework for use in electron, no thought or care has been given to any other
-environment.
+environment or use case.
 
 * * *
 
@@ -203,6 +203,10 @@ Main class for for a 'view', examples in example folder
     * [.bindings(bindings)](#MuView+bindings)
     * [.events()](#MuView+events)
     * [.addCollection(options)](#MuView+addCollection)
+    * [.registerSubview(view)](#MuView+registerSubview)
+    * [.renderSubviews()](#MuView+renderSubviews)
+    * [.remove()](#MuView+remove)
+    * [.render()](#MuView+render)
     * [.on(event, fn)](#MuEvent+on)
     * [.removeListener(event, fn)](#MuEvent+removeListener)
     * [.clearListeners()](#MuEvent+clearListeners)
@@ -323,7 +327,41 @@ Adds a collection as a subview of this view, wrapping it in either a
 | options.view | [<code>MuView</code>](#MuView) \| [<code>MuWrapperView</code>](#MuWrapperView) | The result of calling [muView](#muView) curried function is called by [MuCollectionView](#MuCollectionView) or [MuPaginatedCollectionView](#MuPaginatedCollectionView) per item in collection |
 | options.viewOptions | <code>Object</code> | Merged before view is instantiated per item |
 | options.lookup | <code>function</code> | If present is called with value of item, what it returns is used in place of item for view per item |
+| options.target | <code>String</code> | IF supplied must be selector of some node in parent |
 
+**Example**  
+```js
+myView.addCollection({view: someView, collection someCollection, target: 'div.foo'})
+```
+<a name="MuView+registerSubview"></a>
+
+### muView.registerSubview(view)
+Registers a subview that knows where to insert itself into this view
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| view | [<code>MuWrapperView</code>](#MuWrapperView) | A wrapped view of some kind |
+
+<a name="MuView+renderSubviews"></a>
+
+### muView.renderSubviews()
+Attempts to call render on all subviews
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+<a name="MuView+remove"></a>
+
+### muView.remove()
+Attempts to remove first all subviews and then self from the dom
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+<a name="MuView+render"></a>
+
+### muView.render()
+Slaps events and model bindings onto this.el and then renders subviews
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
 <a name="MuEvent+on"></a>
 
 ### muView.on(event, fn)
