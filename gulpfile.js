@@ -12,7 +12,6 @@ gulp.task('script', function() {
                      'util/*.js',
                      'app/*.js',
                      'core/muView.js',
-                     //'core/*.js',
                      'widgets/*.js']))
         .pipe(concat('mu.js'))
         .pipe(strip())

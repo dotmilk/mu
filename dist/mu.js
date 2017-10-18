@@ -748,14 +748,16 @@ class MuView extends MuEvent {
                 collection: collection,
                 el: this.rootWrapped.find(target).elements[0],
                 view: view,
-                lookup: lookup
+                lookup: lookup,
+                viewOptions: viewOptions
             })
         } else {
             vc = new MuCollectionView({
                 collection: collection,
                 el: this.rootWrapped.find(target).elements[0],
                 view: view,
-                lookup: lookup
+                lookup: lookup,
+                viewOptions: viewOptions
             })
         }
         this.registerSubview(vc)
@@ -1417,7 +1419,6 @@ class MuCollectionView extends MuWrapperView{
             }
         })
     }
-    render(){}
     remove(){
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
@@ -1444,10 +1445,6 @@ class MuPaginatedCollectionView extends MuCollectionView{
         }
         this.collection.on('newPage',handler)
         this.collection.on('restructure',handler)
-    }
-    render(){}
-    remove(){
-        super.remove()
     }
 }
 function arrayClone(a) {

@@ -22,8 +22,8 @@
 
 <dl>
 <dt><a href="#muView">muView()</a></dt>
-<dd><p>Factory function for <a href="#MuView">MuView</a>, uses currying to allow you to
-have default options, calling result with final options to produce instances.</p>
+<dd><p>Factory function for <a href="#MuView">MuView</a>, uses currying to allow default options,
+calling result with final options to produce instances.</p>
 </dd>
 </dl>
 
@@ -53,7 +53,6 @@ Stub function, extending class may implement
 Stub function, extending class may implement
 
 **Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
-**Overrides**: [<code>render</code>](#MuWrapperView+render)  
 <a name="MuWrapperView+remove"></a>
 
 ### muCollectionView.remove()
@@ -87,14 +86,12 @@ Stub function, extending class may implement
 Stub function, extending class may implement
 
 **Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
-**Overrides**: [<code>render</code>](#MuWrapperView+render)  
 <a name="MuWrapperView+remove"></a>
 
 ### muPaginatedCollectionView.remove()
 Stub function, extending class must implement
 
 **Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
-**Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ [<code>MuEvent</code>](#MuEvent)
@@ -198,7 +195,7 @@ Main class for for a 'view', examples in example folder
     * [.parseBindings(bindings)](#MuView+parseBindings)
     * [.bindings(bindings)](#MuView+bindings)
     * [.events()](#MuView+events)
-    * [.addCollection(options)](#MuView+addCollection)
+    * [.addCollection(options, collection, view)](#MuView+addCollection)
     * [.on(event, fn)](#MuEvent+on)
     * [.removeListener(event, fn)](#MuEvent+removeListener)
     * [.clearListeners()](#MuEvent+clearListeners)
@@ -305,7 +302,7 @@ myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
 ```
 <a name="MuView+addCollection"></a>
 
-### muView.addCollection(options)
+### muView.addCollection(options, collection, view)
 Adds a collection as a subview of this view, wrapping it in either a
 [MuCollectionView](#MuCollectionView) or if the collection is paginated a
 [MuPaginatedCollectionView](#MuPaginatedCollectionView)
@@ -315,6 +312,8 @@ Adds a collection as a subview of this view, wrapping it in either a
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Set of options for the collection |
+| collection | <code>Collection</code> | An object conforming to collection contract |
+| view | [<code>MuView</code>](#MuView) \| <code>MuViewWrapper</code> | The result of calling [muView](#muView) |
 
 <a name="MuEvent+on"></a>
 
@@ -426,8 +425,8 @@ Emit event
 <a name="muView"></a>
 
 ## muView()
-Factory function for [MuView](#MuView), uses currying to allow you to
-have default options, calling result with final options to produce instances.
+Factory function for [MuView](#MuView), uses currying to allow default options,
+calling result with final options to produce instances.
 
 **Kind**: global function  
 **Example**  

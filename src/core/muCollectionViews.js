@@ -40,7 +40,6 @@ class MuCollectionView extends MuWrapperView{
         })
     }
 
-    render(){}
     remove(){
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
@@ -55,7 +54,6 @@ class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)
         console.log('right view')
-
         this.lookup = opts.lookup
     }
     init(){
@@ -73,9 +71,5 @@ class MuPaginatedCollectionView extends MuCollectionView{
         }
         this.collection.on('newPage',handler)
         this.collection.on('restructure',handler)
-    }
-    render(){}
-    remove(){
-        super.remove()
     }
 }

@@ -262,6 +262,8 @@ class MuView extends MuEvent {
      * {@link MuCollectionView} or if the collection is paginated a
      * {@link MuPaginatedCollectionView}
      * @param {Object} options - Set of options for the collection
+     * @param {Collection} collection - An object conforming to collection contract
+     * @param {(MuView | MuViewWrapper)} view - The result of calling {@link muView}
      */
     addCollection({collection, view, target, viewOptions, lookup}) {
         let vc
@@ -270,14 +272,16 @@ class MuView extends MuEvent {
                 collection: collection,
                 el: this.rootWrapped.find(target).elements[0],
                 view: view,
-                lookup: lookup
+                lookup: lookup,
+                viewOptions: viewOptions
             })
         } else {
             vc = new MuCollectionView({
                 collection: collection,
                 el: this.rootWrapped.find(target).elements[0],
                 view: view,
-                lookup: lookup
+                lookup: lookup,
+                viewOptions: viewOptions
             })
         }
 
@@ -332,8 +336,8 @@ class MuView extends MuEvent {
 
 
 /**
- * Factory function for {@link MuView}, uses currying to allow you to
- * have default options, calling result with final options to produce instances.
+ * Factory function for {@link MuView}, uses currying to allow default options,
+ * calling result with final options to produce instances.
  * @example
  * let personView = muView({template: '<div></div>'})
  * let personOne = personView({model: personOneModel })
