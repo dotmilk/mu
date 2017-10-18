@@ -1,12 +1,12 @@
 <a name="MuWrapperView"></a>
 
-## MuWrapperView
-Class for wrapping more complex constructs.
-Abstract.
+## MuWrapperView ⇐ <code>MuEvent</code>
+Class for wrapping more complex constructs. Abstract.
 
 **Kind**: global class  
+**Extends**: <code>MuEvent</code>  
 
-* [MuWrapperView](#MuWrapperView)
+* [MuWrapperView](#MuWrapperView) ⇐ <code>MuEvent</code>
     * [new MuWrapperView(options, el, parent)](#new_MuWrapperView_new)
     * [.init()](#MuWrapperView+init)
     * [.render()](#MuWrapperView+render)

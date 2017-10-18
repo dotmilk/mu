@@ -2,6 +2,8 @@ let gulp = require('gulp')
 let concat = require('gulp-concat')
 let less = require('gulp-less')
 let path = require('path')
+let strip = require('gulp-strip-comments')
+let removeEmptyLines = require('gulp-remove-empty-lines')
 
 gulp.task('script', function() {
     return gulp.src(['./src/dom/*.js',
@@ -10,6 +12,8 @@ gulp.task('script', function() {
                      './src/core/*.js',
                      './src/widgets/*.js'])
         .pipe(concat('mu.js'))
+        .pipe(strip())
+        .pipe(removeEmptyLines())
         .pipe(gulp.dest('./dist/'))
         .pipe(gulp.dest('./example/'))
         .pipe(gulp.dest('../conflux/gui/js'))
@@ -43,6 +47,6 @@ gulp.task('docs', function () {
     const fs = require('fs-then-native')
     const jsdoc2md = require('jsdoc-to-markdown')
 
-    return jsdoc2md.render({ files: './src/core/*.js' })
-        .then(output => fs.writeFile('./src/core/README.md', output))
+    return jsdoc2md.render({ files: './src/**/*.js' })
+        .then(output => fs.writeFile('./README.md', output))
 })

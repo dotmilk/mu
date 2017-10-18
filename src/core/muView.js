@@ -1,7 +1,7 @@
-/** Class for wrapping more complex constructs.
- * Abstract.
+/** Class for wrapping more complex constructs. Abstract.
+ * @extends MuEvent
  */
-class MuWrapperView {
+class MuWrapperView extends MuEvent{
     /**
      * Should only be called by super in extending class
      * @param {Object} options - References to parent and root el

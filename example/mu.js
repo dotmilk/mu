@@ -6,7 +6,6 @@ function muCss(style,id) {
     sheet.innerHTML = style
     document.body.appendChild(sheet)
 }
-
 function muDom(s,c) {
     if (!window.muDomInjected) {
         muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
@@ -16,7 +15,6 @@ function muDom(s,c) {
         return document.createRange().createContextualFragment(`<template>${t}</template>`)
             .children[0].content.children[0]
     }
-
     let proto = {
         html(newHtml){
             this.elements.forEach(element => {
@@ -34,7 +32,6 @@ function muDom(s,c) {
             if (this.count == 1) {
                 return this.elements[0].value
             }
-
             return this.elements.map((element)=>{
                 return element.value
             })
@@ -134,7 +131,6 @@ function muDom(s,c) {
             return this.each((e)=>{
                 e.append(node)
             })
-
         },
         prepend(node){
             if (typeof node === 'string') {
@@ -143,7 +139,6 @@ function muDom(s,c) {
             return this.each((e)=>{
                 e.prepend(node.cloneNode(true))
             })
-
         },
         remove(){
             return this.each((e)=>{
@@ -159,7 +154,6 @@ function muDom(s,c) {
             return this
         }
     }
-
     function md(context) {
         Object.assign(this,proto)
         this.context = context
@@ -167,27 +161,22 @@ function muDom(s,c) {
         this.count = 0
         this.isMudom = true
     }
-
     if (s.isMudom) {
         return s
     }
-
     if (typeof s === 'string') {
         if (s[ 0 ] === "<" &&
 	    s[ s.length - 1 ] === ">" &&
 	    s.length >= 3) {
             s = toDomNode(s)
         }
-
     }
-
     if (Array.isArray(s)){
         let m = new md(c)
         m.elements = s
         m.count = s.length
         return m
     }
-
     if (s.nodeType && !c){
         let out = new md(s)
         out.elements.push(s)
@@ -201,9 +190,7 @@ function muDom(s,c) {
         console.log(s,c)
         throw 'WTF are you trying to do'
     }
-
 }
-
 let parser = new DOMParser()
 class MuTagen {
     constructor(fullPrefix,parent) {
@@ -217,34 +204,22 @@ class MuTagen {
         this.innerText
         return this
     }
-
     tag(name,prefix) {
-        /*
-          If there is already a tag in 'this' make a new instance and pass it intended tag
-         */
         if (this.elem) {
             let childPrefix
             if (this.fullPrefix.length) {
                 childPrefix = [].concat(this.fullPrefix)
                 childPrefix.push(prefix)
             } else if (prefix) {
-                //console.log('no current prefix, creating new one',prefix)
                 childPrefix = [prefix]
             }
-
-            //console.log(this.fullPrefix,childPrefix)
-
             let child = new MuTagen(childPrefix,this).tag(name)
             this.children.push(child)
             return child
-
         }
-
         if (prefix) {
-            //console.log('ddd')
             this.fullPrefix.push(prefix)
         }
-        //this.fullPrefix = prefix
         this.elem = {
             open: `<${name}`,
             afterOpen: '>',
@@ -252,35 +227,28 @@ class MuTagen {
         }
         return this
     }
-
     attribute(name,prop = name) {
         if (!(name in this.attributes)) {
-            // todo maybe filter out undefined things
             this.attributes.push([name,prop])
         }
         return this
     }
-
     class(prop = 'class') {
         return this.attribute('class',prop)
     }
-
     id(prop = 'id') {
         return this.attributes('id',prop)
     }
-
     text(prop = 'text') {
         this.innerText = prop
         return this
     }
-
     close() {
         if (this.parent) {
             return this.parent
         }
         return this
     }
-
     closeAll() {
         let parent = this.parent
         while (parent.parent) {
@@ -288,11 +256,9 @@ class MuTagen {
         }
         return parent
     }
-
     compileAttributes() {
         let out = ''
         for (let attr of this.attributes) {
-            //console.log(attr)
             out += ` ${attr[0]}="`
             out += '${'
             if (this.fullPrefix.length) {
@@ -300,27 +266,21 @@ class MuTagen {
             } else {
                 out += `opts.${attr[1]}`
             }
-
             out += '}"'
         }
         return out
     }
-
     compile(down) {
         let childrenString
         let attributes = ''
-
         if (this.parent && !down) {
             return this.parent.compile()
         }
-
         let childTmp = this.children.map((child)=>{
             child.compile(true)
             return child.compiledString
         })
-
         attributes = this.compileAttributes()
-        //console.log('attr',attributes)
         childrenString = childTmp.join('')
         if (this.innerText) {
             this.compiledString = this.elem.open +
@@ -334,44 +294,31 @@ class MuTagen {
                 attributes + this.elem.afterOpen +
                 childrenString + this.elem.close
         }
-
         this.template = new Function('opts',`return \`${this.compiledString}\``)
         return this
     }
-
     render(opts) {
         if (!this.template) { throw 'No template compiled'}
-        //console.log(parser.parseFromString(this.template(opts), 'text/html'))
-        // return parser.parseFromString(this.template(opts), 'text/html')
-        //     .querySelector('body')
-        //     .firstChild
-        // allows generation of th and other tags that normally vanish out of the fragment
         return document.createRange()
             .createContextualFragment(`<template>${this.template(opts)}</template>`)
             .children[0].content.children[0]
     }
-
 }
-
 class MuEvent {
     constructor(){
         this._events = {}
     }
-
     on(event, fn) {
         this._events[event] = this._events[event] || []
         this._events[event].push(fn)
     }
-
     removeListener(event, fn) {
         if (! (event in this._events)) {return}
         this._events[event].splice(this._events[event].indexOf(fn),1)
     }
-
     clearListeners() {
         this._events = []
     }
-
     emit(event) {
         if (! (event in this._events)) {return}
         for (let listener of this._events[event]) {
@@ -379,7 +326,6 @@ class MuEvent {
         }
     }
 }
-
 let muMultiInherit = (baseClass, ...mixins) => {
     class base extends baseClass {
         constructor (...args) {
@@ -389,7 +335,7 @@ let muMultiInherit = (baseClass, ...mixins) => {
             });
         }
     }
-    let copyProps = (target, source) => {  // this function copies all properties and symbols, filtering out some special ones
+    let copyProps = (target, source) => {  
         Object.getOwnPropertyNames(source)
             .concat(Object.getOwnPropertySymbols(source))
             .forEach((prop) => {
@@ -397,13 +343,12 @@ let muMultiInherit = (baseClass, ...mixins) => {
                     Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop));
             })
     }
-    mixins.forEach((mixin) => { // outside contructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
+    mixins.forEach((mixin) => { 
         copyProps(base.prototype, mixin.prototype);
         copyProps(base, mixin);
     });
     return base;
 }
-
 class MuNodeManager {
     constructor(){
         this.nodes = {}
@@ -415,7 +360,6 @@ class MuNodeManager {
         } else {
             this.nodes[name] = node
         }
-
         return node
     }
     addAndRemove(name,selector,context=document){
@@ -435,7 +379,6 @@ class MuNodeManager {
         }
     }
 }
-
 class MuPaginator {
     constructor({pageSize, data}) {
         if (!Array.isArray(data)) {
@@ -445,7 +388,6 @@ class MuPaginator {
         this.pageSize = pageSize
         this.currentPage = 1
     }
-
     * paginator(start) {
         let newIndex
         let doIt
@@ -465,7 +407,6 @@ class MuPaginator {
             }
         }
     }
-
     getPage(pageNumber = this.currentPage) {
         this.currentPage = pageNumber
         let page = []
@@ -483,32 +424,26 @@ class MuPaginator {
         }
         return page
     }
-
     maxPage() {
         return Math.ceil(this.data.length/this.pageSize)
     }
-
     isLastPage() {
         return !(this.maxPage() > this.currentPage)
     }
-
     lastPage() {
         this.currentPage = Math.ceil(this.data.length/this.pageSize)
         return this.getPage()
     }
-
     firstPage() {
         this.currentPage = 1
         return this.getPage()
     }
-
     nextPage() {
         if (!this.isLastPage()) {
             this.currentPage++
         }
         return this.getPage()
     }
-
     previousPage() {
         this.currentPage--
         if (this.currentPage < 1) {
@@ -516,31 +451,24 @@ class MuPaginator {
         }
         return this.getPage()
     }
-
 }
-
 class MuManager extends MuEvent {
     constructor(opts = {}) {
         super()
     }
-
     add(name,opts = {}) {
         if (opts['classDef'] && typeof opts['classDef'] === 'function') {
             let fn = opts['classDef']
-            // clear classDef so rest of opts can be passed to fn
             delete opts.classDef
             this[name] = new fn(opts)
         } else {
             this[name] = opts
         }
     }
-
     get(name){
         return this[name]
     }
-
 }
-
 window.MuPage = class MuPage {
     constructor(opts) {
         this.pageName = opts.pageName
@@ -550,7 +478,6 @@ window.MuPage = class MuPage {
     onShow() {}
     onHide() {}
 }
-
 class MuPageManager extends MuEvent {
     constructor(opts = {}) {
         super()
@@ -560,10 +487,8 @@ class MuPageManager extends MuEvent {
         this.context = opts['context'] || document
         this.rootName = opts['root'] || 'mu-root'
         this.root = muDom(`[${this.rootName}]`).elements[0]
-
         this.pageAttributeName = opts['pageAttribute'] || 'mu-page'
         this.pageAttribute = `[${this['pageAttributeName']}]`
-
         this.controllerAttributeName = opts['controllerAttribute'] || 'mu-controller'
         muDom(this.pageAttribute, this.context).each((el)=>{
             let name = el.getAttribute(this.pageAttributeName)
@@ -578,7 +503,6 @@ class MuPageManager extends MuEvent {
             this.pages[name] = {}
             this.pages[name]['dom'] = el.cloneNode(true)
             el.parentNode.removeChild(el)
-
             if (controllerName && window[controllerName]) {
                 PageClass = window[controllerName]
             } else {
@@ -595,23 +519,18 @@ class MuPageManager extends MuEvent {
             this.on(`show:${name}`,this.getController(name).onShow)
         })
     }
-
     getAttributes(name) {
         let ref = this.getDOM(name)
         if (!ref) { return ref }
         return Array.from(ref.attributes)
     }
-
     getDOM(name) {
         return this.pages[name]['dom']
     }
-
     getController(name){
         return this.pages[name]['controller']
     }
-
     load(name) {
-
         let old
         let newEl = this.getDOM(name)
         if (this.currentPage) {
@@ -623,7 +542,6 @@ class MuPageManager extends MuEvent {
         } else {
             this.root.appendChild(newEl)
         }
-
         this.currentPage = name
         if (! this.loaded.includes(name)) {
             this.emit(`load:${name}`,this.getDOM(this.currentPage))
@@ -631,18 +549,13 @@ class MuPageManager extends MuEvent {
         } else {
             this.emit(`show:${name}`,this.getDOM(this.currentPage))
         }
-
-
     }
-
 }
-
 class MuState {
     constructor(){}
     onEnter(){}
     onExit(){}
 }
-
 class MuStateMachine extends MuEvent {
     constructor(opts){
         super()
@@ -660,22 +573,18 @@ class MuStateMachine extends MuEvent {
         this.initialState = this.initialState || 'unitialized'
         this.transition(this.initialState)
     }
-
     transition(name) {
         let old = this.currentState
         let args = Array.prototype.slice.call(arguments, 1)
         if (old) {
             this.handle('onExit')
         }
-
         if (name && this.states[name]) {
             this.currentState = name
             this.handle('onEnter')
             this.emit('transition',old,name)
         }
-
     }
-
     handle(name) {
         let state = this.states[this.currentState]
         if (typeof state[name] === 'string') {
@@ -685,9 +594,7 @@ class MuStateMachine extends MuEvent {
         let fn = state[name] || state['*'] || this.catchAll
         Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
     }
-
 }
-
 class MuCollection extends MuEvent {
     constructor(opts = {}){
         super()
@@ -703,19 +610,15 @@ class MuCollection extends MuEvent {
                 return a - b
             }
         }
-
         if (opts.contents) {
             this.add(opts.contents)
         }
     }
-
     addBulk(items) {
         this.add(items,true)
     }
-
     add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
-
         if (this.flat) {
             if (bulk) {
                 this.collection = this.collection.concat(items)
@@ -727,7 +630,6 @@ class MuCollection extends MuEvent {
             }
         } else {
             for (let item of items) {
-                //item = new this.model(item)
                 let old = this.collection[item[this.idField] || item]
                 this.collection[item[this.idField] || item] = item
                 if (old) {
@@ -739,18 +641,14 @@ class MuCollection extends MuEvent {
                 }
             }
         }
-
         if (bulk) {
             this.emit('bulk')
         }
     }
-
     sort(comparator = this.comparator, reverse = false) {
         reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
-
         this.emit('sort',this.idx.slice())
     }
-
     remove(idxs) {
         if (this.flat) {throw 'No remove on flat collection, use reset'}
         if (!Array.isArray(idxs)) { idxs = [idxs] }
@@ -766,11 +664,9 @@ class MuCollection extends MuEvent {
             }
         }
     }
-
     get(id) {
         return this.collection[id]
     }
-
     each(fn) {
         if (this.flat) {
             this.collection.forEach(fn)
@@ -779,9 +675,7 @@ class MuCollection extends MuEvent {
                 fn.call(this,this.collection[idx],idx)
             }
         }
-
     }
-
     reset(items = [],bulk){
         if (this.flat) {
             this.collection = []
@@ -795,7 +689,6 @@ class MuCollection extends MuEvent {
         }
     }
 }
-
 class MuPagedCollection extends MuCollection {
     constructor(opts){
         super(opts)
@@ -806,12 +699,10 @@ class MuPagedCollection extends MuCollection {
         this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
                                           data: this.flat ? this.collection : this.idx})
     }
-
     changeHandler(event,data){
         this.paginator.paginate = undefined
         this.emit('restructure',this.currentPage())
     }
-
     setPageSize(n) {
         if (n != this.paginator.pageSize) {
             this.paginator.pageSize = n
@@ -819,56 +710,45 @@ class MuPagedCollection extends MuCollection {
             this.changeHandler()
         }
     }
-
     getPageSize() {
         return this.paginator.pageSize
     }
-
     maxPage() {
         return this.paginator.maxPage()
     }
-
     currentPageNumber() {
         return this.paginator.currentPage
     }
-
     currentPage() {
         let page = this.paginator.getPage()
         return page
     }
-
     getPage(n){
         let page = this.paginator.getPage(n)
         this.emit('newPage',page)
         return page
     }
-
     nextPage(){
         let page = this.paginator.nextPage()
         this.emit('newPage',page)
         return page
     }
-
     previousPage(){
         let page = this.paginator.previousPage()
         this.emit('newPage',page)
         return page
     }
-
     lastPage(){
         let page = this.paginator.lastPage()
         this.emit('newPage',page)
         return page
     }
-
     firstPage(){
         let page = this.paginator.firstPage()
         this.emit('newPage',page)
         return page
     }
-
 }
-
 class MuCollectionView {
     constructor({collection,el,view,parent,viewOptions={}}) {
         this.collection = collection
@@ -881,7 +761,6 @@ class MuCollectionView {
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
     }
-
     init(){
         console.log(this)
         this.collection.on('add',(idx)=>{
@@ -890,7 +769,6 @@ class MuCollectionView {
             let view = this.view(Object.assign({
                 model: item.on ? item : new this.modelWrapper(item)},
                                                this.viewOptions))
-
             this.collectionViews[idx] = view
             this.el.appendChild(view.el)
         })
@@ -907,7 +785,6 @@ class MuCollectionView {
             }
         })
     }
-
     render(){}
     remove(){
         if (this.el.parentNode) {
@@ -915,12 +792,10 @@ class MuCollectionView {
         }
     }
 }
-
 class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)
         console.log('right view')
-
         this.lookup = opts.lookup
     }
     init(){
@@ -934,7 +809,6 @@ class MuPaginatedCollectionView extends MuCollectionView{
                 this.collectionViews[idx] = view
                 this.el.appendChild(view.el)
             })
-
         }
         this.collection.on('newPage',handler)
         this.collection.on('restructure',handler)
@@ -942,43 +816,33 @@ class MuPaginatedCollectionView extends MuCollectionView{
     render(){}
     remove(){}
 }
-
 function arrayClone(a) {
     return [].concat[a]
 }
-
 function objectClone(o) {
     return JSON.parse(JSON.stringify(o))
 }
-
 function MuObservableObject(opts) {
-
     let internalProps = Object.keys(MuEvent.__proto__)
-
     internalProps.push('_eventsCount')
     internalProps.push('_state')
     let namedProps = opts.props || []
     let derivedProps = opts.derived || {}
     let derivedKeys = Object.keys(derivedProps)
-
     class State extends MuEvent {
         constructor(data) {
             super()
             this._state = {}
-            // later filter this for known props if opt set for such
             Object.assign(this._state,data)
             this.on('change',function (changed){
                 this.emit(`change:${changed.key}`,changed.value,changed.old)
             })
-
             let out =  new Proxy(this,{
                 set: (target, key, value) => {
-
                     if (internalProps.includes(key)) {
                         this[key] = value
                         return true
                     }
-                    // lets avoid sending out an old value by reference
                     let old
                     if (Array.isArray(this._state[key])) {
                         old = arrayClone(this._state[key])
@@ -995,21 +859,12 @@ function MuObservableObject(opts) {
                     if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
                         return this[key]
                     }
-
-                    // else if (derivedKeys.includes(key)) {
-                    //     return derivedProps[key]
-                    // }
                     return this._state[key] ? this._state[key] : data[key]
                 }
             })
-            // we must refer to 'out' since we need the traps
-            // set up before we can register the derived listeners
             for (let d in derivedProps) {
-
                 let fn = derivedProps[d]['fn']
-
                 if (fn && typeof fn === 'function') {
-
                     for (let k of derivedProps[d]['deps']) {
                         out.on(`change:${k}`,(newV,oldV)=>{
                             if (newV !== oldV) {
@@ -1018,93 +873,58 @@ function MuObservableObject(opts) {
                         })
                     }
                     out[d] = fn.apply(out._state)
-
                 }
             }
             return out
         }
-
         static props() {
             return Reflect.ownKeys(namedProps) || {}
         }
-
         static derivedProps() {
             return Reflect.ownKeys(derivedProps) || {}
         }
-
         static dump(instance) {
             return instance._state
         }
-
         toJSON() {
             return this._state
         }
-
     }
-
     return State
 }
-
-/** Class for wrapping more complex constructs.
- * Abstract.
- */
-class MuWrapperView {
-    /**
-     * Should only be called by super in extending class
-     * @param {Object} options - References to parent and root el
-     * @param el - The node this view manipulates
-     * @param parent - The view rendering this
-     */
+class MuWrapperView extends MuEvent{
     constructor({el,parent}) {
         this.el = el
         this.rootWrapped = muDom(el)
         this.parent = parent
     }
-    /** Stub function, extending class may implement*/
     init(){}
-    /** Stub function, extending class may implement*/
     render(){}
-    /** Stub function, extending class must implement*/
     remove(){ throw 'Remove not overridden'}
 }
-
 class MuView extends MuEvent {
         constructor(opts = {}){
             super()
             this.isMuView = true
             this.template = opts.template
-
             if (opts.model) {
                 this.model = opts.model
             }
-
-            // if fn must return dom node or html string
             if (typeof this.template === 'function') {
                 this.template = this.template.call(this)
             }
-
             this._references = opts.references || {}
             this._bindings = opts.bindings || {}
             this._events = opts.events || {}
             this._boundEvents = this._boundEvents || {}
             this.rootWrapped = muDom(this.template)
             this.root = this.el = this.rootWrapped.elements[0]
-
             this.references()
             this.parseBindings()
             if (opts.autoRender) {
                 this.render()
             }
-            //this.render()
         }
-
-        /*
-          Handle:
-          A selector
-          muDom instance
-          Bare element
-          {foo: '#foo'} = this.foo element reference to avoid later dom queries
-        */
         references(refs = this._references){
             if (refs) {
                 for (let ref in refs) {
@@ -1112,11 +932,8 @@ class MuView extends MuEvent {
                 }
             }
         }
-
         parseBindings(bindings = this._bindings) {
-
             for (let binding in bindings) {
-
                 if (binding == '*') {
                     let toBind = bindings[binding]
                     let onChange = (newVal)=>{
@@ -1126,24 +943,17 @@ class MuView extends MuEvent {
                     }
                     toBind.model.on(`change:${toBind.prop}`,onChange)
                     let toModel = []
-                    // for (let prop of toBind.model[toBind.prop]) {
-                    //     toModel.push(this.model[prop])
-                    // }
-
                     onChange(toBind.model[toBind.prop])
-                    bindings[toBind.name] = toBind.action // toModel
+                    bindings[toBind.name] = toBind.action 
                 }
             }
-
         }
-
         bindings(bindings = this._bindings){
             if (this.model && bindings) {
-                let render = true // fix this later
+                let render = true 
                 for (let binding in bindings) {
                     if (binding == '*') { continue }
                     let element = bindings[binding].selector == '' ? muDom(this.root) : muDom(bindings[binding].selector,this.root)
-
                     let options = bindings[binding]
                     let changeHandler
                     if (!options.type) { options.type = 'text'}
@@ -1186,7 +996,6 @@ class MuView extends MuEvent {
                                 element.append(options.template(item))
                             }
                         }
-
                         if (this.model.on) {
                             this.model.on(`change:${binding}`,changeHandler)
                         }
@@ -1196,16 +1005,11 @@ class MuView extends MuEvent {
                 }
             }
         }
-
         events(events = this._events){
             for (let eventsAndSelectors in events || {}) {
-                // snag the first item as the event name
                 let selector = eventsAndSelectors.split(' ')
                 let event = selector.shift()
-
-                // reassamble selector string
                 selector = selector.join(' ')
-                // add to our eventName: [[selector strings],...] hash
                 let existingEvents = this._boundEvents[event]
                 if (existingEvents) {
                     existingEvents.push({selector: selector,
@@ -1216,14 +1020,10 @@ class MuView extends MuEvent {
                 }
             }
             for (let eventName in this._boundEvents) {
-                // reverse the array so that more generic / non selectors are processed last
                 this._boundEvents[eventName].reverse()
-                // bind generic handlers for each event given
                 this.rootWrapped.on(eventName,(e)=>{
                     if (e.target && this._boundEvents[e.type]) {
                         for (let handler of this._boundEvents[e.type]) {
-                            // '' is root: we have exhausted all other selectors
-                            // event meant for root
                             if (handler.selector === '') {
                                 handler.handle.call(this,e)
                                 break
@@ -1236,7 +1036,6 @@ class MuView extends MuEvent {
                 })
             }
         }
-
         addCollection({collection, view, target, viewOptions, lookup}) {
             let vc
             if (collection.paginated) {
@@ -1254,21 +1053,16 @@ class MuView extends MuEvent {
                     lookup: lookup
                 })
             }
-
             this.registerSubview(vc)
         }
-
         registerSubview(view) {
             this.subViews = this.subViews || []
             this.subViews.push(view)
-
             if (!view.parent) { view.parent = this}
             return view
         }
-
         renderSubviews(v) {
             if (this.subViews && this.subViews.length) {
-
                 this.subViews.forEach((sv)=>{
                     if (sv.init) {
                         sv.init()
@@ -1277,16 +1071,13 @@ class MuView extends MuEvent {
                 })
             }
         }
-
         remove(){
             if (this.subViews && this.subViews.length) {
                 this.subViews.forEach((sv)=>{
                     sv.remove
                 })
-
                 this.subViews = []
             }
-
             if (this.model && this.model.on) {
                 console.log(this.model)
                 this.model.clearListeners()
@@ -1295,38 +1086,29 @@ class MuView extends MuEvent {
                 this.el.parentNode.removeChild(this.el)
             }
         }
-
         render(v){
             this.events()
             this.bindings()
             this.renderSubviews()
         }
-
     }
-
-
-// Use to create view factory
 function muView(op) {
     return (o)=>{
         Object.assign(o,op)
         return new MuView(o)
     }
 }
-
 class MuSelects {
     constructor(config) {
-
         this.ensureOverlay()
         let overlay = this.overlay
         this.cfg = Object.assign(this.defaults(),config)
-
         let multiple = this.cfg.multiple
         let changeEventSring = this.changeEventString()
         let logicEventString = this.logicEventString()
         let changeHandler = this.changeHandler()
         let logicHandler = this.logicHandler()
         let buttonClickString = `click button.${this.cfg.buttonClass}`
-
         let reselect = function () {
             this.model.selected.forEach((e)=>{
                 this.options.find(`[muvalue="${e}"]`).setAttribute('selected','true')
@@ -1355,23 +1137,13 @@ class MuSelects {
                     let logicSelected = this.logic.find(selectLogic).map((ele)=>{
                         return ele.getAttribute('muvalue')
                     })
-
                     if (JSON.stringify(this.model.selected) !== JSON.stringify(allSelected) ||
                         JSON.stringify(this.model.selectedLogic) !== JSON.stringify(logicSelected)) {
                         this.model.selected = allSelected
                         this.model.selectedLogic = logicSelected
-                        /*
-                          twiddle the number between 1 and -1
-                          to fire change event on confirmation spo
-                          anything listening outside can just bind to
-                          this.model.on('change:confirmed') to get
-                          selection confirmation
-                        */
                         this.model.confirmed = -this.model.confirmed
                     }
-
                     this.modal.toggle('mu-modal-show')
-
                     overlay.toggle('mu-select-show')
                     if (this.model.selected.length) {
                         this.mainButton.addClass('hasSelection')
@@ -1394,11 +1166,9 @@ class MuSelects {
                         reselect.call(this)
                         return
                     }
-
                     let newShown = this.model.options.filter((val)=>{
                         return val.toLowerCase().indexOf(search.toLowerCase()) > -1
                     })
-
                     if (newShown.length) {
                         this.options.find('.muNoResults').hide()
                         this.model.shownOptions = newShown
@@ -1427,7 +1197,6 @@ class MuSelects {
                     template: this.optionTemplate()
                 }
             }
-
         })
         let modelConstructor =  MuObservableObject({
             props: ['options','selected','shownOption','confirm','multiple']
@@ -1439,7 +1208,6 @@ class MuSelects {
                                            multiple: this.cfg.multiple,
                                            logicOptions: this.cfg.logicOptions || [],
                                            selectedLogic: this.cfg.selectedLogic || []})
-
         this.view = viewConstructor({
             model: this.model
         })
@@ -1455,7 +1223,6 @@ class MuSelects {
         if (this.cfg.noButton) {
             quickRef.find(`button.${this.cfg.buttonClass}`).remove()
         }
-
         this.view.options.find('[muvalue]').each((ele)=>{
             if (this.model.selected.includes(ele.getAttribute('muvalue'))){
                 ele.setAttribute('selected','true')
@@ -1464,7 +1231,6 @@ class MuSelects {
             }
         })
     }
-
     logicHandler(){
         return function(e) {
             let selected = e.target.getAttribute('selected')
@@ -1475,7 +1241,6 @@ class MuSelects {
             }
         }
     }
-
     changeHandler(){
         return function (e) {
             let selected = e.target.getAttribute('selected')
@@ -1485,24 +1250,19 @@ class MuSelects {
                 } else {
                     e.target.setAttribute('selected','true')
                 }
-                //this.model.selected = [...this.model.selected,e.target.getAttribute('muvalue')]
             } else {
                 if (selected && selected == 'true') {
                     e.target.setAttribute('selected','false')
-                    //this.model.selected = []
                     return
                 } else {
                     this.options.find('[selected="true"]').each((ele)=>{
                         ele.setAttribute('selected','false')
                     })
                     e.target.setAttribute('selected','true')
-                    //this.model.selected = [e.target.getAttribute('muvalue')]
                 }
-
             }
         }
     }
-
     registerExternalControl(control) {
         this.externalControl = this.view.externalControl = muDom(control)
         this.externalControl.on('click',()=>{
@@ -1512,12 +1272,10 @@ class MuSelects {
             control.addClass('hasSelection')
         }
     }
-
     showModal(){
         this.modal.toggle('mu-modal-show')
         this.overlay.toggle('mu-select-show')
     }
-
     optionTemplate(){
         return (item)=>{
             return new MuTagen()
@@ -1530,7 +1288,6 @@ class MuSelects {
                          decoration: 'muCircle'})
         }
     }
-
     viewTemplate(){
         return ()=>{
             return new MuTagen().tag('section').class('wrapperClass')
@@ -1549,7 +1306,6 @@ class MuSelects {
                 .render(this.cfg)
         }
     }
-
     defaults(){
         return {
             search: false,
@@ -1572,7 +1328,6 @@ class MuSelects {
             logicClass: 'muLogic'
         }
     }
-
     ensureOverlay(){
         let overlay = muDom('.mu-select-overlay')
         if (overlay.count == 0) {
@@ -1586,30 +1341,23 @@ class MuSelects {
         }
         this.overlay = overlay
     }
-
     changeEventString(){
         return `click .${this.cfg.mainClass} .muOption, .${this.cfg.mainClass} .muOption *`
     }
-
     logicEventString(){
         return `click .${this.cfg.logicClass} .muOption, .${this.cfg.logicClass} .muOption *`
     }
 }
-
 class MuTable extends MuEvent{
     constructor(config){
         super()
         this.cfg = config = Object.assign(this.defaults(),config)
-
         let tableMetaModelConstructor = MuObservableObject({
             props: ['headers']
         })
-
         this.tableMetaModel = new tableMetaModelConstructor({
             headerKeys: config.headerKeys,
-
         })
-
         let viewConstructor = muView({
             template: this.tableTemplate(),
             references: {
@@ -1644,7 +1392,6 @@ class MuTable extends MuEvent{
                     this.pageCount.value(config.rows.currentPageNumber())
                 },
                 [`click .${this.cfg.tableCfg.tableClass} tbody td`]: (e)=>{
-
                     console.log(e.target.parentNode)
                     if (this.cfg.markSelection) {
                         muDom(e.target.parentNode).addClass('selected')
@@ -1664,22 +1411,16 @@ class MuTable extends MuEvent{
                     if (e.target.value < 1) {
                         e.target.value = 1
                     }
-
                     if (config.rows.getPageSize != e.target.value) {
                         config.rows.setPageSize(e.target.value)
                         config.rows.currentPage()
                         console.log(this.pageCount.value())
                         this.pageCount.value(config.rows.currentPageNumber())
-
-
                     }
                 }
-
             }
         })
-
         this.view = viewConstructor({model: this.tableMetaModel})
-
         let rowCollectionView = muView({
             autoRender: true,
             template: this.rowTemplate(),
@@ -1695,14 +1436,12 @@ class MuTable extends MuEvent{
                 }
             }
         })
-
         this.view.addCollection({
             view: rowCollectionView,
             collection: config.rows,
             target: 'tbody',
             lookup: config.lookup,
         })
-
         muDom(`.${this.cfg.tableCfg.controlClass} input.pagerInput`,this.view.el)
             .value(config.rows.currentPageNumber())
         muDom(`.${this.cfg.tableCfg.controlClass} input.perPageInput`,this.view.el)
@@ -1714,7 +1453,6 @@ class MuTable extends MuEvent{
         this.el = this.view.el
         this.paginatorControls = this.view.subViews[0].collection
     }
-
     tableTemplate(){
         return ()=>{
             return new MuTagen()
@@ -1723,7 +1461,6 @@ class MuTable extends MuEvent{
                 .tag('button').class('firstClass').text('firstText').close()
                 .tag('button').class('previousClass').text('previousText').close()
                 .tag('input').class('pagerInputClass').attribute('type','inputType').close()
-                //.tag('div').class('pagerInfoClass').close()
                 .tag('button').class('nextClass').text('nextText').close()
                 .tag('button').class('lastClass').text('lastText').close()
                 .tag('input').class('perPageClass').attribute('type','inputType').close()
@@ -1735,10 +1472,8 @@ class MuTable extends MuEvent{
                 .tag('tbody')
                 .compile()
                 .render(this.cfg.tableCfg)
-
         }
     }
-
     headerTemplate(){
         return (header)=>{
             return new MuTagen()
@@ -1747,7 +1482,6 @@ class MuTable extends MuEvent{
                 .render({text: this.cfg.headers[header]})
         }
     }
-
     rowTemplate(){
         let field = this.cfg.rows.idField
         return function (foo){
@@ -1757,7 +1491,6 @@ class MuTable extends MuEvent{
                 .render({id: this.model[field]})
         }
     }
-
     cellTemplate(){
         return (content)=>{
             return new MuTagen()
@@ -1766,7 +1499,6 @@ class MuTable extends MuEvent{
                 .render({text: content})
         }
     }
-
     defaults(){
         return {
             tableCfg: {
