@@ -262,8 +262,13 @@ class MuView extends MuEvent {
      * {@link MuCollectionView} or if the collection is paginated a
      * {@link MuPaginatedCollectionView}
      * @param {Object} options - Set of options for the collection
-     * @param {Collection} collection - An object conforming to collection contract
-     * @param {(MuView | MuWrapperView)} view - The result of calling {@link muView}
+     * @param {Collection} options.collection - An object conforming to collection contract
+     * @param {(MuView | MuWrapperView)} options.view - The result of calling {@link muView}
+     * curried function is called by {@link MuCollectionView} or {@link MuPaginatedCollectionView}
+     * per item in collection
+     * @param {Object} options.viewOptions - Merged before view is instantiated per item
+     * @param {Function} options.lookup - If present is called with value of item, what it returns
+     * is used in place of item for view per item
      */
     addCollection({collection, view, target, viewOptions, lookup}) {
         let vc

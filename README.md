@@ -195,7 +195,7 @@ Main class for for a 'view', examples in example folder
     * [.parseBindings(bindings)](#MuView+parseBindings)
     * [.bindings(bindings)](#MuView+bindings)
     * [.events()](#MuView+events)
-    * [.addCollection(options, collection, view)](#MuView+addCollection)
+    * [.addCollection(options)](#MuView+addCollection)
     * [.on(event, fn)](#MuEvent+on)
     * [.removeListener(event, fn)](#MuEvent+removeListener)
     * [.clearListeners()](#MuEvent+clearListeners)
@@ -302,7 +302,7 @@ myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
 ```
 <a name="MuView+addCollection"></a>
 
-### muView.addCollection(options, collection, view)
+### muView.addCollection(options)
 Adds a collection as a subview of this view, wrapping it in either a
 [MuCollectionView](#MuCollectionView) or if the collection is paginated a
 [MuPaginatedCollectionView](#MuPaginatedCollectionView)
@@ -312,8 +312,10 @@ Adds a collection as a subview of this view, wrapping it in either a
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Set of options for the collection |
-| collection | <code>Collection</code> | An object conforming to collection contract |
-| view | [<code>MuView</code>](#MuView) \| [<code>MuWrapperView</code>](#MuWrapperView) | The result of calling [muView](#muView) |
+| options.collection | <code>Collection</code> | An object conforming to collection contract |
+| options.view | [<code>MuView</code>](#MuView) \| [<code>MuWrapperView</code>](#MuWrapperView) | The result of calling [muView](#muView) curried function is called by [MuCollectionView](#MuCollectionView) or [MuPaginatedCollectionView](#MuPaginatedCollectionView) per item in collection |
+| options.viewOptions | <code>Object</code> | Merged before view is instantiated per item |
+| options.lookup | <code>function</code> | If present is called with value of item, what it returns is used in place of item for view per item |
 
 <a name="MuEvent+on"></a>
 
