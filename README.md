@@ -9,6 +9,14 @@
 </dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#muView">muView()</a></dt>
+<dd><p>Factory function for <a href="#MuView">MuView</a></p>
+</dd>
+</dl>
+
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ <code>MuEvent</code>
@@ -66,6 +74,7 @@ Main class for for a 'view', examples in example folder
     * [.references(references)](#MuView+references)
     * [.parseBindings(bindings)](#MuView+parseBindings)
     * [.bindings(bindings)](#MuView+bindings)
+    * [.events()](#MuView+events)
 
 <a name="new_MuView_new"></a>
 
@@ -147,5 +156,25 @@ myView.bindings({foo: {selector: 'div.foo',
                        type: html,
                        template: someFnTakingNewValueReturningHtml }})
 modelPassedIntoMyViewConstructor.foo = 'bar'
-// result is myView.el's div.foo is replaces with template function output
+// result is myView.el's div.foo is replaced with template function output
 ```
+<a name="MuView+events"></a>
+
+### muView.events()
+Uses event delegation to respond to events on view.el and its children.
+keys should follow pattern 'eventName selector'. Called internally.
+a string with no selector, only eventName refers to view.el itself
+and not some child.
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+**Example**  
+```js
+myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
+//clicking on button.foo logs the click to console
+```
+<a name="muView"></a>
+
+## muView()
+Factory function for [MuView](#MuView)
+
+**Kind**: global function  
