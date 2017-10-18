@@ -1,5 +1,5 @@
-/** Class for wrapping more complex constructs. Abstract.
- * @extends MuEvent
+/** Abstract class for wrapping more complex constructs.
+    @extends MuEvent
  */
 class MuWrapperView extends MuEvent{
     /**
@@ -9,6 +9,7 @@ class MuWrapperView extends MuEvent{
      * @param parent - The view rendering this
      */
     constructor({el,parent}) {
+        super()
         this.el = el
         this.rootWrapped = muDom(el)
         this.parent = parent
@@ -21,7 +22,13 @@ class MuWrapperView extends MuEvent{
     remove(){ throw 'Remove not overridden'}
 }
 
+/** Main class for for a 'view
+ * @extends MuEvent
+ */
 class MuView extends MuEvent {
+        /**
+
+         */
         constructor(opts = {}){
             super()
             this.isMuView = true

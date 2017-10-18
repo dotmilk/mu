@@ -894,6 +894,7 @@ function MuObservableObject(opts) {
 }
 class MuWrapperView extends MuEvent{
     constructor({el,parent}) {
+        super()
         this.el = el
         this.rootWrapped = muDom(el)
         this.parent = parent

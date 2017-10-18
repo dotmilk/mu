@@ -1,7 +1,18 @@
+## Classes
+
+<dl>
+<dt><a href="#MuWrapperView">MuWrapperView</a> ⇐ <code>MuEvent</code></dt>
+<dd><p>Abstract class for wrapping more complex constructs.</p>
+</dd>
+<dt><a href="#MuView">MuView</a> ⇐ <code>MuEvent</code></dt>
+<dd><p>Main class for for a &#39;view</p>
+</dd>
+</dl>
+
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ <code>MuEvent</code>
-Class for wrapping more complex constructs. Abstract.
+Abstract class for wrapping more complex constructs.
 
 **Kind**: global class  
 **Extends**: <code>MuEvent</code>  
@@ -42,3 +53,10 @@ Stub function, extending class may implement
 Stub function, extending class must implement
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+<a name="MuView"></a>
+
+## MuView ⇐ <code>MuEvent</code>
+Main class for for a 'view
+
+**Kind**: global class  
+**Extends**: <code>MuEvent</code>  
