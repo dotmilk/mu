@@ -89,6 +89,6 @@ Main class for for a 'view'
 
 **Example**  
 ```js
-myView.references({aBtn: 'button #myButton'});
-myView.aBtn.on('click',()=>{console.log('button clicked')});
+myView.references({aBtn: 'button #myButton'})
+myView.aBtn.on('click',()=>{console.log('button clicked')})
 ```
