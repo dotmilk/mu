@@ -82,10 +82,11 @@ Main class for for a 'view', examples in example folder
 
 **Example**  
 ```js
+// overly simple non working example
 let myView = new MuView({bindings: {foo: {valid action schema}...},
-model: someModelWithFoo,
-events: {'click some selector that exists within this.el': someFn},
-references: {aDomRef: '.bar'}})
+                         model: someModelWithFoo,
+                         events: {'click some selector that exists within this.el': someFn},
+                         references: {aDomRef: '.bar'}})
 
 someModelWithFoo.foo = 'bar'
 // result is action schema is called with new value of someModelWithFoo.foo
@@ -127,7 +128,12 @@ the resulting mapped array, see rowCollectionView in muTable for use. Called int
 <a name="MuView+bindings"></a>
 
 ### muView.bindings(bindings)
-Method for binding changes in the model to actions
+Method for binding changes in the model to actions, called internally.
+Currently accepts text, html, attribute and value actions on
+changed model prop. As well as special case '\*' which is mentioned
+in documentation for [MuView.parseBindings](MuView.parseBindings).
+
+Empty string selector is view.el. Selector is required to exist.
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
 
@@ -137,5 +143,9 @@ Method for binding changes in the model to actions
 
 **Example**  
 ```js
-let myView =
+myView.bindings({foo: {selector: 'div.foo',
+                       type: html,
+                       template: someFnTakingNewValueReturningHtml }})
+modelPassedIntoMyViewConstructor.foo = 'bar'
+// result is myView.el's div.foo is replaces with template function output
 ```
