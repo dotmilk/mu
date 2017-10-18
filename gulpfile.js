@@ -38,3 +38,11 @@ gulp.task('watch', function() {
         console.log('Change detected')
     })
 })
+
+gulp.task('docs', function () {
+    const fs = require('fs-then-native')
+    const jsdoc2md = require('jsdoc-to-markdown')
+
+    return jsdoc2md.render({ files: './src/core/*.js' })
+        .then(output => fs.writeFile('./src/core/README.md', output))
+})

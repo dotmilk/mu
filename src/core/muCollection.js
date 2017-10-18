@@ -1,7 +1,8 @@
 class MuCollection extends MuEvent {
     constructor(opts = {}){
         super()
-        this.collection = {}
+        this.flat = opts.flat
+        this.collection = this.flat ? [] : {}
         this.idx = []
         this.idField = opts.idField || 'id'
         this.model = opts.model || MuObservableObject({})
@@ -24,16 +25,28 @@ class MuCollection extends MuEvent {
 
     add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
-        for (let item of items) {
-            //item = new this.model(item)
-            let old = this.collection[item[this.idField] || item]
-            this.collection[item[this.idField] || item] = item
-            if (old) {
-                this.emit('replace',item[this.idField])
-                this.collection[item[this.idField] || item] = item
+
+        if (this.flat) {
+            if (bulk) {
+                this.collection = this.collection.concat(items)
             } else {
-                this.idx.push(item[this.idField] || item)
-                if (!bulk) {this.emit('add',item[this.idField] || item)}
+                for (let item of items) {
+                    this.collection.push(item)
+                    this.emit('add', item)
+                }
+            }
+        } else {
+            for (let item of items) {
+                //item = new this.model(item)
+                let old = this.collection[item[this.idField] || item]
+                this.collection[item[this.idField] || item] = item
+                if (old) {
+                    this.emit('replace',item[this.idField])
+                    this.collection[item[this.idField] || item] = item
+                } else {
+                    this.idx.push(item[this.idField] || item)
+                    if (!bulk) {this.emit('add',item[this.idField] || item)}
+                }
             }
         }
 
@@ -49,6 +62,7 @@ class MuCollection extends MuEvent {
     }
 
     remove(idxs) {
+        if (this.flat) {throw 'No remove on flat collection, use reset'}
         if (!Array.isArray(idxs)) { idxs = [idxs] }
         for (let toRemove of idxs) {
             let ref = this.collection[toRemove]
@@ -68,16 +82,27 @@ class MuCollection extends MuEvent {
     }
 
     each(fn) {
-        for (let idx of this.idx) {
-            fn.call(this,this.collection[idx],idx)
+        if (this.flat) {
+            this.collection.forEach(fn)
+        } else {
+            for (let idx of this.idx) {
+                fn.call(this,this.collection[idx],idx)
+            }
         }
+
     }
 
     reset(items = [],bulk){
-        let old = Object.assign({},this.collection)
-        this.remove(this.idx.slice())
-        this.emit('reset',old)
-        this.add(items,bulk)
+        if (this.flat) {
+            this.collection = []
+            this.emit('reset')
+            this.add(items,bulk)
+        } else {
+            let old = Object.assign({},this.collection)
+            this.remove(this.idx.slice())
+            this.emit('reset',old)
+            this.add(items,bulk)
+        }
     }
 }
 
@@ -88,7 +113,8 @@ class MuPagedCollection extends MuCollection {
         this.on('add',this.changeHandler)
         this.on('bulk',this.changeHandler)
         this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16, data: this.idx})
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
+                                          data: this.flat ? this.collection : this.idx})
     }
 
     changeHandler(event,data){

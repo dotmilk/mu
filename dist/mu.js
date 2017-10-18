@@ -691,7 +691,8 @@ class MuStateMachine extends MuEvent {
 class MuCollection extends MuEvent {
     constructor(opts = {}){
         super()
-        this.collection = {}
+        this.flat = opts.flat
+        this.collection = this.flat ? [] : {}
         this.idx = []
         this.idField = opts.idField || 'id'
         this.model = opts.model || MuObservableObject({})
@@ -714,16 +715,28 @@ class MuCollection extends MuEvent {
 
     add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
-        for (let item of items) {
-            //item = new this.model(item)
-            let old = this.collection[item[this.idField] || item]
-            this.collection[item[this.idField] || item] = item
-            if (old) {
-                this.emit('replace',item[this.idField])
-                this.collection[item[this.idField] || item] = item
+
+        if (this.flat) {
+            if (bulk) {
+                this.collection = this.collection.concat(items)
             } else {
-                this.idx.push(item[this.idField] || item)
-                if (!bulk) {this.emit('add',item[this.idField] || item)}
+                for (let item of items) {
+                    this.collection.push(item)
+                    this.emit('add', item)
+                }
+            }
+        } else {
+            for (let item of items) {
+                //item = new this.model(item)
+                let old = this.collection[item[this.idField] || item]
+                this.collection[item[this.idField] || item] = item
+                if (old) {
+                    this.emit('replace',item[this.idField])
+                    this.collection[item[this.idField] || item] = item
+                } else {
+                    this.idx.push(item[this.idField] || item)
+                    if (!bulk) {this.emit('add',item[this.idField] || item)}
+                }
             }
         }
 
@@ -739,6 +752,7 @@ class MuCollection extends MuEvent {
     }
 
     remove(idxs) {
+        if (this.flat) {throw 'No remove on flat collection, use reset'}
         if (!Array.isArray(idxs)) { idxs = [idxs] }
         for (let toRemove of idxs) {
             let ref = this.collection[toRemove]
@@ -758,16 +772,27 @@ class MuCollection extends MuEvent {
     }
 
     each(fn) {
-        for (let idx of this.idx) {
-            fn.call(this,this.collection[idx],idx)
+        if (this.flat) {
+            this.collection.forEach(fn)
+        } else {
+            for (let idx of this.idx) {
+                fn.call(this,this.collection[idx],idx)
+            }
         }
+
     }
 
     reset(items = [],bulk){
-        let old = Object.assign({},this.collection)
-        this.remove(this.idx.slice())
-        this.emit('reset',old)
-        this.add(items,bulk)
+        if (this.flat) {
+            this.collection = []
+            this.emit('reset')
+            this.add(items,bulk)
+        } else {
+            let old = Object.assign({},this.collection)
+            this.remove(this.idx.slice())
+            this.emit('reset',old)
+            this.add(items,bulk)
+        }
     }
 }
 
@@ -778,7 +803,8 @@ class MuPagedCollection extends MuCollection {
         this.on('add',this.changeHandler)
         this.on('bulk',this.changeHandler)
         this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16, data: this.idx})
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
+                                          data: this.flat ? this.collection : this.idx})
     }
 
     changeHandler(event,data){
@@ -841,6 +867,80 @@ class MuPagedCollection extends MuCollection {
         return page
     }
 
+}
+
+class MuCollectionView {
+    constructor({collection,el,view,parent,viewOptions={}}) {
+        this.collection = collection
+        this.el = el
+        this.rootWrapped = muDom(el)
+        this.view = view
+        this.parent = parent
+        this.viewOptions = viewOptions
+        Object.assign(this.viewOptions,{autoRender: true})
+        this.collectionViews = {}
+        this.modelWrapper = MuObservableObject({})
+    }
+
+    init(){
+        console.log(this)
+        this.collection.on('add',(idx)=>{
+            console.log('added')
+            let item = this.collection.get(idx)
+            let view = this.view(Object.assign({
+                model: item.on ? item : new this.modelWrapper(item)},
+                                               this.viewOptions))
+
+            this.collectionViews[idx] = view
+            this.el.appendChild(view.el)
+        })
+        this.collection.on('remove',(idx)=>{
+            let view = this.collectionViews[idx]
+            view.remove()
+            delete this.collectionViews[idx]
+        })
+        this.collection.on('sort',(newOrder)=>{
+            for (let viewIdx of newOrder ) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                this.el.appendChild(view.el)
+            }
+        })
+    }
+
+    render(){}
+    remove(){
+        if (this.el.parentNode) {
+            this.el.parentNode.removeChild(this.el)
+        }
+    }
+}
+
+class MuPaginatedCollectionView extends MuCollectionView{
+    constructor(opts){
+        super(opts)
+        console.log('right view')
+
+        this.lookup = opts.lookup
+    }
+    init(){
+        let handler = (page)=>{
+            this.rootWrapped.clear()
+            page.forEach((idx)=>{
+                let item = this.collection.get(idx)
+                item = this.lookup ? this.lookup(item) : item
+                let view = this.view(Object.assign({model: item.on ? item :
+                                                    new this.modelWrapper(item)},this.viewOptions))
+                this.collectionViews[idx] = view
+                this.el.appendChild(view.el)
+            })
+
+        }
+        this.collection.on('newPage',handler)
+        this.collection.on('restructure',handler)
+    }
+    render(){}
+    remove(){}
 }
 
 function arrayClone(a) {
@@ -945,105 +1045,27 @@ function MuObservableObject(opts) {
     return State
 }
 
-class MuCollectionView {
-    constructor({collection,el,view,parent,viewOptions={}}) {
-        this.collection = collection
+/** Class for wrapping more complex constructs.
+ * Abstract.
+ */
+class MuWrapperView {
+    /**
+     * Should only be called by super in extending class
+     * @param {Object} options - References to parent and root el
+     * @param el - The node this view manipulates
+     * @param parent - The view rendering this
+     */
+    constructor({el,parent}) {
         this.el = el
         this.rootWrapped = muDom(el)
-        this.view = view
         this.parent = parent
-        this.viewOptions = viewOptions
-        Object.assign(this.viewOptions,{autoRender: true})
-        this.collectionViews = {}
-        this.modelWrapper = MuObservableObject({})
     }
-
-    init(){
-        console.log(this)
-        this.collection.on('add',(idx)=>{
-            console.log('added')
-            let item = this.collection.get(idx)
-            let view = this.view(Object.assign({model: item.on ? item : new this.modelWrapper(item)},this.viewOptions))
-
-            this.collectionViews[idx] = view
-            this.el.appendChild(view.el)
-        })
-        this.collection.on('remove',(idx)=>{
-            let view = this.collectionViews[idx]
-            view.remove()
-            delete this.collectionViews[idx]
-        })
-        this.collection.on('sort',(newOrder)=>{
-            for (let viewIdx of newOrder ) {
-                let view = this.collectionViews[viewIdx]
-                view.remove()
-                this.el.appendChild(view.el)
-            }
-        })
-    }
-
-    render(){
-        //throw 'stop'
-        console.log('RENNNNNNNNNNNN')
-    }
-
-    remove(){
-        //console.log('clear')
-        this.collection.each((item,idx)=>{
-            let view = this.collectionViews[idx]
-            view.remove()
-            delete this.collectionViews[idx]
-        })
-        this.collection.clearListeners()
-        if (this.el.parentNode) {
-            this.el.parentNode.removeChild(this.el)
-        }
-    }
-}
-
-class MuPaginatedCollectionView extends MuCollectionView{
-    constructor(opts){
-        super(opts)
-        console.log('right view')
-
-        this.lookup = opts.lookup
-    }
-
-    init(){
-        let handler = (page)=>{
-            this.rootWrapped.clear()
-            page.forEach((idx)=>{
-                let item = this.collection.get(idx)
-
-                item = this.lookup ? this.lookup(item) : item
-
-                let view = this.view(Object.assign({model: item.on ? item :
-                                                    new this.modelWrapper(item)},this.viewOptions))
-                this.collectionViews[idx] = view
-                this.el.appendChild(view.el)
-            })
-
-        }
-        this.collection.on('newPage',handler)
-        this.collection.on('restructure',handler)
-    }
-
-    render(){}
-    remove(){}
-}
-
-class MuWrapperView {
-    constructor({el,view,parent,viewOptions}) {
-        this.el = el || parent.el
-        this.rootWrapped = muDom(el)
-        this.view = view
-        this.parent = parent
-        this.viewOptions = viewOptions
-    }
-
+    /** Stub function, extending class may implement*/
     init(){}
+    /** Stub function, extending class may implement*/
     render(){}
-    remove(){}
+    /** Stub function, extending class must implement*/
+    remove(){ throw 'Remove not overridden'}
 }
 
 class MuView extends MuEvent {
