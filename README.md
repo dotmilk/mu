@@ -1,6 +1,12 @@
 ## Classes
 
 <dl>
+<dt><a href="#MuCollectionView">MuCollectionView</a></dt>
+<dd><p>Generic view wrapper for a collection, implementing View contract</p>
+</dd>
+<dt><a href="#MuPaginatedCollectionView">MuPaginatedCollectionView</a> ⇐ <code><a href="#MuCollectionView">MuCollectionView</a></code></dt>
+<dd><p>View wrapper for a paginated collection</p>
+</dd>
 <dt><a href="#MuWrapperView">MuWrapperView</a> ⇐ <code>MuEvent</code></dt>
 <dd><p>Abstract class for wrapping more complex constructs.</p>
 </dd>
@@ -18,6 +24,19 @@ have default options, calling result with final options to produce instances.</p
 </dd>
 </dl>
 
+<a name="MuCollectionView"></a>
+
+## MuCollectionView
+Generic view wrapper for a collection, implementing View contract
+
+**Kind**: global class  
+<a name="MuPaginatedCollectionView"></a>
+
+## MuPaginatedCollectionView ⇐ [<code>MuCollectionView</code>](#MuCollectionView)
+View wrapper for a paginated collection
+
+**Kind**: global class  
+**Extends**: [<code>MuCollectionView</code>](#MuCollectionView)  
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ <code>MuEvent</code>
@@ -76,6 +95,7 @@ Main class for for a 'view', examples in example folder
     * [.parseBindings(bindings)](#MuView+parseBindings)
     * [.bindings(bindings)](#MuView+bindings)
     * [.events()](#MuView+events)
+    * [.addCollection(options)](#MuView+addCollection)
 
 <a name="new_MuView_new"></a>
 
@@ -163,9 +183,12 @@ modelPassedIntoMyViewConstructor.foo = 'bar'
 
 ### muView.events()
 Uses event delegation to respond to events on view.el and its children.
-keys should follow pattern 'eventName selector'. Called internally.
-a string with no selector, only eventName refers to view.el itself
-and not some child.
+keys should follow pattern 'eventName selector'. A string with no selector,
+only eventName refers to view.el itself and not some child.
+
+Place more generically selected things first:
+{'click': fn, 'click button': fn, 'click button.foo': fn}
+Called internally.
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
 **Example**  
@@ -173,6 +196,19 @@ and not some child.
 myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
 //clicking on button.foo logs the click to console
 ```
+<a name="MuView+addCollection"></a>
+
+### muView.addCollection(options)
+Adds a collection as a subview of this view, wrapping it in either a
+[MuCollectionView](#MuCollectionView) or if the collection is paginated a
+[MuPaginatedCollectionView](#MuPaginatedCollectionView)
+
+**Kind**: instance method of [<code>MuView</code>](#MuView)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Set of options for the collection |
+
 <a name="muView"></a>
 
 ## muView()
