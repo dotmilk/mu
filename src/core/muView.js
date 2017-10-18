@@ -71,7 +71,8 @@ class MuView extends MuEvent {
            Will handle a selector or muDom instance.
 
            @example
-           myView.references({aBtn: 'button #myButton'}); myView.aBtn.on('click',()=>{console.log('button clicked')});
+           myView.references({aBtn: 'button #myButton'});
+myView.aBtn.on('click',()=>{console.log('button clicked')});
         */
         references(refs = this._references){
             if (refs) {
