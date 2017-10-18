@@ -4,13 +4,16 @@ let less = require('gulp-less')
 let path = require('path')
 let strip = require('gulp-strip-comments')
 let removeEmptyLines = require('gulp-remove-empty-lines')
+let order = require('gulp-order')
 
 gulp.task('script', function() {
-    return gulp.src(['./src/dom/*.js',
-                     './src/util/*.js',
-                     './src/app/*.js',
-                     './src/core/*.js',
-                     './src/widgets/*.js'])
+    return gulp.src('./src/**/*.js')
+        .pipe(order(['dom/*.js',
+                     'util/*.js',
+                     'app/*.js',
+                     'core/muView.js',
+                     //'core/*.js',
+                     'widgets/*.js']))
         .pipe(concat('mu.js'))
         .pipe(strip())
         .pipe(removeEmptyLines())
@@ -36,7 +39,7 @@ gulp.task('css', function() {
 })
 
 gulp.task('watch', function() {
-    let watcher = gulp.watch('./src/**/*.js',['script','muDom'])
+    let watcher = gulp.watch('./src/**/*.js',['script','muDom','docs'])
     gulp.watch('./src/*.less',['css'])
     watcher.on('change',()=>{
         console.log('Change detected')

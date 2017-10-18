@@ -8,7 +8,7 @@ class MuTable extends MuEvent{
         })
 
         this.tableMetaModel = new tableMetaModelConstructor({
-            headerKeys: config.headerKeys,
+            headerKeys: config.headerKeys
 
         })
 
@@ -19,7 +19,7 @@ class MuTable extends MuEvent{
                 previous: `.${this.cfg.tableCfg.controlClass} button.previous`,
                 next: `.${this.cfg.tableCfg.controlClass} button.next`,
                 last: `.${this.cfg.tableCfg.controlClass} button.last`,
-                pageCount: `.${this.cfg.tableCfg.controlClass} input.pagerInput`,
+                pageCount: `.${this.cfg.tableCfg.controlClass} input.pagerInput`
             },
             bindings: {
                 headerKeys: {
@@ -102,7 +102,7 @@ class MuTable extends MuEvent{
             view: rowCollectionView,
             collection: config.rows,
             target: 'tbody',
-            lookup: config.lookup,
+            lookup: config.lookup
         })
 
         muDom(`.${this.cfg.tableCfg.controlClass} input.pagerInput`,this.view.el)

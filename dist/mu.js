@@ -595,303 +595,6 @@ class MuStateMachine extends MuEvent {
         Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
     }
 }
-class MuCollection extends MuEvent {
-    constructor(opts = {}){
-        super()
-        this.flat = opts.flat
-        this.collection = this.flat ? [] : {}
-        this.idx = []
-        this.idField = opts.idField || 'id'
-        this.model = opts.model || MuObservableObject({})
-        this.comparator = opts.comparator || function (a,b)  {
-            if (typeof a === 'string') {
-                return a < b ? -1 : 1 }
-            else {
-                return a - b
-            }
-        }
-        if (opts.contents) {
-            this.add(opts.contents)
-        }
-    }
-    addBulk(items) {
-        this.add(items,true)
-    }
-    add(items,bulk = false) {
-        if (!Array.isArray(items)) { items = [items] }
-        if (this.flat) {
-            if (bulk) {
-                this.collection = this.collection.concat(items)
-            } else {
-                for (let item of items) {
-                    this.collection.push(item)
-                    this.emit('add', item)
-                }
-            }
-        } else {
-            for (let item of items) {
-                let old = this.collection[item[this.idField] || item]
-                this.collection[item[this.idField] || item] = item
-                if (old) {
-                    this.emit('replace',item[this.idField])
-                    this.collection[item[this.idField] || item] = item
-                } else {
-                    this.idx.push(item[this.idField] || item)
-                    if (!bulk) {this.emit('add',item[this.idField] || item)}
-                }
-            }
-        }
-        if (bulk) {
-            this.emit('bulk')
-        }
-    }
-    sort(comparator = this.comparator, reverse = false) {
-        reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
-        this.emit('sort',this.idx.slice())
-    }
-    remove(idxs) {
-        if (this.flat) {throw 'No remove on flat collection, use reset'}
-        if (!Array.isArray(idxs)) { idxs = [idxs] }
-        for (let toRemove of idxs) {
-            let ref = this.collection[toRemove]
-            if (ref) {
-                delete this.collection[toRemove]
-                let idxLocation = this.idx.indexOf(toRemove)
-                if (idxLocation >= 0) {
-                    this.idx.splice(idxLocation,1)
-                }
-                this.emit('remove',toRemove,ref)
-            }
-        }
-    }
-    get(id) {
-        return this.collection[id]
-    }
-    each(fn) {
-        if (this.flat) {
-            this.collection.forEach(fn)
-        } else {
-            for (let idx of this.idx) {
-                fn.call(this,this.collection[idx],idx)
-            }
-        }
-    }
-    reset(items = [],bulk){
-        if (this.flat) {
-            this.collection = []
-            this.emit('reset')
-            this.add(items,bulk)
-        } else {
-            let old = Object.assign({},this.collection)
-            this.remove(this.idx.slice())
-            this.emit('reset',old)
-            this.add(items,bulk)
-        }
-    }
-}
-class MuPagedCollection extends MuCollection {
-    constructor(opts){
-        super(opts)
-        this.paginated = true
-        this.on('add',this.changeHandler)
-        this.on('bulk',this.changeHandler)
-        this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
-                                          data: this.flat ? this.collection : this.idx})
-    }
-    changeHandler(event,data){
-        this.paginator.paginate = undefined
-        this.emit('restructure',this.currentPage())
-    }
-    setPageSize(n) {
-        if (n != this.paginator.pageSize) {
-            this.paginator.pageSize = n
-            this.getPage(1)
-            this.changeHandler()
-        }
-    }
-    getPageSize() {
-        return this.paginator.pageSize
-    }
-    maxPage() {
-        return this.paginator.maxPage()
-    }
-    currentPageNumber() {
-        return this.paginator.currentPage
-    }
-    currentPage() {
-        let page = this.paginator.getPage()
-        return page
-    }
-    getPage(n){
-        let page = this.paginator.getPage(n)
-        this.emit('newPage',page)
-        return page
-    }
-    nextPage(){
-        let page = this.paginator.nextPage()
-        this.emit('newPage',page)
-        return page
-    }
-    previousPage(){
-        let page = this.paginator.previousPage()
-        this.emit('newPage',page)
-        return page
-    }
-    lastPage(){
-        let page = this.paginator.lastPage()
-        this.emit('newPage',page)
-        return page
-    }
-    firstPage(){
-        let page = this.paginator.firstPage()
-        this.emit('newPage',page)
-        return page
-    }
-}
-class MuCollectionView {
-    constructor({collection,el,view,parent,viewOptions={}}) {
-        this.collection = collection
-        this.el = el
-        this.rootWrapped = muDom(el)
-        this.view = view
-        this.parent = parent
-        this.viewOptions = viewOptions
-        Object.assign(this.viewOptions,{autoRender: true})
-        this.collectionViews = {}
-        this.modelWrapper = MuObservableObject({})
-    }
-    init(){
-        console.log(this)
-        this.collection.on('add',(idx)=>{
-            console.log('added')
-            let item = this.collection.get(idx)
-            let view = this.view(Object.assign({
-                model: item.on ? item : new this.modelWrapper(item)},
-                                               this.viewOptions))
-            this.collectionViews[idx] = view
-            this.el.appendChild(view.el)
-        })
-        this.collection.on('remove',(idx)=>{
-            let view = this.collectionViews[idx]
-            view.remove()
-            delete this.collectionViews[idx]
-        })
-        this.collection.on('sort',(newOrder)=>{
-            for (let viewIdx of newOrder ) {
-                let view = this.collectionViews[viewIdx]
-                view.remove()
-                this.el.appendChild(view.el)
-            }
-        })
-    }
-    render(){}
-    remove(){
-        if (this.el.parentNode) {
-            this.el.parentNode.removeChild(this.el)
-        }
-    }
-}
-class MuPaginatedCollectionView extends MuCollectionView{
-    constructor(opts){
-        super(opts)
-        console.log('right view')
-        this.lookup = opts.lookup
-    }
-    init(){
-        let handler = (page)=>{
-            this.rootWrapped.clear()
-            page.forEach((idx)=>{
-                let item = this.collection.get(idx)
-                item = this.lookup ? this.lookup(item) : item
-                let view = this.view(Object.assign({model: item.on ? item :
-                                                    new this.modelWrapper(item)},this.viewOptions))
-                this.collectionViews[idx] = view
-                this.el.appendChild(view.el)
-            })
-        }
-        this.collection.on('newPage',handler)
-        this.collection.on('restructure',handler)
-    }
-    render(){}
-    remove(){}
-}
-function arrayClone(a) {
-    return [].concat[a]
-}
-function objectClone(o) {
-    return JSON.parse(JSON.stringify(o))
-}
-function MuObservableObject(opts) {
-    let internalProps = Object.keys(MuEvent.__proto__)
-    internalProps.push('_eventsCount')
-    internalProps.push('_state')
-    let namedProps = opts.props || []
-    let derivedProps = opts.derived || {}
-    let derivedKeys = Object.keys(derivedProps)
-    class State extends MuEvent {
-        constructor(data) {
-            super()
-            this._state = {}
-            Object.assign(this._state,data)
-            this.on('change',function (changed){
-                this.emit(`change:${changed.key}`,changed.value,changed.old)
-            })
-            let out =  new Proxy(this,{
-                set: (target, key, value) => {
-                    if (internalProps.includes(key)) {
-                        this[key] = value
-                        return true
-                    }
-                    let old
-                    if (Array.isArray(this._state[key])) {
-                        old = arrayClone(this._state[key])
-                    } else if (typeof(this._state[key]) === 'object') {
-                        old = objectClone(this._state[key])
-                    } else {
-                        old = this._state[key]
-                    }
-                    this._state[key] = value
-                    this.emit('change',{key: key, value: value, old: old},target)
-                    return true
-                },
-                get: (target, key, value) => {
-                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
-                        return this[key]
-                    }
-                    return this._state[key] ? this._state[key] : data[key]
-                }
-            })
-            for (let d in derivedProps) {
-                let fn = derivedProps[d]['fn']
-                if (fn && typeof fn === 'function') {
-                    for (let k of derivedProps[d]['deps']) {
-                        out.on(`change:${k}`,(newV,oldV)=>{
-                            if (newV !== oldV) {
-                                out[d] = fn.apply(out._state)
-                            }
-                        })
-                    }
-                    out[d] = fn.apply(out._state)
-                }
-            }
-            return out
-        }
-        static props() {
-            return Reflect.ownKeys(namedProps) || {}
-        }
-        static derivedProps() {
-            return Reflect.ownKeys(derivedProps) || {}
-        }
-        static dump(instance) {
-            return instance._state
-        }
-        toJSON() {
-            return this._state
-        }
-    }
-    return State
-}
 class MuWrapperView extends MuEvent{
     constructor({el,parent}) {
         super()
@@ -954,7 +657,8 @@ class MuView extends MuEvent {
             let render = true 
             for (let binding in bindings) {
                 if (binding == '*') { continue }
-                let element = bindings[binding].selector == '' ? muDom(this.root) : muDom(bindings[binding].selector,this.root)
+                let element = bindings[binding].selector == '' ?
+                    muDom(this.root) : muDom(bindings[binding].selector,this.root)
                 let options = bindings[binding]
                 let changeHandler
                 if (!options.type) { options.type = 'text'}
@@ -1075,7 +779,7 @@ class MuView extends MuEvent {
     remove(){
         if (this.subViews && this.subViews.length) {
             this.subViews.forEach((sv)=>{
-                sv.remove
+                sv.remove()
             })
             this.subViews = []
         }
@@ -1357,7 +1061,7 @@ class MuTable extends MuEvent{
             props: ['headers']
         })
         this.tableMetaModel = new tableMetaModelConstructor({
-            headerKeys: config.headerKeys,
+            headerKeys: config.headerKeys
         })
         let viewConstructor = muView({
             template: this.tableTemplate(),
@@ -1366,7 +1070,7 @@ class MuTable extends MuEvent{
                 previous: `.${this.cfg.tableCfg.controlClass} button.previous`,
                 next: `.${this.cfg.tableCfg.controlClass} button.next`,
                 last: `.${this.cfg.tableCfg.controlClass} button.last`,
-                pageCount: `.${this.cfg.tableCfg.controlClass} input.pagerInput`,
+                pageCount: `.${this.cfg.tableCfg.controlClass} input.pagerInput`
             },
             bindings: {
                 headerKeys: {
@@ -1441,7 +1145,7 @@ class MuTable extends MuEvent{
             view: rowCollectionView,
             collection: config.rows,
             target: 'tbody',
-            lookup: config.lookup,
+            lookup: config.lookup
         })
         muDom(`.${this.cfg.tableCfg.controlClass} input.pagerInput`,this.view.el)
             .value(config.rows.currentPageNumber())
@@ -1523,4 +1227,300 @@ class MuTable extends MuEvent{
             }
         }
     }
+}
+class MuCollection extends MuEvent {
+    constructor(opts = {}){
+        super()
+        this.flat = opts.flat
+        this.collection = this.flat ? [] : {}
+        this.idx = []
+        this.idField = opts.idField || 'id'
+        this.model = opts.model || MuObservableObject({})
+        this.comparator = opts.comparator || function (a,b)  {
+            if (typeof a === 'string') {
+                return a < b ? -1 : 1 }
+            else {
+                return a - b
+            }
+        }
+        if (opts.contents) {
+            this.add(opts.contents)
+        }
+    }
+    addBulk(items) {
+        this.add(items,true)
+    }
+    add(items,bulk = false) {
+        if (!Array.isArray(items)) { items = [items] }
+        if (this.flat) {
+            if (bulk) {
+                this.collection = this.collection.concat(items)
+            } else {
+                for (let item of items) {
+                    this.collection.push(item)
+                    this.emit('add', item)
+                }
+            }
+        } else {
+            for (let item of items) {
+                let old = this.collection[item[this.idField] || item]
+                this.collection[item[this.idField] || item] = item
+                if (old) {
+                    this.emit('replace',item[this.idField])
+                    this.collection[item[this.idField] || item] = item
+                } else {
+                    this.idx.push(item[this.idField] || item)
+                    if (!bulk) {this.emit('add',item[this.idField] || item)}
+                }
+            }
+        }
+        if (bulk) {
+            this.emit('bulk')
+        }
+    }
+    sort(comparator = this.comparator, reverse = false) {
+        reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
+        this.emit('sort',this.idx.slice())
+    }
+    remove(idxs) {
+        if (this.flat) {throw 'No remove on flat collection, use reset'}
+        if (!Array.isArray(idxs)) { idxs = [idxs] }
+        for (let toRemove of idxs) {
+            let ref = this.collection[toRemove]
+            if (ref) {
+                delete this.collection[toRemove]
+                let idxLocation = this.idx.indexOf(toRemove)
+                if (idxLocation >= 0) {
+                    this.idx.splice(idxLocation,1)
+                }
+                this.emit('remove',toRemove,ref)
+            }
+        }
+    }
+    get(id) {
+        return this.collection[id]
+    }
+    each(fn) {
+        if (this.flat) {
+            this.collection.forEach(fn)
+        } else {
+            for (let idx of this.idx) {
+                fn.call(this,this.collection[idx],idx)
+            }
+        }
+    }
+    reset(items = [],bulk){
+        if (this.flat) {
+            this.collection = []
+            this.emit('reset')
+            this.add(items,bulk)
+        } else {
+            let old = Object.assign({},this.collection)
+            this.remove(this.idx.slice())
+            this.emit('reset',old)
+            this.add(items,bulk)
+        }
+    }
+}
+class MuPagedCollection extends MuCollection {
+    constructor(opts){
+        super(opts)
+        this.paginated = true
+        this.on('add',this.changeHandler)
+        this.on('bulk',this.changeHandler)
+        this.on('remove',this.changeHandler)
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
+                                          data: this.flat ? this.collection : this.idx})
+    }
+    changeHandler(event,data){
+        this.paginator.paginate = undefined
+        this.emit('restructure',this.currentPage())
+    }
+    setPageSize(n) {
+        if (n != this.paginator.pageSize) {
+            this.paginator.pageSize = n
+            this.getPage(1)
+            this.changeHandler()
+        }
+    }
+    getPageSize() {
+        return this.paginator.pageSize
+    }
+    maxPage() {
+        return this.paginator.maxPage()
+    }
+    currentPageNumber() {
+        return this.paginator.currentPage
+    }
+    currentPage() {
+        let page = this.paginator.getPage()
+        return page
+    }
+    getPage(n){
+        let page = this.paginator.getPage(n)
+        this.emit('newPage',page)
+        return page
+    }
+    nextPage(){
+        let page = this.paginator.nextPage()
+        this.emit('newPage',page)
+        return page
+    }
+    previousPage(){
+        let page = this.paginator.previousPage()
+        this.emit('newPage',page)
+        return page
+    }
+    lastPage(){
+        let page = this.paginator.lastPage()
+        this.emit('newPage',page)
+        return page
+    }
+    firstPage(){
+        let page = this.paginator.firstPage()
+        this.emit('newPage',page)
+        return page
+    }
+}
+class MuCollectionView extends MuWrapperView{
+    constructor({collection,el,view,parent,viewOptions={}}) {
+        super({el,parent})
+        this.collection = collection
+        this.rootWrapped = muDom(el)
+        this.view = view
+        this.viewOptions = viewOptions
+        Object.assign(this.viewOptions,{autoRender: true})
+        this.collectionViews = {}
+        this.modelWrapper = MuObservableObject({})
+    }
+    init(){
+        console.log(this)
+        this.collection.on('add',(idx)=>{
+            console.log('added')
+            let item = this.collection.get(idx)
+            let view = this.view(Object.assign({
+                model: item.on ? item : new this.modelWrapper(item)},
+                                               this.viewOptions))
+            this.collectionViews[idx] = view
+            this.el.appendChild(view.el)
+        })
+        this.collection.on('remove',(idx)=>{
+            let view = this.collectionViews[idx]
+            view.remove()
+            delete this.collectionViews[idx]
+        })
+        this.collection.on('sort',(newOrder)=>{
+            for (let viewIdx of newOrder ) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                this.el.appendChild(view.el)
+            }
+        })
+    }
+    render(){}
+    remove(){
+        if (this.el.parentNode) {
+            this.el.parentNode.removeChild(this.el)
+        }
+    }
+}
+class MuPaginatedCollectionView extends MuCollectionView{
+    constructor(opts){
+        super(opts)
+        console.log('right view')
+        this.lookup = opts.lookup
+    }
+    init(){
+        let handler = (page)=>{
+            this.rootWrapped.clear()
+            page.forEach((idx)=>{
+                let item = this.collection.get(idx)
+                item = this.lookup ? this.lookup(item) : item
+                let view = this.view(Object.assign({model: item.on ? item :
+                                                    new this.modelWrapper(item)},this.viewOptions))
+                this.collectionViews[idx] = view
+                this.el.appendChild(view.el)
+            })
+        }
+        this.collection.on('newPage',handler)
+        this.collection.on('restructure',handler)
+    }
+    render(){}
+    remove(){}
+}
+function arrayClone(a) {
+    return [].concat[a]
+}
+function objectClone(o) {
+    return JSON.parse(JSON.stringify(o))
+}
+function MuObservableObject(opts) {
+    let internalProps = Object.keys(MuEvent.__proto__)
+    internalProps.push('_eventsCount')
+    internalProps.push('_state')
+    let namedProps = opts.props || []
+    let derivedProps = opts.derived || {}
+    let derivedKeys = Object.keys(derivedProps)
+    class State extends MuEvent {
+        constructor(data) {
+            super()
+            this._state = {}
+            Object.assign(this._state,data)
+            this.on('change',function (changed){
+                this.emit(`change:${changed.key}`,changed.value,changed.old)
+            })
+            let out =  new Proxy(this,{
+                set: (target, key, value) => {
+                    if (internalProps.includes(key)) {
+                        this[key] = value
+                        return true
+                    }
+                    let old
+                    if (Array.isArray(this._state[key])) {
+                        old = arrayClone(this._state[key])
+                    } else if (typeof(this._state[key]) === 'object') {
+                        old = objectClone(this._state[key])
+                    } else {
+                        old = this._state[key]
+                    }
+                    this._state[key] = value
+                    this.emit('change',{key: key, value: value, old: old},target)
+                    return true
+                },
+                get: (target, key, value) => {
+                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
+                        return this[key]
+                    }
+                    return this._state[key] ? this._state[key] : data[key]
+                }
+            })
+            for (let d in derivedProps) {
+                let fn = derivedProps[d]['fn']
+                if (fn && typeof fn === 'function') {
+                    for (let k of derivedProps[d]['deps']) {
+                        out.on(`change:${k}`,(newV,oldV)=>{
+                            if (newV !== oldV) {
+                                out[d] = fn.apply(out._state)
+                            }
+                        })
+                    }
+                    out[d] = fn.apply(out._state)
+                }
+            }
+            return out
+        }
+        static props() {
+            return Reflect.ownKeys(namedProps) || {}
+        }
+        static derivedProps() {
+            return Reflect.ownKeys(derivedProps) || {}
+        }
+        static dump(instance) {
+            return instance._state
+        }
+        toJSON() {
+            return this._state
+        }
+    }
+    return State
 }

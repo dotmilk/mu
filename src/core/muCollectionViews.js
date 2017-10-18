@@ -1,10 +1,13 @@
-class MuCollectionView {
+/**
+ * Generic view wrapper for a collection
+ * @extends MuWrapperView
+ */
+class MuCollectionView extends MuWrapperView{
     constructor({collection,el,view,parent,viewOptions={}}) {
+        super({el,parent})
         this.collection = collection
-        this.el = el
         this.rootWrapped = muDom(el)
         this.view = view
-        this.parent = parent
         this.viewOptions = viewOptions
         Object.assign(this.viewOptions,{autoRender: true})
         this.collectionViews = {}
@@ -44,7 +47,10 @@ class MuCollectionView {
         }
     }
 }
-
+/**
+ * View wrapper for a paginated collection
+ * @extends MuCollectionView
+ */
 class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)

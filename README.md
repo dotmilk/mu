@@ -1,8 +1,8 @@
 ## Classes
 
 <dl>
-<dt><a href="#MuCollectionView">MuCollectionView</a></dt>
-<dd><p>Generic view wrapper for a collection, implementing View contract</p>
+<dt><a href="#MuCollectionView">MuCollectionView</a> ⇐ <code><a href="#MuWrapperView">MuWrapperView</a></code></dt>
+<dd><p>Generic view wrapper for a collection</p>
 </dd>
 <dt><a href="#MuPaginatedCollectionView">MuPaginatedCollectionView</a> ⇐ <code><a href="#MuCollectionView">MuCollectionView</a></code></dt>
 <dd><p>View wrapper for a paginated collection</p>
@@ -26,10 +26,38 @@ have default options, calling result with final options to produce instances.</p
 
 <a name="MuCollectionView"></a>
 
-## MuCollectionView
-Generic view wrapper for a collection, implementing View contract
+## MuCollectionView ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
+Generic view wrapper for a collection
 
 **Kind**: global class  
+**Extends**: [<code>MuWrapperView</code>](#MuWrapperView)  
+
+* [MuCollectionView](#MuCollectionView) ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
+    * [.init()](#MuWrapperView+init)
+    * [.render()](#MuWrapperView+render)
+    * [.remove()](#MuWrapperView+remove)
+
+<a name="MuWrapperView+init"></a>
+
+### muCollectionView.init()
+Stub function, extending class may implement
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>init</code>](#MuWrapperView+init)  
+<a name="MuWrapperView+render"></a>
+
+### muCollectionView.render()
+Stub function, extending class may implement
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>render</code>](#MuWrapperView+render)  
+<a name="MuWrapperView+remove"></a>
+
+### muCollectionView.remove()
+Stub function, extending class must implement
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
 <a name="MuPaginatedCollectionView"></a>
 
 ## MuPaginatedCollectionView ⇐ [<code>MuCollectionView</code>](#MuCollectionView)
@@ -37,6 +65,33 @@ View wrapper for a paginated collection
 
 **Kind**: global class  
 **Extends**: [<code>MuCollectionView</code>](#MuCollectionView)  
+
+* [MuPaginatedCollectionView](#MuPaginatedCollectionView) ⇐ [<code>MuCollectionView</code>](#MuCollectionView)
+    * [.init()](#MuWrapperView+init)
+    * [.render()](#MuWrapperView+render)
+    * [.remove()](#MuWrapperView+remove)
+
+<a name="MuWrapperView+init"></a>
+
+### muPaginatedCollectionView.init()
+Stub function, extending class may implement
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>init</code>](#MuWrapperView+init)  
+<a name="MuWrapperView+render"></a>
+
+### muPaginatedCollectionView.render()
+Stub function, extending class may implement
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>render</code>](#MuWrapperView+render)  
+<a name="MuWrapperView+remove"></a>
+
+### muPaginatedCollectionView.remove()
+Stub function, extending class must implement
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ <code>MuEvent</code>

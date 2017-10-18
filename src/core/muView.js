@@ -24,8 +24,19 @@ class MuWrapperView extends MuEvent{
 }
 
 /**
- * Main class for for a 'view'
+ * Main class for for a 'view', examples in example folder
  * @extends MuEvent
+ * @example
+ * // overly simple non working example
+ * let myView = new MuView({bindings: {foo: {valid action schema}...},
+ *                          model: someModelWithFoo,
+ *                          events: {'click some selector that exists within this.el': someFn},
+ *                          references: {aDomRef: '.bar'}})
+ *
+ * someModelWithFoo.foo = 'bar'
+ * // result is action schema is called with new value of someModelWithFoo.foo
+ * // clicking on element inside view.el with 'some selector that exists within this.el'
+ * // calls someFn, someFn might use this.aDomRef to manipulate something
  */
 class MuView extends MuEvent {
     /**
@@ -85,15 +96,23 @@ class MuView extends MuEvent {
     }
 
     /**
-     *
+     * Checks for special case of '\*' right now. In the future, there might be more.
+     * '*' creates a new essentially derived property on the 'model' passed in.
+     * Naming said property according to the 'name' key, based of some property
+     * of the model 'prop' which should be an array. Essentially flattening a sequence
+     * of model properties to an array: [key1,key2] comes out ['foo','bar'] of a
+     * model {key1: 'foo', key2: 'bar', key3: 'baz'} this array is added to the bindings
+     * ['foo','bar'] and if [key1,key2] is changed then the binding is called again with
+     * the resulting mapped array, see rowCollectionView in muTable for use. Called internally.
+     * @param {Object} bindings - List of bindings defaults to this._bindings
      */
     parseBindings(bindings = this._bindings) {
-
         for (let binding in bindings) {
 
             if (binding == '*') {
                 let toBind = bindings[binding]
                 let onChange = (newVal)=>{
+
                     this.model[toBind.name] = newVal.map((prop)=>{
                         return this.model[prop]
                     })
@@ -110,13 +129,28 @@ class MuView extends MuEvent {
         }
 
     }
-
+    /**
+     * Method for binding changes in the model to actions, called internally.
+     * Currently accepts text, html, attribute and value actions on
+     * changed model prop. As well as special case '\*' which is mentioned
+     * in documentation for {@link MuView#parseBindings}.
+     *
+     * Empty string selector is view.el. Selector is required to exist.
+     * @param {Object} bindings - List of model props to bind to actions
+     * @example
+     * myView.bindings({foo: {selector: 'div.foo',
+     *                        type: html,
+     *                        template: someFnTakingNewValueReturningHtml }})
+     * modelPassedIntoMyViewConstructor.foo = 'bar'
+     * // result is myView.el's div.foo is replaced with template function output
+     */
     bindings(bindings = this._bindings){
         if (this.model && bindings) {
             let render = true // fix this later
             for (let binding in bindings) {
                 if (binding == '*') { continue }
-                let element = bindings[binding].selector == '' ? muDom(this.root) : muDom(bindings[binding].selector,this.root)
+                let element = bindings[binding].selector == '' ?
+                    muDom(this.root) : muDom(bindings[binding].selector,this.root)
 
                 let options = bindings[binding]
                 let changeHandler
@@ -170,7 +204,19 @@ class MuView extends MuEvent {
             }
         }
     }
-
+    /**
+     * Uses event delegation to respond to events on view.el and its children.
+     * keys should follow pattern 'eventName selector'. A string with no selector,
+     * only eventName refers to view.el itself and not some child.
+     *
+     * Place more generically selected things first:
+     * {'click': fn, 'click button': fn, 'click button.foo': fn}
+     * Called internally.
+     *
+     * @example
+     * myView.events({'click button.foo': ()=>{console.log('foo was clicked')}})
+     * //clicking on button.foo logs the click to console
+     */
     events(events = this._events){
         for (let eventsAndSelectors in events || {}) {
             // snag the first item as the event name
@@ -211,6 +257,12 @@ class MuView extends MuEvent {
         }
     }
 
+    /**
+     * Adds a collection as a subview of this view, wrapping it in either a
+     * {@link MuCollectionView} or if the collection is paginated a
+     * {@link MuPaginatedCollectionView}
+     * @param {Object} options - Set of options for the collection
+     */
     addCollection({collection, view, target, viewOptions, lookup}) {
         let vc
         if (collection.paginated) {
@@ -255,7 +307,7 @@ class MuView extends MuEvent {
     remove(){
         if (this.subViews && this.subViews.length) {
             this.subViews.forEach((sv)=>{
-                sv.remove
+                sv.remove()
             })
 
             this.subViews = []
@@ -279,7 +331,14 @@ class MuView extends MuEvent {
 }
 
 
-// Use to create view factory
+/**
+ * Factory function for {@link MuView}, uses currying to allow you to
+ * have default options, calling result with final options to produce instances.
+ * @example
+ * let personView = muView({template: '<div></div>'})
+ * let personOne = personView({model: personOneModel })
+ * let personTwo = personView({model: personTwoModel })
+ */
 function muView(op) {
     return (o)=>{
         Object.assign(o,op)

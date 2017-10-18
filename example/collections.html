@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <script src="/mu.js"></script>
+        <link rel="stylesheet" type="text/css" href="styles.css" />
+    </head>
+    <body>
+        <script>
+         let model = new MuObservableObject({props:['foos']})
+         model.foos = ['bar','buz','baz']
+         let view = new MuView({
+             autoRender: true,
+             template: ()=>{return new MuTagen().tag('div').class().compile().render({class: 'view'})},
+             bindings: {
+                 foos: {
+                     selector: '',
+                     type: 'html',
+                     template: (foo)=>{return new MuTagen().tag('div').text()
+                                                           .tag('ul')
+                                                           .class()
+                                                           .compile()
+                                                           .render({ class: foo,
+                                                                     text: foo})}
+                 }
+             },
+             model: model
+         })
+
+         let collectionView
+
+         view.addCollection
+
+         document.querySelector('body').appendChild(view.el)
+        </script>
+    </body>
+
+</html>
