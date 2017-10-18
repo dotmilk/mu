@@ -263,7 +263,7 @@ class MuView extends MuEvent {
      * {@link MuPaginatedCollectionView}
      * @param {Object} options - Set of options for the collection
      * @param {Collection} collection - An object conforming to collection contract
-     * @param {(MuView | MuViewWrapper)} view - The result of calling {@link muView}
+     * @param {(MuView | MuWrapperView)} view - The result of calling {@link muView}
      */
     addCollection({collection, view, target, viewOptions, lookup}) {
         let vc

@@ -313,7 +313,7 @@ Adds a collection as a subview of this view, wrapping it in either a
 | --- | --- | --- |
 | options | <code>Object</code> | Set of options for the collection |
 | collection | <code>Collection</code> | An object conforming to collection contract |
-| view | [<code>MuView</code>](#MuView) \| <code>MuViewWrapper</code> | The result of calling [muView](#muView) |
+| view | [<code>MuView</code>](#MuView) \| [<code>MuWrapperView</code>](#MuWrapperView) | The result of calling [muView](#muView) |
 
 <a name="MuEvent+on"></a>
 
