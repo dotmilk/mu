@@ -15,7 +15,9 @@ class MuWrapperView extends MuEvent{
         this.rootWrapped = muDom(el)
         this.parent = parent
     }
-    /** Stub function, extending class may implement*/
+    /** Stub function, extending class may implement
+     * @abstract
+     */
     init(){}
     /** Stub function, extending class may implement*/
     render(){}

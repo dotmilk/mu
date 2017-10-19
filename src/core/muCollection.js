@@ -170,7 +170,15 @@ class MuCollection extends MuEvent {
  */
 class MuPagedCollection extends MuCollection {
     /**
-     *
+     * This is where shit gets real, ok that might be an overstatement. Basically this provides
+     * an api for {@link MuPaginator} and special events pertaining to a paged collection
+     * @param {Object} options - Options for the collection
+     * @param {Boolean} options.flat - Store as array, not k:v
+     * @param {String} options.idField - The field to use as k when not flat, defaults to 'id'
+     * @param {MuObservableObject} options.model - Future: non instantiated model to wrap each item
+     * @param {Function} options.comparator - Some fn to aid in sorting
+     * @param {Array} options.content - Initial items in collection, will fire add events,
+     * but you will be unable to listen
      */
     constructor(opts){
         super(opts)

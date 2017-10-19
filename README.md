@@ -220,6 +220,22 @@ I dunno, you're the one using it.
 
 **Kind**: global class  
 **Extends**: <code>Mucollection</code>  
+<a name="new_MuPagedCollection_new"></a>
+
+### new MuPagedCollection(options)
+This is where shit gets real, ok that might be an overstatement. Basically this provides
+an api for [MuPaginator](MuPaginator) and special events pertaining to a paged collection
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Options for the collection |
+| options.flat | <code>Boolean</code> | Store as array, not k:v |
+| options.idField | <code>String</code> | The field to use as k when not flat, defaults to 'id' |
+| options.model | <code>MuObservableObject</code> | Future: non instantiated model to wrap each item |
+| options.comparator | <code>function</code> | Some fn to aid in sorting |
+| options.content | <code>Array</code> | Initial items in collection, will fire add events, but you will be unable to listen |
+
 <a name="MuCollectionView"></a>
 
 ## MuCollectionView ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
@@ -229,16 +245,16 @@ Generic view wrapper for a collection
 **Extends**: [<code>MuWrapperView</code>](#MuWrapperView)  
 
 * [MuCollectionView](#MuCollectionView) ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
-    * [.init()](#MuWrapperView+init)
+    * *[.init()](#MuWrapperView+init)*
     * [.render()](#MuWrapperView+render)
     * [.remove()](#MuWrapperView+remove)
 
 <a name="MuWrapperView+init"></a>
 
-### muCollectionView.init()
+### *muCollectionView.init()*
 Stub function, extending class may implement
 
-**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Kind**: instance abstract method of [<code>MuCollectionView</code>](#MuCollectionView)  
 **Overrides**: [<code>init</code>](#MuWrapperView+init)  
 <a name="MuWrapperView+render"></a>
 
@@ -262,16 +278,16 @@ View wrapper for a paginated collection
 **Extends**: [<code>MuCollectionView</code>](#MuCollectionView)  
 
 * [MuPaginatedCollectionView](#MuPaginatedCollectionView) ⇐ [<code>MuCollectionView</code>](#MuCollectionView)
-    * [.init()](#MuWrapperView+init)
+    * *[.init()](#MuWrapperView+init)*
     * [.render()](#MuWrapperView+render)
     * [.remove()](#MuWrapperView+remove)
 
 <a name="MuWrapperView+init"></a>
 
-### muPaginatedCollectionView.init()
+### *muPaginatedCollectionView.init()*
 Stub function, extending class may implement
 
-**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Kind**: instance abstract method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
 **Overrides**: [<code>init</code>](#MuWrapperView+init)  
 <a name="MuWrapperView+render"></a>
 
@@ -295,7 +311,7 @@ Abstract class for wrapping more complex constructs.
 
 * [MuWrapperView](#MuWrapperView) ⇐ [<code>MuEvent</code>](#MuEvent)
     * [new MuWrapperView(options)](#new_MuWrapperView_new)
-    * [.init()](#MuWrapperView+init)
+    * *[.init()](#MuWrapperView+init)*
     * [.render()](#MuWrapperView+render)
     * [.remove()](#MuWrapperView+remove)
     * [.on(event, fn)](#MuEvent+on)
@@ -317,10 +333,10 @@ Should only be called by super in extending class
 
 <a name="MuWrapperView+init"></a>
 
-### muWrapperView.init()
+### *muWrapperView.init()*
 Stub function, extending class may implement
 
-**Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+**Kind**: instance abstract method of [<code>MuWrapperView</code>](#MuWrapperView)  
 <a name="MuWrapperView+render"></a>
 
 ### muWrapperView.render()
