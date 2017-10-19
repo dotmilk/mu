@@ -165,7 +165,7 @@ class MuTable extends MuEvent{
             return new MuTagen()
                 .tag('td').text()
                 .compile()
-                .render({text: content})
+                .render({text: content || 'N/A'})
         }
     }
 

@@ -1198,7 +1198,7 @@ class MuTable extends MuEvent{
             return new MuTagen()
                 .tag('td').text()
                 .compile()
-                .render({text: content})
+                .render({text: content || 'N/A'})
         }
     }
     defaults(){
@@ -1226,22 +1226,31 @@ class MuTable extends MuEvent{
     }
 }
 class MuCollection extends MuEvent {
-    constructor(opts = {}){
+    constructor({flat,idField,model,comparator,contents}){
         super()
-        this.flat = opts.flat
-        this.collection = this.flat ? [] : {}
-        this.idx = []
-        this.idField = opts.idField || 'id'
-        this.model = opts.model || MuObservableObject({})
-        this.comparator = opts.comparator || function (a,b)  {
-            if (typeof a === 'string') {
-                return a < b ? -1 : 1 }
-            else {
-                return a - b
+        let defaultCompare = (a,b) => {
+            if (this.flat) {
+                if (typeof a === 'string') {
+                    return a < b ? -1 : 1 }
+                else {
+                    return a - b
+                }
+            } else {
+                if (typeof this.collection[a] === 'string') {
+                    return this.collection[a] < this.collection[b] ? -1 : 1 }
+                else {
+                    return this.collection[a] - this.colletion[b]
+                }
             }
         }
-        if (opts.contents) {
-            this.add(opts.contents)
+        this.flat = flat
+        this.collection = this.flat ? [] : {}
+        this.idx = []
+        this.idField = idField || 'id'
+        this.model = model || MuObservableObject({})
+        this.comparator = comparator || defaultCompare
+        if (contents) {
+            this.add(contents)
         }
     }
     addBulk(items) {
@@ -1331,6 +1340,9 @@ class MuPagedCollection extends MuCollection {
     }
     changeHandler(event,data){
         this.paginator.paginate = undefined
+        if (this.flat) {
+            this.paginator.data = this.collection
+        }
         this.emit('restructure',this.currentPage())
     }
     setPageSize(n) {
@@ -1391,9 +1403,7 @@ class MuCollectionView extends MuWrapperView{
         this.modelWrapper = MuObservableObject({})
     }
     init(){
-        console.log(this)
         this.collection.on('add',(idx)=>{
-            console.log('added')
             let item = this.collection.get(idx)
             let view = this.view(Object.assign({
                 model: item.on ? item : new this.modelWrapper(item)},
@@ -1430,7 +1440,7 @@ class MuPaginatedCollectionView extends MuCollectionView{
         let handler = (page)=>{
             this.rootWrapped.clear()
             page.forEach((idx)=>{
-                let item = this.collection.get(idx)
+                let item = this.collection.flat ? idx : this.collection.get(idx)
                 item = this.lookup ? this.lookup(item) : item
                 let view = this.view(Object.assign({model: item.on ? item :
                                                     new this.modelWrapper(item)},this.viewOptions))

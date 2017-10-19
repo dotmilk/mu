@@ -15,9 +15,7 @@ class MuCollectionView extends MuWrapperView{
     }
 
     init(){
-        console.log(this)
         this.collection.on('add',(idx)=>{
-            console.log('added')
             let item = this.collection.get(idx)
             let view = this.view(Object.assign({
                 model: item.on ? item : new this.modelWrapper(item)},
@@ -60,7 +58,8 @@ class MuPaginatedCollectionView extends MuCollectionView{
         let handler = (page)=>{
             this.rootWrapped.clear()
             page.forEach((idx)=>{
-                let item = this.collection.get(idx)
+
+                let item = this.collection.flat ? idx : this.collection.get(idx)
                 item = this.lookup ? this.lookup(item) : item
                 let view = this.view(Object.assign({model: item.on ? item :
                                                     new this.modelWrapper(item)},this.viewOptions))

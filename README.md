@@ -8,6 +8,9 @@ environment or use case.
 ## Classes
 
 <dl>
+<dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
+<dd><p>A collection emitting events on certain actions</p>
+</dd>
 <dt><a href="#MuCollectionView">MuCollectionView</a> ⇐ <code><a href="#MuWrapperView">MuWrapperView</a></code></dt>
 <dd><p>Generic view wrapper for a collection</p>
 </dd>
@@ -33,6 +36,91 @@ environment or use case.
 calling result with final options to produce instances.</p>
 </dd>
 </dl>
+
+<a name="MuCollection"></a>
+
+## MuCollection ⇐ [<code>MuEvent</code>](#MuEvent)
+A collection emitting events on certain actions
+
+**Kind**: global class  
+**Extends**: [<code>MuEvent</code>](#MuEvent)  
+
+* [MuCollection](#MuCollection) ⇐ [<code>MuEvent</code>](#MuEvent)
+    * [new MuCollection(options)](#new_MuCollection_new)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
+
+<a name="new_MuCollection_new"></a>
+
+### new MuCollection(options)
+Create a new collection, in the future will optionally wrap items in a model.
+for exceptionally large collections, use flat, so as to not add each 'item' to
+this.collection[item.idField] = item. Can be very slow. Flat instead stores
+this.collection as an array, no removal of elements, just reset.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Options for the collection |
+| options.flat | <code>Boolean</code> | Store as array, not k:v |
+| options.idField | <code>String</code> | The field to use as k when not flat, defaults to 'id' |
+| options.model | <code>MuObservableObject</code> | Future: non instantiated model to wrap each item |
+| options.comparator | <code>function</code> | Some fn to aid in sorting |
+| options.content | <code>Array</code> | Initial items in collection, will fire add events, but you will be unable to listen |
+
+**Example**  
+```js
+myCollection = new MuCollection({idField: 'customId'})
+// or
+myCollection = new MuCollection({flat: true})
+myCollection.on('add',someFn)
+myCollection.add([{foo: 'a'},{foo: 'b}])
+// someFn called twice with item, or
+myCollection.add([{foo: 'a'},{foo: 'b}],true)
+// no add event fired, instead 'bulk' event fired after all items added
+```
+<a name="MuEvent+on"></a>
+
+### muCollection.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muCollection.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muCollection.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+<a name="MuEvent+emit"></a>
+
+### muCollection.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
 
 <a name="MuCollectionView"></a>
 
