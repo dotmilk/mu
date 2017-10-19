@@ -164,7 +164,7 @@ class MuCollection extends MuEvent {
     }
 }
 /**
- * Uses {@link MuPaginator} to paginate a {@link MuCollection}, why you'd want to do this?
+ * Uses {@link MuPaginator} to paginate a {@link MuCollection}, why would you want to do this?
  * I dunno, you're the one using it.
  * @extends Mucollection
  */
@@ -190,6 +190,7 @@ class MuPagedCollection extends MuCollection {
                                           data: this.flat ? this.collection : this.idx})
     }
 
+
     changeHandler(event,data){
         this.paginator.paginate = undefined
         if (this.flat) {
@@ -197,7 +198,10 @@ class MuPagedCollection extends MuCollection {
         }
         this.emit('restructure',this.currentPage())
     }
-
+    /**
+     * Sets the number of items per 'page'
+     * @param {Integer} n - Number of items per page
+     */
     setPageSize(n) {
         if (n != this.paginator.pageSize) {
             this.paginator.pageSize = n

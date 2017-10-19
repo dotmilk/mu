@@ -15,13 +15,13 @@ class MuWrapperView extends MuEvent{
         this.rootWrapped = muDom(el)
         this.parent = parent
     }
-    /** Stub function, extending class may implement
-     * @abstract
-     */
+    /** Stub function, extending class may implement*/
     init(){}
     /** Stub function, extending class may implement*/
     render(){}
-    /** Stub function, extending class must implement*/
+    /** Stub function, extending class must implement
+     * @abstract
+     */
     remove(){ throw 'Remove not overridden'}
 }
 
