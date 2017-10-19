@@ -895,6 +895,18 @@ Emit event
 Class for 'paginating' an array
 
 **Kind**: global class  
+
+* [MuPaginator](#MuPaginator)
+    * [new MuPaginator(options)](#new_MuPaginator_new)
+    * [.paginator()](#MuPaginator+paginator)
+    * [.getPage(pageNumber)](#MuPaginator+getPage)
+    * [.maxPage()](#MuPaginator+maxPage)
+    * [.isLastPage()](#MuPaginator+isLastPage)
+    * [.lastPage()](#MuPaginator+lastPage)
+    * [.firstPage()](#MuPaginator+firstPage)
+    * [.nextPage()](#MuPaginator+nextPage)
+    * [.previousPage()](#MuPaginator+previousPage)
+
 <a name="new_MuPaginator_new"></a>
 
 ### new MuPaginator(options)
@@ -916,6 +928,61 @@ let p = new MuPaginator({pageSize: 2, data: [1,2,3,4,5,6,7,8,9,10]})
 console.log(p.nextPage())
 // [3,4]
 ```
+<a name="MuPaginator+paginator"></a>
+
+### muPaginator.paginator()
+Internal generator function, for the actual paginating, cause why the hell not
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+**Yields**: <code>(Value \| PageDone)</code> Very fancy  
+<a name="MuPaginator+getPage"></a>
+
+### muPaginator.getPage(pageNumber)
+Does pretty much all of the work, returns a page by pagenumber.
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pageNumber | <code>Integer</code> | defaults to this.currentPage if not provided |
+
+<a name="MuPaginator+maxPage"></a>
+
+### muPaginator.maxPage()
+Returns the max possible page number
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuPaginator+isLastPage"></a>
+
+### muPaginator.isLastPage()
+Are we on the last page?
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuPaginator+lastPage"></a>
+
+### muPaginator.lastPage()
+If we weren't, we are now, on the last page that is.
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuPaginator+firstPage"></a>
+
+### muPaginator.firstPage()
+Similar to [lastPage](#MuPaginator+lastPage) except by some miracle, gets you the first page
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuPaginator+nextPage"></a>
+
+### muPaginator.nextPage()
+Now this one is unique, it gets you the next page
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuPaginator+previousPage"></a>
+
+### muPaginator.previousPage()
+Ok I lied [nextPage](#MuPaginator+nextPage) wasn't that unique, this gets a page too
+but the previous one this time.
+
+**Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
 <a name="muView"></a>
 
 ## muView()

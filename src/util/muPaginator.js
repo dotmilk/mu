@@ -23,7 +23,10 @@ class MuPaginator {
         this.pageSize = pageSize
         this.currentPage = 1
     }
-
+    /**
+     * Internal generator function, for the actual paginating, cause why the hell not
+     * @yields {(Value | PageDone)} Very fancy
+     */
     * paginator(start) {
         let newIndex
         let doIt
@@ -43,7 +46,10 @@ class MuPaginator {
             }
         }
     }
-
+    /**
+     * Does pretty much all of the work, returns a page by pagenumber.
+     * @param {Integer?} pageNumber - defaults to this.currentPage if not provided
+     */
     getPage(pageNumber = this.currentPage) {
         this.currentPage = pageNumber
         let page = []
@@ -61,32 +67,45 @@ class MuPaginator {
         }
         return page
     }
-
+    /**
+     * Returns the max possible page number
+     */
     maxPage() {
         return Math.ceil(this.data.length/this.pageSize)
     }
-
+    /**
+     * Are we on the last page?
+     */
     isLastPage() {
         return !(this.maxPage() > this.currentPage)
     }
-
+    /**
+     * If we weren't, we are now, on the last page that is.
+     */
     lastPage() {
         this.currentPage = Math.ceil(this.data.length/this.pageSize)
         return this.getPage()
     }
-
+    /**
+     * Similar to {@link MuPaginator#lastPage} except by some miracle, gets you the first page
+     */
     firstPage() {
         this.currentPage = 1
         return this.getPage()
     }
-
+    /**
+     * Now this one is unique, it gets you the next page
+     */
     nextPage() {
         if (!this.isLastPage()) {
             this.currentPage++
         }
         return this.getPage()
     }
-
+    /**
+     * Ok I lied {@link MuPaginator#nextPage} wasn't that unique, this gets a page too
+     * but the previous one this time.
+     */
     previousPage() {
         this.currentPage--
         if (this.currentPage < 1) {
