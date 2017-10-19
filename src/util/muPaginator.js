@@ -1,4 +1,20 @@
+/**
+ * Class for 'paginating' an array
+ */
 class MuPaginator {
+    /**
+     * Set a pagesize and pass in some  data, if you reset or change data from outside
+     * you should probably go ahead and set instance.paginate to undefined before
+     * getting next page or change current page...or really do whatever to get
+     * your desired result
+     * @param {Object} options - Options for paginator
+     * @param {Integer} options.pageSize - Items to return per page
+     * @param {Array} options.data - An array to paginate, yay!
+     * @example
+     * let p = new MuPaginator({pageSize: 2, data: [1,2,3,4,5,6,7,8,9,10]})
+     * console.log(p.nextPage())
+     * // [3,4]
+     */
     constructor({pageSize, data}) {
         if (!Array.isArray(data)) {
             throw "Data must be array"
@@ -35,7 +51,7 @@ class MuPaginator {
         if (!this.paginate) {
             this.paginate = this.paginator(startingIndex)
         } else {
-            this.paginate.next(startingIndex).value
+            this.paginate.next(startingIndex)
         }
         let val
         while (true) {

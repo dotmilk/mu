@@ -414,7 +414,7 @@ class MuPaginator {
         if (!this.paginate) {
             this.paginate = this.paginator(startingIndex)
         } else {
-            this.paginate.next(startingIndex).value
+            this.paginate.next(startingIndex)
         }
         let val
         while (true) {

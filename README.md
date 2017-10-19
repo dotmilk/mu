@@ -12,7 +12,7 @@ environment or use case.
 <dd><p>A collection emitting events on certain actions</p>
 </dd>
 <dt><a href="#MuPagedCollection">MuPagedCollection</a> ⇐ <code><a href="#MuCollection">MuCollection</a></code></dt>
-<dd><p>Uses <a href="MuPaginator">MuPaginator</a> to paginate a <a href="#MuCollection">MuCollection</a>, why would you want to do this?
+<dd><p>Uses <a href="#MuPaginator">MuPaginator</a> to paginate a <a href="#MuCollection">MuCollection</a>, why would you want to do this?
 I dunno, you&#39;re the one using it.</p>
 </dd>
 <dt><a href="#MuCollectionView">MuCollectionView</a> ⇐ <code><a href="#MuWrapperView">MuWrapperView</a></code></dt>
@@ -29,6 +29,9 @@ I dunno, you&#39;re the one using it.</p>
 </dd>
 <dt><a href="#MuEvent">MuEvent</a></dt>
 <dd><p>Very simple no frills Event Emitter so to speak, might add emitter.once later</p>
+</dd>
+<dt><a href="#MuPaginator">MuPaginator</a></dt>
+<dd><p>Class for &#39;paginating&#39; an array</p>
 </dd>
 </dl>
 
@@ -118,7 +121,7 @@ Perhaps the most useful method on a collection, adding things to the collection
 <a name="MuCollection+sort"></a>
 
 ### muCollection.sort(comparator, reverse)
-Sort the collection, may or may not work, haven't test it lol
+Sort the collection, may or may not work, haven't tested it in any real manner
 
 **Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
 
@@ -215,7 +218,7 @@ Emit event
 <a name="MuPagedCollection"></a>
 
 ## MuPagedCollection ⇐ [<code>MuCollection</code>](#MuCollection)
-Uses [MuPaginator](MuPaginator) to paginate a [MuCollection](#MuCollection), why would you want to do this?
+Uses [MuPaginator](#MuPaginator) to paginate a [MuCollection](#MuCollection), why would you want to do this?
 I dunno, you're the one using it.
 
 **Kind**: global class  
@@ -224,6 +227,15 @@ I dunno, you're the one using it.
 * [MuPagedCollection](#MuPagedCollection) ⇐ [<code>MuCollection</code>](#MuCollection)
     * [new MuPagedCollection(options)](#new_MuPagedCollection_new)
     * [.setPageSize(n)](#MuPagedCollection+setPageSize)
+    * [.getPageSize()](#MuPagedCollection+getPageSize)
+    * [.maxPage()](#MuPagedCollection+maxPage)
+    * [.currentPageNumber()](#MuPagedCollection+currentPageNumber)
+    * [.currentPage()](#MuPagedCollection+currentPage)
+    * [.getPage(n)](#MuPagedCollection+getPage)
+    * [.nextPage()](#MuPagedCollection+nextPage)
+    * [.previousPage()](#MuPagedCollection+previousPage)
+    * [.lastPage()](#MuPagedCollection+lastPage)
+    * [.firstPage()](#MuPagedCollection+firstPage)
     * [.addBulk(items)](#MuCollection+addBulk)
     * [.add(items, bulk)](#MuCollection+add)
     * [.sort(comparator, reverse)](#MuCollection+sort)
@@ -240,7 +252,7 @@ I dunno, you're the one using it.
 
 ### new MuPagedCollection(options)
 This is where shit gets real, ok that might be an overstatement. Basically this provides
-an api for [MuPaginator](MuPaginator) and special events pertaining to a paged collection
+an api for [MuPaginator](#MuPaginator) and special events pertaining to a paged collection
 
 
 | Param | Type | Description |
@@ -263,6 +275,65 @@ Sets the number of items per 'page'
 | --- | --- | --- |
 | n | <code>Integer</code> | Number of items per page |
 
+<a name="MuPagedCollection+getPageSize"></a>
+
+### muPagedCollection.getPageSize()
+Gets the current page size
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+maxPage"></a>
+
+### muPagedCollection.maxPage()
+Gets maximum possible page number with current collection
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+currentPageNumber"></a>
+
+### muPagedCollection.currentPageNumber()
+Gets the current page number
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+currentPage"></a>
+
+### muPagedCollection.currentPage()
+Gets a reference to current page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+getPage"></a>
+
+### muPagedCollection.getPage(n)
+Gets specified page number, if out of range gets first or last page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| n | <code>Integer</code> | Page number to get |
+
+<a name="MuPagedCollection+nextPage"></a>
+
+### muPagedCollection.nextPage()
+Gets the next page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+previousPage"></a>
+
+### muPagedCollection.previousPage()
+Gets previous page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+lastPage"></a>
+
+### muPagedCollection.lastPage()
+Gets last page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuPagedCollection+firstPage"></a>
+
+### muPagedCollection.firstPage()
+Gets first page
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
 <a name="MuCollection+addBulk"></a>
 
 ### muPagedCollection.addBulk(items)
@@ -289,7 +360,7 @@ Perhaps the most useful method on a collection, adding things to the collection
 <a name="MuCollection+sort"></a>
 
 ### muPagedCollection.sort(comparator, reverse)
-Sort the collection, may or may not work, haven't test it lol
+Sort the collection, may or may not work, haven't tested it in any real manner
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
 
@@ -818,6 +889,33 @@ Emit event
 | --- | --- | --- |
 | event | <code>String</code> | Name of event to emit |
 
+<a name="MuPaginator"></a>
+
+## MuPaginator
+Class for 'paginating' an array
+
+**Kind**: global class  
+<a name="new_MuPaginator_new"></a>
+
+### new MuPaginator(options)
+Set a pagesize and pass in some  data, if you reset or change data from outside
+you should probably go ahead and set instance.paginate to undefined before
+getting next page or change current page...or really do whatever to get
+your desired result
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Options for paginator |
+| options.pageSize | <code>Integer</code> | Items to return per page |
+| options.data | <code>Array</code> | An array to paginate, yay! |
+
+**Example**  
+```js
+let p = new MuPaginator({pageSize: 2, data: [1,2,3,4,5,6,7,8,9,10]})
+console.log(p.nextPage())
+// [3,4]
+```
 <a name="muView"></a>
 
 ## muView()

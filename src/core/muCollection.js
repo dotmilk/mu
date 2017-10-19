@@ -97,7 +97,7 @@ class MuCollection extends MuEvent {
         }
     }
     /**
-     * Sort the collection, may or may not work, haven't test it lol
+     * Sort the collection, may or may not work, haven't tested it in any real manner
      * @param {Function} comparator - Some function that sorts things
      * @param {Boolean} reverse - Sorting direction
      */
@@ -209,53 +209,70 @@ class MuPagedCollection extends MuCollection {
             this.changeHandler()
         }
     }
-
+    /**
+     * Gets the current page size
+     */
     getPageSize() {
         return this.paginator.pageSize
     }
-
+    /**
+     * Gets maximum possible page number with current collection
+     */
     maxPage() {
         return this.paginator.maxPage()
     }
-
+    /**
+     * Gets the current page number
+     */
     currentPageNumber() {
         return this.paginator.currentPage
     }
-
+    /**
+     * Gets a reference to current page
+     */
     currentPage() {
         let page = this.paginator.getPage()
-        //console.log('page is ',page,this.paginator)
         return page
     }
-
+    /**
+     * Gets specified page number, if out of range gets first or last page
+     * @param {Integer} n - Page number to get
+     */
     getPage(n){
         let page = this.paginator.getPage(n)
         this.emit('newPage',page)
         return page
     }
-
+    /**
+     * Gets the next page
+     */
     nextPage(){
         let page = this.paginator.nextPage()
         this.emit('newPage',page)
         return page
     }
-
+    /**
+     * Gets previous page
+     */
     previousPage(){
         let page = this.paginator.previousPage()
         this.emit('newPage',page)
         return page
     }
-
+    /**
+     * Gets last page
+     */
     lastPage(){
         let page = this.paginator.lastPage()
         this.emit('newPage',page)
         return page
     }
-
+    /**
+     * Gets first page
+     */
     firstPage(){
         let page = this.paginator.firstPage()
         this.emit('newPage',page)
         return page
     }
-
 }
