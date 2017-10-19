@@ -47,6 +47,8 @@ A collection emitting events on certain actions
 
 * [MuCollection](#MuCollection) ⇐ [<code>MuEvent</code>](#MuEvent)
     * [new MuCollection(options)](#new_MuCollection_new)
+    * [.addBulk(items)](#MuCollection+addBulk)
+    * [.add(items, bulk)](#MuCollection+add)
     * [.on(event, fn)](#MuEvent+on)
     * [.removeListener(event, fn)](#MuEvent+removeListener)
     * [.clearListeners()](#MuEvent+clearListeners)
@@ -76,11 +78,34 @@ myCollection = new MuCollection({idField: 'customId'})
 // or
 myCollection = new MuCollection({flat: true})
 myCollection.on('add',someFn)
-myCollection.add([{foo: 'a'},{foo: 'b}])
+myCollection.add([{foo: 'a'},{foo: 'b'}])
 // someFn called twice with item, or
-myCollection.add([{foo: 'a'},{foo: 'b}],true)
+myCollection.add([{foo: 'a'},{foo: 'b'}],true)
 // no add event fired, instead 'bulk' event fired after all items added
 ```
+<a name="MuCollection+addBulk"></a>
+
+### muCollection.addBulk(items)
+Convenience function for add(stuff,true)
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> | Stuff to add |
+
+<a name="MuCollection+add"></a>
+
+### muCollection.add(items, bulk)
+Perhaps the most useful method on a collection, adding things to the collection
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> |  | Stuff to add |
+| bulk | <code>Boolean</code> | <code>false</code> | Skip emitting add for each item, emit 'bulk' |
+
 <a name="MuEvent+on"></a>
 
 ### muCollection.on(event, fn)

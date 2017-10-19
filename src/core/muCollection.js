@@ -20,9 +20,9 @@ class MuCollection extends MuEvent {
      * // or
      * myCollection = new MuCollection({flat: true})
      * myCollection.on('add',someFn)
-     * myCollection.add([{foo: 'a'},{foo: 'b}])
+     * myCollection.add([{foo: 'a'},{foo: 'b'}])
      * // someFn called twice with item, or
-     * myCollection.add([{foo: 'a'},{foo: 'b}],true)
+     * myCollection.add([{foo: 'a'},{foo: 'b'}],true)
      * // no add event fired, instead 'bulk' event fired after all items added
      */
     constructor({flat,idField,model,comparator,contents}){
@@ -53,11 +53,18 @@ class MuCollection extends MuEvent {
             this.add(contents)
         }
     }
-
+    /**
+     * Convenience function for add(stuff,true)
+     * @param {(Array | SingleItem)} items - Stuff to add
+     */
     addBulk(items) {
         this.add(items,true)
     }
-
+    /**
+     * Perhaps the most useful method on a collection, adding things to the collection
+     * @param {(Array | SingleItem)} items - Stuff to add
+     * @param {Boolean} bulk - Skip emitting add for each item, emit 'bulk'
+     */
     add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
 
