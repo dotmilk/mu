@@ -11,7 +11,7 @@ environment or use case.
 <dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>A collection emitting events on certain actions</p>
 </dd>
-<dt><a href="#MuPagedCollection">MuPagedCollection</a> ⇐ <code>Mucollection</code></dt>
+<dt><a href="#MuPagedCollection">MuPagedCollection</a> ⇐ <code><a href="#MuCollection">MuCollection</a></code></dt>
 <dd><p>Uses <a href="MuPaginator">MuPaginator</a> to paginate a <a href="#MuCollection">MuCollection</a>, why would you want to do this?
 I dunno, you&#39;re the one using it.</p>
 </dd>
@@ -214,16 +214,27 @@ Emit event
 
 <a name="MuPagedCollection"></a>
 
-## MuPagedCollection ⇐ <code>Mucollection</code>
+## MuPagedCollection ⇐ [<code>MuCollection</code>](#MuCollection)
 Uses [MuPaginator](MuPaginator) to paginate a [MuCollection](#MuCollection), why would you want to do this?
 I dunno, you're the one using it.
 
 **Kind**: global class  
-**Extends**: <code>Mucollection</code>  
+**Extends**: [<code>MuCollection</code>](#MuCollection)  
 
-* [MuPagedCollection](#MuPagedCollection) ⇐ <code>Mucollection</code>
+* [MuPagedCollection](#MuPagedCollection) ⇐ [<code>MuCollection</code>](#MuCollection)
     * [new MuPagedCollection(options)](#new_MuPagedCollection_new)
     * [.setPageSize(n)](#MuPagedCollection+setPageSize)
+    * [.addBulk(items)](#MuCollection+addBulk)
+    * [.add(items, bulk)](#MuCollection+add)
+    * [.sort(comparator, reverse)](#MuCollection+sort)
+    * [.remove(idxs)](#MuCollection+remove)
+    * [.get(id)](#MuCollection+get)
+    * [.each(fn)](#MuCollection+each)
+    * [.reset(items)](#MuCollection+reset)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="new_MuPagedCollection_new"></a>
 
@@ -251,6 +262,126 @@ Sets the number of items per 'page'
 | Param | Type | Description |
 | --- | --- | --- |
 | n | <code>Integer</code> | Number of items per page |
+
+<a name="MuCollection+addBulk"></a>
+
+### muPagedCollection.addBulk(items)
+Convenience function for add(stuff,true)
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> | Stuff to add |
+
+<a name="MuCollection+add"></a>
+
+### muPagedCollection.add(items, bulk)
+Perhaps the most useful method on a collection, adding things to the collection
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> |  | Stuff to add |
+| bulk | <code>Boolean</code> | <code>false</code> | Skip emitting add for each item, emit 'bulk' |
+
+<a name="MuCollection+sort"></a>
+
+### muPagedCollection.sort(comparator, reverse)
+Sort the collection, may or may not work, haven't test it lol
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| comparator | <code>function</code> |  | Some function that sorts things |
+| reverse | <code>Boolean</code> | <code>false</code> | Sorting direction |
+
+<a name="MuCollection+remove"></a>
+
+### muPagedCollection.remove(idxs)
+Removes item / items from collection, throws an error if collection is flat
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| idxs | <code>Array</code> \| <code>SingleItem</code> | A single index/key or array of them |
+
+<a name="MuCollection+get"></a>
+
+### muPagedCollection.get(id)
+Get Item from collection by idField or by index if flat
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>String</code> \| <code>Number</code> | A string key for idField lookup or number for flat index |
+
+<a name="MuCollection+each"></a>
+
+### muPagedCollection.each(fn)
+Do something with each thing in this collection...duh
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | A thing to do to each item in this collection |
+
+<a name="MuCollection+reset"></a>
+
+### muPagedCollection.reset(items)
+Reset internal state to a collection with no items or with items passed in
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> | Stuff to add to newly cleared collection |
+
+<a name="MuEvent+on"></a>
+
+### muPagedCollection.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muPagedCollection.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muPagedCollection.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+<a name="MuEvent+emit"></a>
+
+### muPagedCollection.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
 
 <a name="MuCollectionView"></a>
 

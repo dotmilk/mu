@@ -166,7 +166,7 @@ class MuCollection extends MuEvent {
 /**
  * Uses {@link MuPaginator} to paginate a {@link MuCollection}, why would you want to do this?
  * I dunno, you're the one using it.
- * @extends Mucollection
+ * @extends MuCollection
  */
 class MuPagedCollection extends MuCollection {
     /**
