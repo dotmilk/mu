@@ -11,7 +11,7 @@ environment or use case.
 <dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>A collection emitting events on certain actions</p>
 </dd>
-<dt><a href="#MuPagedCollection">MuPagedCollection</a></dt>
+<dt><a href="#MuPagedCollection">MuPagedCollection</a> ⇐ <code>Mucollection</code></dt>
 <dd><p>Uses <a href="MuPaginator">MuPaginator</a> to paginate a <a href="#MuCollection">MuCollection</a>, why you&#39;d want to do this?
 I dunno, you&#39;re the one using it.</p>
 </dd>
@@ -214,11 +214,12 @@ Emit event
 
 <a name="MuPagedCollection"></a>
 
-## MuPagedCollection
+## MuPagedCollection ⇐ <code>Mucollection</code>
 Uses [MuPaginator](MuPaginator) to paginate a [MuCollection](#MuCollection), why you'd want to do this?
 I dunno, you're the one using it.
 
 **Kind**: global class  
+**Extends**: <code>Mucollection</code>  
 <a name="MuCollectionView"></a>
 
 ## MuCollectionView ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
