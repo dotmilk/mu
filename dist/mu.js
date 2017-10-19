@@ -353,7 +353,7 @@ class MuNodeManager {
     constructor(){
         this.nodes = {}
     }
-    add(name,selector,context,clone){
+    add(name,selector,context=document,clone=true){
         let node = muDom(selector,context).elements[0]
         if (clone) {
             this.nodes[name] = node.cloneNode(true)
@@ -362,8 +362,8 @@ class MuNodeManager {
         }
         return node
     }
-    addAndRemove(name,selector,context=document){
-        let node = this.add(name,selector,context,true)
+    addAndRemove(name,selector,context,clone){
+        let node = this.add(name,selector,context,clone)
         node.parentNode.removeChild(node)
         return node
     }

@@ -30,6 +30,10 @@ I dunno, you&#39;re the one using it.</p>
 <dt><a href="#MuEvent">MuEvent</a></dt>
 <dd><p>Very simple no frills Event Emitter so to speak, might add emitter.once later</p>
 </dd>
+<dt><a href="#MuNodeManager">MuNodeManager</a></dt>
+<dd><p>Name, store and possibly clone / possibly remove arbitrary nodes of
+your document for later retrieval. Pretty fancy right?</p>
+</dd>
 <dt><a href="#MuPaginator">MuPaginator</a></dt>
 <dd><p>Class for &#39;paginating&#39; an array</p>
 </dd>
@@ -888,6 +892,73 @@ Emit event
 | Param | Type | Description |
 | --- | --- | --- |
 | event | <code>String</code> | Name of event to emit |
+
+<a name="MuNodeManager"></a>
+
+## MuNodeManager
+Name, store and possibly clone / possibly remove arbitrary nodes of
+your document for later retrieval. Pretty fancy right?
+
+**Kind**: global class  
+
+* [MuNodeManager](#MuNodeManager)
+    * [new MuNodeManager()](#new_MuNodeManager_new)
+    * [.add(name, selector, context, clone)](#MuNodeManager+add)
+    * [.addAndRemove()](#MuNodeManager+addAndRemove)
+    * [.getCloned()](#MuNodeManager+getCloned)
+    * [.get()](#MuNodeManager+get)
+    * [.getCurried(name, cloned)](#MuNodeManager+getCurried)
+
+<a name="new_MuNodeManager_new"></a>
+
+### new MuNodeManager()
+Nothing to see here, pretty standard instance constructor...
+
+<a name="MuNodeManager+add"></a>
+
+### muNodeManager.add(name, selector, context, clone)
+This is the heavy lifter here
+
+**Kind**: instance method of [<code>MuNodeManager</code>](#MuNodeManager)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>String</code> |  | The name you want to store it under |
+| selector | <code>String</code> |  | Where to find your node |
+| context | <code>SomethingDomish</code> |  | Defaults to document |
+| clone | <code>Boolean</code> | <code>true</code> | Clone it or just store reference, defaults to true |
+
+<a name="MuNodeManager+addAndRemove"></a>
+
+### muNodeManager.addAndRemove()
+Like [add](#MuNodeManager+add) but it removes the node from the document after jacking it
+
+**Kind**: instance method of [<code>MuNodeManager</code>](#MuNodeManager)  
+<a name="MuNodeManager+getCloned"></a>
+
+### muNodeManager.getCloned()
+Get a clone of something you stored earlier!!
+
+**Kind**: instance method of [<code>MuNodeManager</code>](#MuNodeManager)  
+<a name="MuNodeManager+get"></a>
+
+### muNodeManager.get()
+Get a direct reference to something you stored earlier!
+Not as exciting as [getCloned](#MuNodeManager+getCloned) so only one !
+
+**Kind**: instance method of [<code>MuNodeManager</code>](#MuNodeManager)  
+<a name="MuNodeManager+getCurried"></a>
+
+### muNodeManager.getCurried(name, cloned)
+Maybe you know what you want now, but later you won't,
+but you'll like, still want it, later, when you want it.
+
+**Kind**: instance method of [<code>MuNodeManager</code>](#MuNodeManager)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>String</code> |  | Name of the node you want |
+| cloned | <code>Boolean</code> | <code>true</code> | Defaults to true, if false gets raw node reference, not clone... |
 
 <a name="MuPaginator"></a>
 
