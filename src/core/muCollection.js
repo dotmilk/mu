@@ -96,12 +96,19 @@ class MuCollection extends MuEvent {
             this.emit('bulk')
         }
     }
-
+    /**
+     * Sort the collection, may or may not work, haven't test it lol
+     * @param {Function} comparator - Some function that sorts things
+     * @param {Boolean} reverse - Sorting direction
+     */
     sort(comparator = this.comparator, reverse = false) {
         reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
         this.emit('sort',this.idx.slice())
     }
-
+    /**
+     * Removes item / items from collection, throws an error if collection is flat
+     * @param {(Array | SingleItem)} idxs - A single index/key or array of them
+     */
     remove(idxs) {
         if (this.flat) {throw 'No remove on flat collection, use reset'}
         if (!Array.isArray(idxs)) { idxs = [idxs] }
@@ -117,12 +124,18 @@ class MuCollection extends MuEvent {
             }
         }
     }
-
+    /**
+     * Get Item from collection by idField or by index if flat
+     * @param {(String | Number)} id - A string key for idField lookup or number for flat index
+     */
     get(id) {
         //console.log('get',this)
         return this.collection[id]
     }
-
+    /**
+     * Do something with each thing in this collection...duh
+     * @param {Function} fn - A thing to do to each item in this collection
+     */
     each(fn) {
         if (this.flat) {
             this.collection.forEach(fn)
@@ -133,7 +146,10 @@ class MuCollection extends MuEvent {
         }
 
     }
-
+    /**
+     * Reset internal state to a collection with no items or with items passed in
+     * @param {(Array | SingleItem)} items - Stuff to add to newly cleared collection
+     */
     reset(items = [],bulk){
         if (this.flat) {
             this.collection = []
@@ -147,7 +163,10 @@ class MuCollection extends MuEvent {
         }
     }
 }
-
+/**
+ * Uses {@link MuPaginator} to paginate a {@link MuCollection}, why you'd want to do this?
+ * I dunno, you're the one using it.
+ */
 class MuPagedCollection extends MuCollection {
     constructor(opts){
         super(opts)

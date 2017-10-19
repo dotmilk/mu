@@ -11,6 +11,10 @@ environment or use case.
 <dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>A collection emitting events on certain actions</p>
 </dd>
+<dt><a href="#MuPagedCollection">MuPagedCollection</a></dt>
+<dd><p>Uses <a href="MuPaginator">MuPaginator</a> to paginate a <a href="#MuCollection">MuCollection</a>, why you&#39;d want to do this?
+I dunno, you&#39;re the one using it.</p>
+</dd>
 <dt><a href="#MuCollectionView">MuCollectionView</a> ⇐ <code><a href="#MuWrapperView">MuWrapperView</a></code></dt>
 <dd><p>Generic view wrapper for a collection</p>
 </dd>
@@ -49,6 +53,11 @@ A collection emitting events on certain actions
     * [new MuCollection(options)](#new_MuCollection_new)
     * [.addBulk(items)](#MuCollection+addBulk)
     * [.add(items, bulk)](#MuCollection+add)
+    * [.sort(comparator, reverse)](#MuCollection+sort)
+    * [.remove(idxs)](#MuCollection+remove)
+    * [.get(id)](#MuCollection+get)
+    * [.each(fn)](#MuCollection+each)
+    * [.reset(items)](#MuCollection+reset)
     * [.on(event, fn)](#MuEvent+on)
     * [.removeListener(event, fn)](#MuEvent+removeListener)
     * [.clearListeners()](#MuEvent+clearListeners)
@@ -106,6 +115,62 @@ Perhaps the most useful method on a collection, adding things to the collection
 | items | <code>Array</code> \| <code>SingleItem</code> |  | Stuff to add |
 | bulk | <code>Boolean</code> | <code>false</code> | Skip emitting add for each item, emit 'bulk' |
 
+<a name="MuCollection+sort"></a>
+
+### muCollection.sort(comparator, reverse)
+Sort the collection, may or may not work, haven't test it lol
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| comparator | <code>function</code> |  | Some function that sorts things |
+| reverse | <code>Boolean</code> | <code>false</code> | Sorting direction |
+
+<a name="MuCollection+remove"></a>
+
+### muCollection.remove(idxs)
+Removes item / items from collection, throws an error if collection is flat
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| idxs | <code>Array</code> \| <code>SingleItem</code> | A single index/key or array of them |
+
+<a name="MuCollection+get"></a>
+
+### muCollection.get(id)
+Get Item from collection by idField or by index if flat
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>String</code> \| <code>Number</code> | A string key for idField lookup or number for flat index |
+
+<a name="MuCollection+each"></a>
+
+### muCollection.each(fn)
+Do something with each thing in this collection...duh
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | A thing to do to each item in this collection |
+
+<a name="MuCollection+reset"></a>
+
+### muCollection.reset(items)
+Reset internal state to a collection with no items or with items passed in
+
+**Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| items | <code>Array</code> \| <code>SingleItem</code> | Stuff to add to newly cleared collection |
+
 <a name="MuEvent+on"></a>
 
 ### muCollection.on(event, fn)
@@ -147,6 +212,13 @@ Emit event
 | --- | --- | --- |
 | event | <code>String</code> | Name of event to emit |
 
+<a name="MuPagedCollection"></a>
+
+## MuPagedCollection
+Uses [MuPaginator](MuPaginator) to paginate a [MuCollection](#MuCollection), why you'd want to do this?
+I dunno, you're the one using it.
+
+**Kind**: global class  
 <a name="MuCollectionView"></a>
 
 ## MuCollectionView ⇐ [<code>MuWrapperView</code>](#MuWrapperView)
