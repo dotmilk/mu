@@ -1,21 +1,56 @@
+/**
+ * A collection emitting events on certain actions
+ * @extends MuEvent
+ */
 class MuCollection extends MuEvent {
-    constructor(opts = {}){
+    /**
+     * Create a new collection, in the future will optionally wrap items in a model.
+     * for exceptionally large collections, use flat, so as to not add each 'item' to
+     * this.collection[item.idField] = item. Can be very slow. Flat instead stores
+     * this.collection as an array, no removal of elements, just reset.
+     * @param {Object} options - Options for the collection
+     * @param {Boolean} options.flat - Store as array, not k:v
+     * @param {String} options.idField - The field to use as k when not flat, defaults to 'id'
+     * @param {MuObservableObject} options.model - Future: non instantiated model to wrap each item
+     * @param {Function} options.comparator - Some fn to aid in sorting
+     * @param {Array} options.content - Initial items in collection, will fire add events,
+     * but you will be unable to listen
+     * @example
+     * myCollection = new MuCollection({idField: 'customId'})
+     * // or
+     * myCollection = new MuCollection({flat: true})
+     * myCollection.on('add',someFn)
+     * myCollection.add([{foo: 'a'},{foo: 'b}])
+     * // someFn called twice with item, or
+     * myCollection.add([{foo: 'a'},{foo: 'b}],true)
+     * // no add event fired, instead 'bulk' event fired after all items added
+     */
+    constructor({flat,idField,model,comparator,contents}){
         super()
-        this.flat = opts.flat
-        this.collection = this.flat ? [] : {}
-        this.idx = []
-        this.idField = opts.idField || 'id'
-        this.model = opts.model || MuObservableObject({})
-        this.comparator = opts.comparator || function (a,b)  {
-            if (typeof a === 'string') {
-                return a < b ? -1 : 1 }
-            else {
-                return a - b
+        let defaultCompare = (a,b) => {
+            if (this.flat) {
+                if (typeof a === 'string') {
+                    return a < b ? -1 : 1 }
+                else {
+                    return a - b
+                }
+            } else {
+                if (typeof this.collection[a] === 'string') {
+                    return this.collection[a] < this.collection[b] ? -1 : 1 }
+                else {
+                    return this.collection[a] - this.colletion[b]
+                }
             }
         }
+        this.flat = flat
+        this.collection = this.flat ? [] : {}
+        this.idx = []
+        this.idField = idField || 'id'
+        this.model = model || MuObservableObject({})
+        this.comparator = comparator || defaultCompare
 
-        if (opts.contents) {
-            this.add(opts.contents)
+        if (contents) {
+            this.add(contents)
         }
     }
 
@@ -57,7 +92,6 @@ class MuCollection extends MuEvent {
 
     sort(comparator = this.comparator, reverse = false) {
         reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
-
         this.emit('sort',this.idx.slice())
     }
 
@@ -78,6 +112,7 @@ class MuCollection extends MuEvent {
     }
 
     get(id) {
+        //console.log('get',this)
         return this.collection[id]
     }
 
@@ -119,6 +154,9 @@ class MuPagedCollection extends MuCollection {
 
     changeHandler(event,data){
         this.paginator.paginate = undefined
+        if (this.flat) {
+            this.paginator.data = this.collection
+        }
         this.emit('restructure',this.currentPage())
     }
 
@@ -144,6 +182,7 @@ class MuPagedCollection extends MuCollection {
 
     currentPage() {
         let page = this.paginator.getPage()
+        //console.log('page is ',page,this.paginator)
         return page
     }
 
