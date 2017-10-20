@@ -42,6 +42,10 @@ your document for later retrieval. Pretty fancy right?</p>
 ## Functions
 
 <dl>
+<dt><a href="#MuObservableObject">MuObservableObject()</a></dt>
+<dd><p>A mystical thing, uses traps to watch for changes to an object,
+also has derived properties.</p>
+</dd>
 <dt><a href="#muView">muView()</a></dt>
 <dd><p>Factory function for <a href="#MuView">MuView</a>, uses currying to allow default options,
 calling result with final options to produce instances.</p>
@@ -84,7 +88,7 @@ this.collection as an array, no removal of elements, just reset.
 | options | <code>Object</code> | Options for the collection |
 | options.flat | <code>Boolean</code> | Store as array, not k:v |
 | options.idField | <code>String</code> | The field to use as k when not flat, defaults to 'id' |
-| options.model | <code>MuObservableObject</code> | Future: non instantiated model to wrap each item |
+| options.model | [<code>MuObservableObject</code>](#MuObservableObject) | Future: non instantiated model to wrap each item |
 | options.comparator | <code>function</code> | Some fn to aid in sorting |
 | options.content | <code>Array</code> | Initial items in collection, will fire add events, but you will be unable to listen |
 
@@ -264,7 +268,7 @@ an api for [MuPaginator](#MuPaginator) and special events pertaining to a paged 
 | options | <code>Object</code> | Options for the collection |
 | options.flat | <code>Boolean</code> | Store as array, not k:v |
 | options.idField | <code>String</code> | The field to use as k when not flat, defaults to 'id' |
-| options.model | <code>MuObservableObject</code> | Future: non instantiated model to wrap each item |
+| options.model | [<code>MuObservableObject</code>](#MuObservableObject) | Future: non instantiated model to wrap each item |
 | options.comparator | <code>function</code> | Some fn to aid in sorting |
 | options.content | <code>Array</code> | Initial items in collection, will fire add events, but you will be unable to listen |
 
@@ -1054,6 +1058,32 @@ Ok I lied [nextPage](#MuPaginator+nextPage) wasn't that unique, this gets a page
 but the previous one this time.
 
 **Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
+<a name="MuObservableObject"></a>
+
+## MuObservableObject()
+A mystical thing, uses traps to watch for changes to an object,
+also has derived properties.
+
+**Kind**: global function  
+**Example**  
+```js
+let person = new MuObservableObject(
+   {props: ['firstName','lastName'],
+    derived: {
+        fullName: {
+            deps: ['firstName','lastName'],
+            fn: function(){
+                return `${this.firstName} ${this.lastName}`
+            }
+        }
+    }})
+let dude = new person({firstName: 'jim', lastName: 'smith'})
+console.log(dude.fullName)
+// Magically fullName is 'jim smith' and if you change first or last...magic
+// fullName updates...crazy
+person.on('change:fullName',doSomething)
+// can also listen for changes on any property.
+```
 <a name="muView"></a>
 
 ## muView()

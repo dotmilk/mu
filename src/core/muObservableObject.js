@@ -5,6 +5,27 @@ function arrayClone(a) {
 function objectClone(o) {
     return JSON.parse(JSON.stringify(o))
 }
+/**
+ * A mystical thing, uses traps to watch for changes to an object,
+ * also has derived properties.
+ * @example
+ * let person = new MuObservableObject(
+ *    {props: ['firstName','lastName'],
+ *     derived: {
+ *         fullName: {
+ *             deps: ['firstName','lastName'],
+ *             fn: function(){
+ *                 return `${this.firstName} ${this.lastName}`
+ *             }
+ *         }
+ *     }})
+ * let dude = new person({firstName: 'jim', lastName: 'smith'})
+ * console.log(dude.fullName)
+ * // Magically fullName is 'jim smith' and if you change first or last...magic
+ * // fullName updates...crazy
+ * person.on('change:fullName',doSomething)
+ * // can also listen for changes on any property.
+ */
 
 function MuObservableObject(opts) {
 
