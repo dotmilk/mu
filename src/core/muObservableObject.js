@@ -9,7 +9,7 @@ function objectClone(o) {
  * A mystical thing, uses traps to watch for changes to an object,
  * also has derived properties.
  * @example
- * let person = new MuObservableObject(
+ * let person = MuObservableObject(
  *    {props: ['firstName','lastName'],
  *     derived: {
  *         fullName: {

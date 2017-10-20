@@ -479,17 +479,20 @@ window.MuPage = class MuPage {
     onHide() {}
 }
 class MuPageManager extends MuEvent {
-    constructor(opts = {}) {
+    constructor({context=document,
+                 options={},
+                 root='mu-root',
+                 pageAttribute='mu-page',
+                 controllerAttribute='mu-controller'}) {
         super()
         this.pages = {}
         this.loaded = []
         this.currentPage = undefined
-        this.context = opts['context'] || document
-        this.rootName = opts['root'] || 'mu-root'
+        this.rootName = root
         this.root = muDom(`[${this.rootName}]`).elements[0]
-        this.pageAttributeName = opts['pageAttribute'] || 'mu-page'
+        this.pageAttributeName = pageAttribute
         this.pageAttribute = `[${this['pageAttributeName']}]`
-        this.controllerAttributeName = opts['controllerAttribute'] || 'mu-controller'
+        this.controllerAttributeName = controllerAttribute
         muDom(this.pageAttribute, this.context).each((el)=>{
             let name = el.getAttribute(this.pageAttributeName)
             let controllerName = el.getAttribute(this.controllerAttributeName)
@@ -511,7 +514,7 @@ class MuPageManager extends MuEvent {
             this.pages[name]['controller'] = new PageClass(Object.assign({
                 pageManager: this,
                 pageName: name
-            },opts.options || {}))
+            },options))
             this.on(`load:${name}`,(page)=>{
                 this.getController(name).onLoad(page)
             })

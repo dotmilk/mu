@@ -8,6 +8,12 @@ environment or use case.
 ## Classes
 
 <dl>
+<dt><a href="#MuPageManager">MuPageManager</a></dt>
+<dd><p>Super fun tool here. Designate by default some element with the attribute
+mu-root, and one or more elements inside that one mu-page=&#39;pagename&#39;
+mu-controller=&#39;someFnWithHandlers&#39;. Then fire this badboy up, and call load with
+&#39;pagename&#39; bam</p>
+</dd>
 <dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>A collection emitting events on certain actions</p>
 </dd>
@@ -51,6 +57,82 @@ also has derived properties.</p>
 calling result with final options to produce instances.</p>
 </dd>
 </dl>
+
+<a name="MuPageManager"></a>
+
+## MuPageManager
+Super fun tool here. Designate by default some element with the attribute
+mu-root, and one or more elements inside that one mu-page='pagename'
+mu-controller='someFnWithHandlers'. Then fire this badboy up, and call load with
+'pagename' bam
+
+**Kind**: global class  
+
+* [MuPageManager](#MuPageManager)
+    * [new MuPageManager(options)](#new_MuPageManager_new)
+    * [.getAttributes(name)](#MuPageManager+getAttributes)
+    * [.getDOM(name)](#MuPageManager+getDOM)
+    * [.getController(name)](#MuPageManager+getController)
+    * [.load(name)](#MuPageManager+load)
+
+<a name="new_MuPageManager_new"></a>
+
+### new MuPageManager(options)
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Options |
+| options.root | <code>String</code> | The name of the attribute denoting the root of your page. Where to find pages, and where page swapping will occur in essence. Defaults to 'mu-root'. |
+| options.pageAttribute | <code>String</code> | The name of the attribute denoting a page. These will be cloned and removed from the dom. Defaults to 'mu-page'. |
+| options.controllerAttribute | <code>String</code> | Placed on same element you denoted as a page. This should be a class name, to be instantiated by [MuPageManager](#MuPageManager) during init. |
+| options.options | <code>Object</code> | Options you want passed in to each page controller, in addition to the defaults passed into each pageManager: a reference to this, and name: its name |
+
+<a name="MuPageManager+getAttributes"></a>
+
+### muPageManager.getAttributes(name)
+Get a list of attributes of the page
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of page to get attributes of. |
+
+<a name="MuPageManager+getDOM"></a>
+
+### muPageManager.getDOM(name)
+Get a reference to the DOM node tied to specified page
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of page |
+
+<a name="MuPageManager+getController"></a>
+
+### muPageManager.getController(name)
+Get the controller instance bound to specified page
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of page |
+
+<a name="MuPageManager+load"></a>
+
+### muPageManager.load(name)
+After construction, this is probably the only method you will be using. Removes old page if any emitting hide:pageName
+so that it knows it is being removed from the dom. If it is the first time this page has been loaded load:pageName is
+emitted in place of show:pageName, allowing your controller to do prep work if needed, you might want to call show yourself
+at the end of your handler for show, depending on how all your shit is setup.
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of page |
 
 <a name="MuCollection"></a>
 
@@ -1067,7 +1149,7 @@ also has derived properties.
 **Kind**: global function  
 **Example**  
 ```js
-let person = new MuObservableObject(
+let person = MuObservableObject(
    {props: ['firstName','lastName'],
     derived: {
         fullName: {
