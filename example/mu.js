@@ -469,10 +469,10 @@ class MuManager extends MuEvent {
         return this[name]
     }
 }
-window.MuPage = class MuPage {
-    constructor(opts) {
-        this.pageName = opts.pageName
-        this.pageManager = opts.pageManager
+class MuPage {
+    constructor({pageName, pageManager}) {
+        this.pageName = pageName
+        this.pageManager = pageManager
     }
     onLoad() {}
     onShow() {}

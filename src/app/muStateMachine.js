@@ -28,7 +28,6 @@ class MuStateMachine extends MuEvent {
         if (old) {
             this.handle('onExit')
         }
-
         if (name && this.states[name]) {
             this.currentState = name
             this.handle('onEnter')

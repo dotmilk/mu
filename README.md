@@ -8,6 +8,9 @@ environment or use case.
 ## Classes
 
 <dl>
+<dt><a href="#MuPage">MuPage</a></dt>
+<dd><p>Abstract class for page controllers</p>
+</dd>
 <dt><a href="#MuPageManager">MuPageManager</a></dt>
 <dd><p>Super fun tool here. Designate by default some element with the attribute
 mu-root, and one or more elements inside that one mu-page=&#39;pagename&#39;
@@ -58,6 +61,49 @@ calling result with final options to produce instances.</p>
 </dd>
 </dl>
 
+<a name="MuPage"></a>
+
+## MuPage
+Abstract class for page controllers
+
+**Kind**: global class  
+
+* [MuPage](#MuPage)
+    * [new MuPage(options)](#new_MuPage_new)
+    * [.onLoad()](#MuPage+onLoad)
+    * [.onShow()](#MuPage+onShow)
+    * [.onHide()](#MuPage+onHide)
+
+<a name="new_MuPage_new"></a>
+
+### new MuPage(options)
+This is always called by super in extending class don't worry about it...
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | Just two options |
+| options.pageName | <code>String</code> | Name of the page |
+| options.pageManager | [<code>MuPageManager</code>](#MuPageManager) | Reference to the [MuPageManager](#MuPageManager) managing this page |
+
+<a name="MuPage+onLoad"></a>
+
+### muPage.onLoad()
+Handler for load:pageName, subclass may implement
+
+**Kind**: instance method of [<code>MuPage</code>](#MuPage)  
+<a name="MuPage+onShow"></a>
+
+### muPage.onShow()
+Handler for show:pageName, subclass may implement
+
+**Kind**: instance method of [<code>MuPage</code>](#MuPage)  
+<a name="MuPage+onHide"></a>
+
+### muPage.onHide()
+Handler for hide:pageName, subclass may implement
+
+**Kind**: instance method of [<code>MuPage</code>](#MuPage)  
 <a name="MuPageManager"></a>
 
 ## MuPageManager

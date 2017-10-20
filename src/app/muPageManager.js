@@ -111,5 +111,4 @@ class MuPageManager extends MuEvent {
             this.emit(`show:${name}`,this.getDOM(this.currentPage))
         }
     }
-
 }
