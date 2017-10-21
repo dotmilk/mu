@@ -1,16 +1,16 @@
 /**
  * Programmatically create some html fragment template
- * @example
- * let frag = new MuTagen().tag('div').class().tag('p').text('aParagraph').compile()
- * frag.render({class: 'foo',aParagraph: 'Some text for the paragraph'})
- * // returns
- * // <div class="foo"><p>Some text for the paragraph</p></div>
  */
 class MuTagen {
     /**
      * Get the party started
      * @example
-     * let frag = new MuTagen()
+     * let frag = new MuTagen().tag('div').class().tag('p').text('aParagraph').compile()
+     * frag.render({class: 'foo',aParagraph: 'Some text for the paragraph'})
+     * // returns
+     * // <div class="foo"><p>Some text for the paragraph</p></div>
+     * //For now lets just assume
+     * frag = new MuTagen()
      */
     constructor(fullPrefix,parent) {
         this.fullPrefix = fullPrefix || []
@@ -29,6 +29,14 @@ class MuTagen {
      * frag.tag('div')
      * // optionally
      * frag.tag('div','foo')
+     * // When render is called later all future properties must be found under {foo:{}}
+     * // for any tag under this level, more robust example being
+     * frag.tag('div').class().tag('section','profile').class()
+     *                        .tag('p').text('name').close()
+     *                        .tag('p').text('info').close().close()
+     *                .tag('p').text('status')
+     * frag.render({class:'foo',status:'online',profile:{ name: 'John Smith', info: 'age: 34, likes: long walks', class: 'profile'}})
+     * // <div class="foo"><section class="profile"><p>John Smith</p><p>age: 34, likes: long walks</p></section><p>online</p></div>
      */
     tag(name,prefix) {
         /*
@@ -38,10 +46,13 @@ class MuTagen {
             let childPrefix
             if (this.fullPrefix.length) {
                 childPrefix = [].concat(this.fullPrefix)
-                childPrefix.push(prefix)
+                if (prefix){
+                    childPrefix.push(prefix)
+                }
             } else if (prefix) {
                 childPrefix = [prefix]
             }
+            console.log('ugh',childPrefix)
             let child = new MuTagen(childPrefix,this).tag(name)
             this.children.push(child)
             return child
@@ -131,13 +142,14 @@ class MuTagen {
         })
 
         attributes = this.compileAttributes()
-        //console.log('attr',attributes)
         childrenString = childTmp.join('')
         if (this.innerText) {
+
             this.compiledString = this.elem.open +
                 attributes +
                 this.elem.afterOpen +
-                '${opts['+ `'${this.innerText}'` +']}' +
+                '${opts' + `${this.fullPrefix.length ? '.' + this.fullPrefix.join('.') : ''}`
+                + '['+ `'${this.innerText}'` +']}' +
                 childrenString +
                 this.elem.close
         } else {

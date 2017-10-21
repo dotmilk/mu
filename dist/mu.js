@@ -208,10 +208,13 @@ class MuTagen {
             let childPrefix
             if (this.fullPrefix.length) {
                 childPrefix = [].concat(this.fullPrefix)
-                childPrefix.push(prefix)
+                if (prefix){
+                    childPrefix.push(prefix)
+                }
             } else if (prefix) {
                 childPrefix = [prefix]
             }
+            console.log('ugh',childPrefix)
             let child = new MuTagen(childPrefix,this).tag(name)
             this.children.push(child)
             return child
@@ -285,7 +288,8 @@ class MuTagen {
             this.compiledString = this.elem.open +
                 attributes +
                 this.elem.afterOpen +
-                '${opts['+ `'${this.innerText}'` +']}' +
+                '${opts' + `${this.fullPrefix.length ? '.' + this.fullPrefix.join('.') : ''}`
+                + '['+ `'${this.innerText}'` +']}' +
                 childrenString +
                 this.elem.close
         } else {
