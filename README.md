@@ -1581,10 +1581,241 @@ muDom('.foo')
 // shorthand for
 muDom(document).find('foo')
 ```
+
+* [muDom(selector, context)](#muDom)
+    * [.html(newHtml)](#muDom.html)
+    * [.value(value)](#muDom.value)
+    * [.text(newTxt)](#muDom.text)
+    * [.setAttribute(name, value)](#muDom.setAttribute)
+    * [.each(fn)](#muDom.each)
+    * [.some(fn)](#muDom.some)
+    * [.map(fn)](#muDom.map)
+    * [.siblings()](#muDom.siblings)
+    * [.toggle(className)](#muDom.toggle)
+    * [.hide()](#muDom.hide)
+    * [.show()](#muDom.show)
+    * [.addClass(class)](#muDom.addClass)
+    * [.removeClass(class)](#muDom.removeClass)
+    * [.swap(el)](#muDom.swap)
+    * [.on(event, handler, options)](#muDom.on)
+    * [.off(event, handler, options)](#muDom.off)
+    * [.find(selector)](#muDom.find)
+    * [.append(node)](#muDom.append)
+    * [.prepend(node)](#muDom.prepend)
+    * [.remove()](#muDom.remove)
+    * [.clear()](#muDom.clear)
+
 <a name="muDom.html"></a>
 
-### muDom.html()
-Sets the innerHTML of matched elements
+### muDom.html(newHtml)
+Sets the innerHTML of matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| newHtml | the new html for matched elements. |
+
+<a name="muDom.value"></a>
+
+### muDom.value(value)
+Sets the value of matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| value | the new value for matched elements. |
+
+<a name="muDom.text"></a>
+
+### muDom.text(newTxt)
+Sets the innerText of matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| newTxt | the new text for matched elements. |
+
+<a name="muDom.setAttribute"></a>
+
+### muDom.setAttribute(name, value)
+Sets an attribute of matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| name | name of attribute to set |
+| value | value of attribute |
+
+<a name="muDom.each"></a>
+
+### muDom.each(fn)
+Calls fn for each matched element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| fn | some function |
+
+<a name="muDom.some"></a>
+
+### muDom.some(fn)
+Determines if some element in matched elements passes fn. Not chainable.
+Basically Array.some()
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| fn | some function |
+
+<a name="muDom.map"></a>
+
+### muDom.map(fn)
+Map over matched elements. Not chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| fn | some function |
+
+<a name="muDom.siblings"></a>
+
+### muDom.siblings()
+Get siblings. Chainable on siblings.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.toggle"></a>
+
+### muDom.toggle(className)
+Toggles a class on matched elements. Defaults to '.muHide' which as
+its name suggests hides the element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| className | class to toggle |
+
+<a name="muDom.hide"></a>
+
+### muDom.hide()
+Hides matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.show"></a>
+
+### muDom.show()
+Shows matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.addClass"></a>
+
+### muDom.addClass(class)
+Adds a class to matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| class | class name to add |
+
+<a name="muDom.removeClass"></a>
+
+### muDom.removeClass(class)
+Removes a class from matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| class | class name to add |
+
+<a name="muDom.swap"></a>
+
+### muDom.swap(el)
+Swaps matched elements with new element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| el | new element |
+
+<a name="muDom.on"></a>
+
+### muDom.on(event, handler, options)
+Listen to some event on matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| event | event to listen for |
+| handler | some fn |
+| options | options for addEventListener |
+
+<a name="muDom.off"></a>
+
+### muDom.off(event, handler, options)
+Removes some event listener from matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| event | event to listen for |
+| handler | some fn |
+| options | options for addEventListener |
+
+<a name="muDom.find"></a>
+
+### muDom.find(selector)
+Find some matching element/elements in current context. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| selector | some selector |
+
+<a name="muDom.append"></a>
+
+### muDom.append(node)
+Append some element to matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| node | some dom node to append |
+
+<a name="muDom.prepend"></a>
+
+### muDom.prepend(node)
+Prepend some element to matched elements. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| node | some dom node to prepend |
+
+<a name="muDom.remove"></a>
+
+### muDom.remove()
+Remove matched elements from their parents. Not chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.clear"></a>
+
+### muDom.clear()
+Clear the contents of matched elements. Chainable.
 
 **Kind**: static method of [<code>muDom</code>](#muDom)  
 

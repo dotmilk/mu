@@ -58,10 +58,12 @@ function muDom(s,c) {
         map(fn){
             return this.elements.map(fn)
         },
-        siblings(fn){
+        siblings(){
             let siblings = []
             let el = this.elements[0].parentNode.firstChild
-            do { if (el != this.elements[0] && el.nodeType != 3 ){ siblings.push(el)} } while (el = el.nextSibling)
+            do { if (el != this.elements[0] && el.nodeType != 3 )
+                 { siblings.push(el)} }
+            while ((el = el.nextSibling))
             return muDom(siblings,this.context)
         },
         toggle(className = 'muHide'){

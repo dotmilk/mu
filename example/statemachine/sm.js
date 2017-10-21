@@ -1,14 +1,3 @@
-/**
- * Could just as easily have not used classes, just plain js objects
- *
- * {states:{
- *   noCoin: {
- *     insertCoin(){
- *       //etc
- *     }
- *   }
- *  }}
- */
 class GumballMachineAbstract extends MuState {
     insertCoin(){}
     refundCoin(){}
@@ -62,6 +51,17 @@ class GumballMachineWithCoin extends GumballMachineAbstract {
     }
 }
 
+/**
+ * Could just as easily have not used classes, just plain js objects
+ *
+ * {states:{
+ *   noCoin: {
+ *     insertCoin(){
+ *       //etc
+ *     }
+ *   }
+ *  }}
+ */
 let gumballMachine = new MuStateMachine({
     states:{
         noCoin: new GumballMachineNoCoin(),
