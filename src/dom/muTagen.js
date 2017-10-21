@@ -1,5 +1,17 @@
-let parser = new DOMParser()
+/**
+ * Programmatically create some html fragment template
+ * @example
+ * let frag = new MuTagen().tag('div').class().tag('p').text('aParagraph').compile()
+ * frag.render({class: 'foo',aParagraph: 'Some text for the paragraph'})
+ * // returns
+ * // <div class="foo"><p>Some text for the paragraph</p></div>
+ */
 class MuTagen {
+    /**
+     * Get the party started
+     * @example
+     * let frag = new MuTagen()
+     */
     constructor(fullPrefix,parent) {
         this.fullPrefix = fullPrefix || []
         this.parent = parent
@@ -11,7 +23,13 @@ class MuTagen {
         this.innerText
         return this
     }
-
+    /**
+     * Now that the party is started, lets make a tag
+     * @example
+     * frag.tag('div')
+     * // optionally
+     * frag.tag('div','foo')
+     */
     tag(name,prefix) {
         /*
           If there is already a tag in 'this' make a new instance and pass it intended tag
@@ -22,12 +40,8 @@ class MuTagen {
                 childPrefix = [].concat(this.fullPrefix)
                 childPrefix.push(prefix)
             } else if (prefix) {
-                //console.log('no current prefix, creating new one',prefix)
                 childPrefix = [prefix]
             }
-
-            //console.log(this.fullPrefix,childPrefix)
-
             let child = new MuTagen(childPrefix,this).tag(name)
             this.children.push(child)
             return child
@@ -35,10 +49,8 @@ class MuTagen {
         }
 
         if (prefix) {
-            //console.log('ddd')
             this.fullPrefix.push(prefix)
         }
-        //this.fullPrefix = prefix
         this.elem = {
             open: `<${name}`,
             afterOpen: '>',
@@ -46,7 +58,13 @@ class MuTagen {
         }
         return this
     }
-
+    /**
+     * Now we have a tag so lets add an attribute to it
+     * @example
+     * frag.attribute('class')
+     * // By default it will look up the value for the attribute later under the
+     * // key with the same name as that attribute, or you can specify
+     */
     attribute(name,prop = name) {
         if (!(name in this.attributes)) {
             // todo maybe filter out undefined things
@@ -86,7 +104,6 @@ class MuTagen {
     compileAttributes() {
         let out = ''
         for (let attr of this.attributes) {
-            //console.log(attr)
             out += ` ${attr[0]}="`
             out += '${'
             if (this.fullPrefix.length) {
@@ -135,10 +152,6 @@ class MuTagen {
 
     render(opts) {
         if (!this.template) { throw 'No template compiled'}
-        //console.log(parser.parseFromString(this.template(opts), 'text/html'))
-        // return parser.parseFromString(this.template(opts), 'text/html')
-        //     .querySelector('body')
-        //     .firstChild
         // allows generation of th and other tags that normally vanish out of the fragment
         return document.createRange()
             .createContextualFragment(`<template>${this.template(opts)}</template>`)

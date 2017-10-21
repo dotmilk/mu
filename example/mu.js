@@ -191,7 +191,6 @@ function muDom(s,c) {
         throw 'WTF are you trying to do'
     }
 }
-let parser = new DOMParser()
 class MuTagen {
     constructor(fullPrefix,parent) {
         this.fullPrefix = fullPrefix || []

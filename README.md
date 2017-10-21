@@ -50,6 +50,9 @@ I dunno, you&#39;re the one using it.</p>
 <dt><a href="#MuView">MuView</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>Main class for for a &#39;view&#39;, examples in example folder</p>
 </dd>
+<dt><a href="#MuTagen">MuTagen</a></dt>
+<dd><p>Programmatically create some html fragment template</p>
+</dd>
 <dt><a href="#MuEvent">MuEvent</a></dt>
 <dd><p>Very simple no frills Event Emitter so to speak, might add emitter.once later</p>
 </dd>
@@ -72,6 +75,9 @@ also has derived properties.</p>
 <dt><a href="#muView">muView()</a></dt>
 <dd><p>Factory function for <a href="#MuView">MuView</a>, uses currying to allow default options,
 calling result with final options to produce instances.</p>
+</dd>
+<dt><a href="#muCss">muCss(style, id)</a></dt>
+<dd><p>Inject a style sheet, if you feel so inclined</p>
 </dd>
 </dl>
 
@@ -1124,6 +1130,54 @@ Emit event
 | --- | --- | --- |
 | event | <code>String</code> | Name of event to emit |
 
+<a name="MuTagen"></a>
+
+## MuTagen
+Programmatically create some html fragment template
+
+**Kind**: global class  
+
+* [MuTagen](#MuTagen)
+    * [new MuTagen()](#new_MuTagen_new)
+    * [.tag()](#MuTagen+tag)
+    * [.attribute()](#MuTagen+attribute)
+
+<a name="new_MuTagen_new"></a>
+
+### new MuTagen()
+Get the party started
+
+**Example**  
+```js
+let frag = new MuTagen().tag('div').class().tag('p').text('aParagraph').compile()
+frag.render({class: 'foo',aParagraph: 'Some text for the paragraph'})
+// returns
+// <div class="foo"><p>Some text for the paragraph</p></div>
+```
+<a name="MuTagen+tag"></a>
+
+### muTagen.tag()
+Now that the party is started, lets make a tag
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+**Example**  
+```js
+frag.tag('div')
+// optionally
+frag.tag('div','foo')
+```
+<a name="MuTagen+attribute"></a>
+
+### muTagen.attribute()
+Now we have a tag so lets add an attribute to it
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+**Example**  
+```js
+frag.attribute('class')
+// By default it will look up the value for the attribute later under the
+// key with the same name as that attribute, or you can specify
+```
 <a name="MuEvent"></a>
 
 ## MuEvent
@@ -1389,6 +1443,22 @@ calling result with final options to produce instances.
 let personView = muView({template: '<div></div>'})
 let personOne = personView({model: personOneModel })
 let personTwo = personView({model: personTwoModel })
+```
+<a name="muCss"></a>
+
+## muCss(style, id)
+Inject a style sheet, if you feel so inclined
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| style | <code>String</code> | some string of css |
+| id | <code>String</code> | optional id for the style node you are about to inject |
+
+**Example**  
+```js
+muCss('.someClass {background-color: red}')
 ```
 
 * * *
