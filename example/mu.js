@@ -8,9 +8,10 @@ function muCss(style,id) {
 }
 function muDom(s,c) {
     if (!window.muDomInjected) {
+        let css =
         if (document.readyState != 'interactive') {
             document.addEventListener('DOMContentLoaded',()=>{
-                muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+                muCss(,'muDom')
             })
         } else {
             muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')

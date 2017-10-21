@@ -12,12 +12,13 @@
  */
 function muDom(s,c) {
     if (!window.muDomInjected) {
+        let css =`.muHide { display: none} .muSlow { transition: 1s; }}`
         if (document.readyState != 'interactive') {
             document.addEventListener('DOMContentLoaded',()=>{
-                muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+                muCss(css,'muDom')
             })
         } else {
-            muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+            muCss(css,'muDom')
         }
         window.muDomInjected = true
     }

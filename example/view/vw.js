@@ -3,7 +3,7 @@ let theModelFactory = new MuObservableObject({
 })
 
 let theModel = new theModelFactory({aNumber: 5})
-// Math.random() * (max - min) + min
+
 let theView = new MuView({
     autoRender: true,
     template: ()=>{ return new MuTagen().tag('div')
@@ -22,5 +22,4 @@ let theView = new MuView({
             this.model.aNumber = Math.random() * (10000 - 1) + 1
         }
     }
-
 })
