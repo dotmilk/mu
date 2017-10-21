@@ -12,6 +12,7 @@ class MuCollectionView extends MuWrapperView{
         Object.assign(this.viewOptions,{autoRender: true})
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
+        console.log(this)
     }
 
     init(){
@@ -20,7 +21,6 @@ class MuCollectionView extends MuWrapperView{
             let view = this.view(Object.assign({
                 model: item.on ? item : new this.modelWrapper(item)},
                                                this.viewOptions))
-
             this.collectionViews[idx] = view
             this.el.appendChild(view.el)
         })

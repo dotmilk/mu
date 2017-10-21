@@ -8,13 +8,13 @@ function muCss(style,id) {
 }
 function muDom(s,c) {
     if (!window.muDomInjected) {
-        let css =
+        let css =`.muHide { display: none} .muSlow { transition: 1s; }}`
         if (document.readyState != 'interactive') {
             document.addEventListener('DOMContentLoaded',()=>{
-                muCss(,'muDom')
+                muCss(css,'muDom')
             })
         } else {
-            muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+            muCss(css,'muDom')
         }
         window.muDomInjected = true
     }
@@ -744,6 +744,7 @@ class MuView extends MuEvent {
         for (let eventName in this._boundEvents) {
             this._boundEvents[eventName].reverse()
             this.rootWrapped.on(eventName,(e)=>{
+                e.stopPropagation()
                 if (e.target && this._boundEvents[e.type]) {
                     for (let handler of this._boundEvents[e.type]) {
                         if (handler.selector === '') {
@@ -1243,7 +1244,7 @@ class MuTable extends MuEvent{
     }
 }
 class MuCollection extends MuEvent {
-    constructor({flat,idField,model,comparator,contents}){
+    constructor({flat,idField,model,comparator,contents} = {}){
         super()
         let defaultCompare = (a,b) => {
             if (this.flat) {
@@ -1418,6 +1419,7 @@ class MuCollectionView extends MuWrapperView{
         Object.assign(this.viewOptions,{autoRender: true})
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
+        console.log(this)
     }
     init(){
         this.collection.on('add',(idx)=>{

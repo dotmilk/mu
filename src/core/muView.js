@@ -242,6 +242,7 @@ class MuView extends MuEvent {
             this._boundEvents[eventName].reverse()
             // bind generic handlers for each event given
             this.rootWrapped.on(eventName,(e)=>{
+                e.stopPropagation()
                 if (e.target && this._boundEvents[e.type]) {
                     for (let handler of this._boundEvents[e.type]) {
                         // '' is root: we have exhausted all other selectors

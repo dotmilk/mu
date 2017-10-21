@@ -25,7 +25,7 @@ class MuCollection extends MuEvent {
      * myCollection.add([{foo: 'a'},{foo: 'b'}],true)
      * // no add event fired, instead 'bulk' event fired after all items added
      */
-    constructor({flat,idField,model,comparator,contents}){
+    constructor({flat,idField,model,comparator,contents} = {}){
         super()
         let defaultCompare = (a,b) => {
             if (this.flat) {
