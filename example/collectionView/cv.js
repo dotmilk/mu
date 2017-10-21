@@ -7,12 +7,6 @@ function makeId() {
     return toJoin.join('')
 }
 
-let numberModel = new MuObservableObject({
-    props: ['aNumber','id']
-})
-
-let theModel = new numberModel({aNumber: 5})
-
 let collectionViewFactory = muView({
     autoRender: true,
     template: ()=>{
@@ -22,6 +16,7 @@ let collectionViewFactory = muView({
             .tag('span')
             .compile().render({text: 'randomize me'})
     },
+    // since the collection auto wraps we can bind to a property
     bindings: {
         aNumber: {
             selector: 'span',
@@ -35,24 +30,18 @@ let collectionViewFactory = muView({
     }
 })
 
+// this will store items added by the button
 let theCollection = new MuCollection()
 
 let theView = new MuView({
-
     template: ()=>{ return new MuTagen().tag('div')
                     .tag('button').text().close()
                     .tag('ul').class().compile().render({text: 'make new item',class: 'items'})
                   },
-    model: theModel,
-    bindings: {
-        aNumber: {
-            selector: 'div',
-            type: 'text'
-        }
-    },
     events: {
         'click button': function(){
-            theCollection.add(new numberModel({aNumber: 5, id: makeId()}))
+            //collection automatically wraps the item in an observable object
+            theCollection.add({aNumber: 5, id: makeId()})
         }
     }
 })

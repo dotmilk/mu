@@ -494,7 +494,7 @@ class MuPageManager extends MuEvent {
                  options={},
                  root='mu-root',
                  pageAttribute='mu-page',
-                 controllerAttribute='mu-controller'}) {
+                 controllerAttribute='mu-controller'} = {}) {
         super()
         this.pages = {}
         this.loaded = []
@@ -529,8 +529,14 @@ class MuPageManager extends MuEvent {
             this.on(`load:${name}`,(page)=>{
                 this.getController(name).onLoad(page)
             })
-            this.on(`hide:${name}`,this.getController(name).onHide)
-            this.on(`show:${name}`,this.getController(name).onShow)
+            this.on(`hide:${name}`,(page)=>{
+                let controller = this.getController(name)
+                controller.onHide.call(controller,page)
+            })
+            this.on(`show:${name}`,(page)=>{
+                let controller = this.getController(name)
+                controller.onShow.call(controller,page)
+            })
         })
     }
     getAttributes(name) {
