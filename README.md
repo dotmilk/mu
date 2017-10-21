@@ -17,6 +17,9 @@ mu-root, and one or more elements inside that one mu-page=&#39;pagename&#39;
 mu-controller=&#39;someFnWithHandlers&#39;. Then fire this badboy up, and call load with
 &#39;pagename&#39; bam</p>
 </dd>
+<dt><a href="#MuState">MuState</a></dt>
+<dd><p>Abstract State class for use in <a href="#MuStateMachine">MuStateMachine</a></p>
+</dd>
 <dt><a href="#MuStateMachine">MuStateMachine</a></dt>
 <dd><p>Super neat statemachine, very loosely based on <a href="http://machina-js.org/">machina.js</a>,
 this is no where near as frilly, this does not have a kitchen sink, nor will it
@@ -231,6 +234,12 @@ Emit event
 | --- | --- | --- |
 | event | <code>String</code> | Name of event to emit |
 
+<a name="MuState"></a>
+
+## MuState
+Abstract State class for use in [MuStateMachine](#MuStateMachine)
+
+**Kind**: global class  
 <a name="MuStateMachine"></a>
 
 ## MuStateMachine
@@ -239,6 +248,54 @@ this is no where near as frilly, this does not have a kitchen sink, nor will it
 keep your beverages cold.
 
 **Kind**: global class  
+
+* [MuStateMachine](#MuStateMachine)
+    * [new MuStateMachine(options)](#new_MuStateMachine_new)
+    * [.transition(name)](#MuStateMachine+transition)
+    * [.handle(name)](#MuStateMachine+handle)
+
+<a name="new_MuStateMachine_new"></a>
+
+### new MuStateMachine(options)
+So basically you only need to define some states, of which there is
+one 'special' state you can add 'uninitialized' if you don't add it
+a blank [MuState](#MuState) is used.
+
+Each state can also have its own '\*' handler as well to respond to
+calls not specifically covered in that state's definition.
+
+Every property not under states:{}, becomes a property of the instance.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>Object</code> | options for your stateMachine, everything not under options.state becomes a property of the instance |
+| options.states | <code>Object</code> | defines the states your machine can transition to |
+
+<a name="MuStateMachine+transition"></a>
+
+### muStateMachine.transition(name)
+Attempt to transition to a state. Should probably be called
+from the api / internally, but again whatever it's your code.
+
+**Kind**: instance method of [<code>MuStateMachine</code>](#MuStateMachine)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of state to transition to. |
+
+<a name="MuStateMachine+handle"></a>
+
+### muStateMachine.handle(name)
+Attempts to call 'name' on current state. Should probably be called
+from your provided api, instead of attempting to call directly from outside
+
+**Kind**: instance method of [<code>MuStateMachine</code>](#MuStateMachine)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | state's method you are attempting to call |
+
 <a name="MuCollection"></a>
 
 ## MuCollection ⇐ [<code>MuEvent</code>](#MuEvent)

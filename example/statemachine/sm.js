@@ -1,21 +1,35 @@
+/**
+ * Could just as easily have not used classes, just plain js objects
+ *
+ * {states:{
+ *   noCoin: {
+ *     insertCoin(){
+ *       //etc
+ *     }
+ *   }
+ *  }}
+ */
 class GumballMachineAbstract extends MuState {
     insertCoin(){}
     refundCoin(){}
     dispense(){}
+    '*'(){
+        console.log('omfg')
+    }
 }
 
 class GumballStartup extends GumballMachineAbstract {
     onEnter(){
-        this.coinsNeededToPurchase = 2
         this.emit('startup',{coinsNeededToPurchase: this.coinsNeededToPurchase,
                              coinCount: 0})
         this.transition('noCoin')
     }
+
 }
 
 class GumballMachineNoCoin extends GumballMachineAbstract {
     insertCoin(){
-        this.coinCount = this.coinCount || 1
+        this.coinCount = 1
         this.emit('coinInserted',this.coinCount)
         this.transition('withCoin')
     }
@@ -54,6 +68,7 @@ let gumballMachine = new MuStateMachine({
         withCoin: new GumballMachineWithCoin(),
         startup: new GumballStartup()
     },
+    // create api
     start(){
         this.transition('startup')
     },
@@ -65,5 +80,11 @@ let gumballMachine = new MuStateMachine({
     },
     dispense(){
         this.handle('dispense')
+    },
+    init(){
+        // You can provide an init function to maybe set up some things
+        // If you want to that is, i'm not trying to tell you how to code
+        this.coinsNeededToPurchase = 2
+        this.coinCount = 1
     }
 })

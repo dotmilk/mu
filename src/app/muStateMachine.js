@@ -1,3 +1,6 @@
+/**
+ * Abstract State class for use in {@link MuStateMachine}
+ */
 class MuState {
     constructor(){}
     onEnter(){}
@@ -9,6 +12,20 @@ class MuState {
  * keep your beverages cold.
  */
 class MuStateMachine extends MuEvent {
+    /**
+     * So basically you only need to define some states, of which there is
+     * one 'special' state you can add 'uninitialized' if you don't add it
+     * a blank {@link MuState} is used.
+     *
+     * Each state can also have its own '\*' handler as well to respond to
+     * calls not specifically covered in that state's definition.
+     *
+     * Every property not under states:{}, becomes a property of the instance.
+     *
+     * @param {Object} options - options for your stateMachine, everything not under
+     * options.state becomes a property of the instance
+     * @param {Object} options.states - defines the states your machine can transition to
+     */
     constructor(opts){
         super()
         Object.assign(this,opts)
@@ -28,7 +45,11 @@ class MuStateMachine extends MuEvent {
         this.initialState = this.initialState || 'unitialized'
         this.transition(this.initialState)
     }
-
+    /**
+     * Attempt to transition to a state. Should probably be called
+     * from the api / internally, but again whatever it's your code.
+     * @param {String} name - Name of state to transition to.
+     */
     transition(name) {
         let old = this.currentState
         let args = Array.prototype.slice.call(arguments, 1)
@@ -42,7 +63,11 @@ class MuStateMachine extends MuEvent {
         }
 
     }
-
+    /**
+     * Attempts to call 'name' on current state. Should probably be called
+     * from your provided api, instead of attempting to call directly from outside
+     * @param {String} name - state's method you are attempting to call
+     */
     handle(name) {
         let state = this.states[this.currentState]
         if (typeof state[name] === 'string') {
