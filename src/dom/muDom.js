@@ -12,7 +12,13 @@
  */
 function muDom(s,c) {
     if (!window.muDomInjected) {
-        muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+        if (document.readyState != 'interactive') {
+            document.addEventListener('DOMContentLoaded',()=>{
+                muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+            })
+        } else {
+            muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
+        }
         window.muDomInjected = true
     }
     function toDomNode(t) {

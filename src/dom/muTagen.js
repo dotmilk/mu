@@ -62,7 +62,6 @@ class MuTagen {
             } else if (prefix) {
                 childPrefix = [prefix]
             }
-            console.log('ugh',childPrefix)
             let child = new MuTagen(childPrefix,this).tag(name)
             this.children.push(child)
             return child
