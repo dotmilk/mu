@@ -1,3 +1,15 @@
+/**
+ * A cheap, light weight jquery-ish knockoff
+ * @example
+ * muDom('.foo')
+ * // shorthand for
+ * muDom(document).find('foo')
+ * @param {(String | DomNode)} selector - If text it's a selector, or if the text looks
+ * like html, muDom will turn it into a fragment and treat it as the context,
+ * or if it is a DomNode of some kind, muDom will treat it as the context
+ * @param {DomNode} context - the context find and subsequent operations will be run under
+ * defaults to document
+ */
 function muDom(s,c) {
     if (!window.muDomInjected) {
         muCss('.muHide { display: none} .muSlow { transition: 1s; } .muRed { background-color: #FF0000;}','muDom')
@@ -9,6 +21,9 @@ function muDom(s,c) {
     }
 
     let proto = {
+        /**
+         * Sets the innerHTML of matched elements
+         */
         html(newHtml){
             this.elements.forEach(element => {
                 element.innerHTML = newHtml

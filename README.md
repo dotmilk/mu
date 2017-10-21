@@ -79,6 +79,9 @@ calling result with final options to produce instances.</p>
 <dt><a href="#muCss">muCss(style, id)</a></dt>
 <dd><p>Inject a style sheet, if you feel so inclined</p>
 </dd>
+<dt><a href="#muDom">muDom(selector, context)</a></dt>
+<dd><p>A cheap, light weight jquery-ish knockoff</p>
+</dd>
 </dl>
 
 <a name="MuManager"></a>
@@ -1559,6 +1562,24 @@ Inject a style sheet, if you feel so inclined
 **Example**  
 ```js
 muCss('.someClass {background-color: red}')
+```
+<a name="muDom"></a>
+
+## muDom(selector, context)
+A cheap, light weight jquery-ish knockoff
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>String</code> \| <code>DomNode</code> | If text it's a selector, or if the text looks like html, muDom will turn it into a fragment and treat it as the context, or if it is a DomNode of some kind, muDom will treat it as the context |
+| context | <code>DomNode</code> | the context find and subsequent operations will be run under defaults to document |
+
+**Example**  
+```js
+muDom('.foo')
+// shorthand for
+muDom(document).find('foo')
 ```
 
 * * *
