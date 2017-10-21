@@ -1139,8 +1139,15 @@ Programmatically create some html fragment template
 
 * [MuTagen](#MuTagen)
     * [new MuTagen()](#new_MuTagen_new)
-    * [.tag()](#MuTagen+tag)
-    * [.attribute()](#MuTagen+attribute)
+    * [.tag(name, prefix)](#MuTagen+tag)
+    * [.attribute(name, prop)](#MuTagen+attribute)
+    * [.class(prop)](#MuTagen+class)
+    * [.id(prop)](#MuTagen+id)
+    * [.text(prop)](#MuTagen+text)
+    * [.close()](#MuTagen+close)
+    * [.closeAll()](#MuTagen+closeAll)
+    * [.compile()](#MuTagen+compile)
+    * [.render(props)](#MuTagen+render)
 
 <a name="new_MuTagen_new"></a>
 
@@ -1158,10 +1165,16 @@ frag = new MuTagen()
 ```
 <a name="MuTagen+tag"></a>
 
-### muTagen.tag()
+### muTagen.tag(name, prefix)
 Now that the party is started, lets make a tag
 
 **Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of the tag you trying to create |
+| prefix | <code>String</code> | Where in the data to find values for attributes / text / etc for this and nested tags |
+
 **Example**  
 ```js
 frag.tag('div')
@@ -1185,16 +1198,86 @@ frag.render({class:'foo',status:'online',profile:{ name: 'John Smith',
 ```
 <a name="MuTagen+attribute"></a>
 
-### muTagen.attribute()
+### muTagen.attribute(name, prop)
 Now we have a tag so lets add an attribute to it
 
 **Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | Name of the attribute you trying to create |
+| prop | <code>String</code> | Where in the data to get value for this attribute, defaults to name of attribute |
+
 **Example**  
 ```js
 frag.attribute('class')
 // By default it will look up the value for the attribute later under the
-// key with the same name as that attribute, or you can specify
+// key with the same name as that attribute, or you can specify what prop
+frag.attribute('class','keyToFindClassUnder')
 ```
+<a name="MuTagen+class"></a>
+
+### muTagen.class(prop)
+Convenience function for frag.attribute('class')
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| prop | <code>String</code> | <code>class</code> | Where in the data to get value for this class, defaults to 'class' |
+
+<a name="MuTagen+id"></a>
+
+### muTagen.id(prop)
+Convenience function for frag.attribute('id')
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| prop | <code>String</code> | <code>id</code> | Where in the data to get value for this id, defaults to 'id' |
+
+<a name="MuTagen+text"></a>
+
+### muTagen.text(prop)
+Set the text for this node
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| prop | <code>String</code> | <code>text</code> | Where in the data to get the value for this text, defaults to 'text' |
+
+<a name="MuTagen+close"></a>
+
+### muTagen.close()
+Close this tag level
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+<a name="MuTagen+closeAll"></a>
+
+### muTagen.closeAll()
+Go all the way back to the first tag that was opened
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+<a name="MuTagen+compile"></a>
+
+### muTagen.compile()
+Now you are done adding tags and attributes etc
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+<a name="MuTagen+render"></a>
+
+### muTagen.render(props)
+Call render now as many times as you want with data that matches what
+you described previously
+
+**Kind**: instance method of [<code>MuTagen</code>](#MuTagen)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| props | <code>Object</code> | Data shaped as described by your calls to tag and attribute |
+
 <a name="MuEvent"></a>
 
 ## MuEvent

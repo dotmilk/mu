@@ -44,6 +44,9 @@ class MuTagen {
      *  </section>
      *  <p>online</p>
      * </div>
+     * @param {String} name - Name of the tag you trying to create
+     * @param {String} prefix - Where in the data to find values for
+     * attributes / text / etc for this and nested tags
      */
     tag(name,prefix) {
         /*
@@ -81,7 +84,11 @@ class MuTagen {
      * @example
      * frag.attribute('class')
      * // By default it will look up the value for the attribute later under the
-     * // key with the same name as that attribute, or you can specify
+     * // key with the same name as that attribute, or you can specify what prop
+     * frag.attribute('class','keyToFindClassUnder')
+     * @param {String} name - Name of the attribute you trying to create
+     * @param {String} prop - Where in the data to get value for this attribute, defaults to
+     * name of attribute
      */
     attribute(name,prop = name) {
         if (!(name in this.attributes)) {
@@ -90,27 +97,43 @@ class MuTagen {
         }
         return this
     }
-
+    /**
+     * Convenience function for frag.attribute('class')
+     * @param {String} prop - Where in the data to get value for this class, defaults to
+     * 'class'
+     */
     class(prop = 'class') {
         return this.attribute('class',prop)
     }
-
+    /**
+     * Convenience function for frag.attribute('id')
+     * @param {String} prop - Where in the data to get value for this id, defaults to
+     * 'id'
+     */
     id(prop = 'id') {
         return this.attributes('id',prop)
     }
-
+    /**
+     * Set the text for this node
+     * @param {String} prop - Where in the data to get the value for this text,
+     * defaults to 'text'
+     */
     text(prop = 'text') {
         this.innerText = prop
         return this
     }
-
+    /**
+     * Close this tag level
+     */
     close() {
         if (this.parent) {
             return this.parent
         }
         return this
     }
-
+    /**
+     * Go all the way back to the first tag that was opened
+     */
     closeAll() {
         let parent = this.parent
         while (parent.parent) {
@@ -134,7 +157,9 @@ class MuTagen {
         }
         return out
     }
-
+    /**
+     * Now you are done adding tags and attributes etc
+     */
     compile(down) {
         let childrenString
         let attributes = ''
@@ -168,7 +193,11 @@ class MuTagen {
         this.template = new Function('opts',`return \`${this.compiledString}\``)
         return this
     }
-
+    /**
+     * Call render now as many times as you want with data that matches what
+     * you described previously
+     * @param {Object} props - Data shaped as described by your calls to tag and attribute
+     */
     render(opts) {
         if (!this.template) { throw 'No template compiled'}
         // allows generation of th and other tags that normally vanish out of the fragment
