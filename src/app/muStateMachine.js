@@ -3,7 +3,11 @@ class MuState {
     onEnter(){}
     onExit(){}
 }
-
+/**
+ * Super neat statemachine, very loosely based on [machina.js]{@link http://machina-js.org/},
+ * this is no where near as frilly, this does not have a kitchen sink, nor will it
+ * keep your beverages cold.
+ */
 class MuStateMachine extends MuEvent {
     constructor(opts){
         super()
@@ -16,6 +20,9 @@ class MuStateMachine extends MuEvent {
         }
         if (!this.states['uninitialized']) {
             this.states['uninitialized'] = new MuState()
+        }
+        if (this.init) {
+            this.init()
         }
         this.currentState = 'uninitialized'
         this.initialState = this.initialState || 'unitialized'

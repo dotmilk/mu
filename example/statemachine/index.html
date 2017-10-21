@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <script src="../mu.js"></script>
+        <script src="sm.js"></script>
+        <link rel="stylesheet" href="../styles.css">
+        <!-- <link rel="icon" href="images/favicon.png"> -->
+    </head>
+
+    <body>
+        <section>
+            <button class="insert">add coin</button>
+            <button class="refund">refund</button>
+            <button class="dispense">dispense</button>
+            <div class="output"></div>
+        </section>
+        <script>
+         document.addEventListener('DOMContentLoaded',()=>{
+             let totalCoinsNeeded
+             let coinsInMachine
+             let contentTemplate = (stateMsg)=>{
+                 return `inserted coins: ${coinsInMachine}
+ coins needed: ${totalCoinsNeeded - coinsInMachine}
+ machine status: ${stateMsg ? stateMsg : ''}`
+             }
+             let insertButton = muDom('.insert')
+             let refundButton = muDom('.refund')
+             let dispenseButton = muDom('.dispense')
+             let outputArea = muDom('.output')
+
+             gumballMachine.on('startup',(initialData)=>{
+                 totalCoinsNeeded = initialData.coinsNeededToPurchase
+                 coinsInMachine = initialData.coinCount
+                 outputArea.text(contentTemplate('ready to go'))
+             })
+             gumballMachine.on('coinInserted',(cc)=>{
+                 coinsInMachine = cc
+                 outputArea.text(contentTemplate('coin inserted'))
+             })
+             gumballMachine.on('refundCoin',(cc)=>{
+                 coinsInMachine = cc
+                 outputArea.text(contentTemplate('here is your refund'))
+             })
+             gumballMachine.on('dispense',(cc)=>{
+                 coinsInMachine = cc
+                 outputArea.text(contentTemplate('you got a gumball'))
+             })
+             gumballMachine.on('noCoinInserted',()=>{
+                 outputArea.text(contentTemplate('not possible, no coin inserted'))
+             })
+             gumballMachine.on('insufficientCoin',()=>{
+                 outputArea.text(contentTemplate('not possible, not enough coin'))
+             })
+
+             insertButton.on('click',()=> gumballMachine.insertCoin())
+             refundButton.on('click',()=> gumballMachine.refundCoin())
+             dispenseButton.on('click',()=> gumballMachine.dispense())
+             gumballMachine.start()
+         })
+        </script>
+    </body>
+
+</html>

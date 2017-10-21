@@ -11,11 +11,16 @@ environment or use case.
 <dt><a href="#MuPage">MuPage</a></dt>
 <dd><p>Abstract class for page controllers</p>
 </dd>
-<dt><a href="#MuPageManager">MuPageManager</a></dt>
+<dt><a href="#MuPageManager">MuPageManager</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>Super fun tool here. Designate by default some element with the attribute
 mu-root, and one or more elements inside that one mu-page=&#39;pagename&#39;
 mu-controller=&#39;someFnWithHandlers&#39;. Then fire this badboy up, and call load with
 &#39;pagename&#39; bam</p>
+</dd>
+<dt><a href="#MuStateMachine">MuStateMachine</a></dt>
+<dd><p>Super neat statemachine, very loosely based on <a href="http://machina-js.org/">machina.js</a>,
+this is no where near as frilly, this does not have a kitchen sink, nor will it
+keep your beverages cold.</p>
 </dd>
 <dt><a href="#MuCollection">MuCollection</a> ⇐ <code><a href="#MuEvent">MuEvent</a></code></dt>
 <dd><p>A collection emitting events on certain actions</p>
@@ -106,20 +111,25 @@ Handler for hide:pageName, subclass may implement
 **Kind**: instance method of [<code>MuPage</code>](#MuPage)  
 <a name="MuPageManager"></a>
 
-## MuPageManager
+## MuPageManager ⇐ [<code>MuEvent</code>](#MuEvent)
 Super fun tool here. Designate by default some element with the attribute
 mu-root, and one or more elements inside that one mu-page='pagename'
 mu-controller='someFnWithHandlers'. Then fire this badboy up, and call load with
 'pagename' bam
 
 **Kind**: global class  
+**Extends**: [<code>MuEvent</code>](#MuEvent)  
 
-* [MuPageManager](#MuPageManager)
+* [MuPageManager](#MuPageManager) ⇐ [<code>MuEvent</code>](#MuEvent)
     * [new MuPageManager(options)](#new_MuPageManager_new)
     * [.getAttributes(name)](#MuPageManager+getAttributes)
     * [.getDOM(name)](#MuPageManager+getDOM)
     * [.getController(name)](#MuPageManager+getController)
     * [.load(name)](#MuPageManager+load)
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="new_MuPageManager_new"></a>
 
@@ -180,6 +190,55 @@ at the end of your handler for show, depending on how all your shit is setup.
 | --- | --- | --- |
 | name | <code>String</code> | Name of page |
 
+<a name="MuEvent+on"></a>
+
+### muPageManager.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muPageManager.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muPageManager.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+<a name="MuEvent+emit"></a>
+
+### muPageManager.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
+
+<a name="MuStateMachine"></a>
+
+## MuStateMachine
+Super neat statemachine, very loosely based on [machina.js](http://machina-js.org/),
+this is no where near as frilly, this does not have a kitchen sink, nor will it
+keep your beverages cold.
+
+**Kind**: global class  
 <a name="MuCollection"></a>
 
 ## MuCollection ⇐ [<code>MuEvent</code>](#MuEvent)

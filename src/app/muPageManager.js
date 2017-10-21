@@ -3,6 +3,7 @@
  * mu-root, and one or more elements inside that one mu-page='pagename'
  * mu-controller='someFnWithHandlers'. Then fire this badboy up, and call load with
  * 'pagename' bam
+ * @extends MuEvent
  */
 class MuPageManager extends MuEvent {
     /**

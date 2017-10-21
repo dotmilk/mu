@@ -572,6 +572,9 @@ class MuStateMachine extends MuEvent {
         if (!this.states['uninitialized']) {
             this.states['uninitialized'] = new MuState()
         }
+        if (this.init) {
+            this.init()
+        }
         this.currentState = 'uninitialized'
         this.initialState = this.initialState || 'unitialized'
         this.transition(this.initialState)
