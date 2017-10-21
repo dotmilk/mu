@@ -8,6 +8,12 @@ environment or use case.
 ## Classes
 
 <dl>
+<dt><a href="#MuManager">MuManager</a></dt>
+<dd><p>A simple place to store anything if so desired, if an object is stored with
+a property &#39;classDef&#39;, it will be treated as a reference to a class / called with new
+and stored under the given key, with remaining properties passed in as options.
+Use it or don&#39;t, I have no feelings either way. Good place to keep shit out of global scope.</p>
+</dd>
 <dt><a href="#MuPage">MuPage</a></dt>
 <dd><p>Abstract class for page controllers</p>
 </dd>
@@ -68,6 +74,49 @@ also has derived properties.</p>
 calling result with final options to produce instances.</p>
 </dd>
 </dl>
+
+<a name="MuManager"></a>
+
+## MuManager
+A simple place to store anything if so desired, if an object is stored with
+a property 'classDef', it will be treated as a reference to a class / called with new
+and stored under the given key, with remaining properties passed in as options.
+Use it or don't, I have no feelings either way. Good place to keep shit out of global scope.
+
+**Kind**: global class  
+
+* [MuManager](#MuManager)
+    * [new MuManager()](#new_MuManager_new)
+    * [.add(name, opts)](#MuManager+add)
+    * [.get(name)](#MuManager+get)
+
+<a name="new_MuManager_new"></a>
+
+### new MuManager()
+Make a manager object
+
+<a name="MuManager+add"></a>
+
+### muManager.add(name, opts)
+Add a property
+
+**Kind**: instance method of [<code>MuManager</code>](#MuManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | key to store whatever you are storing under |
+| opts | <code>\*</code> | Whatever you are storing, if it has a property classDef, that property will be called with new, and the rest of the object as arguments to it. |
+
+<a name="MuManager+get"></a>
+
+### muManager.get(name)
+Retrieve a thing you have stored
+
+**Kind**: instance method of [<code>MuManager</code>](#MuManager)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | key to retrieve |
 
 <a name="MuPage"></a>
 

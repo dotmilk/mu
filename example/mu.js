@@ -453,7 +453,7 @@ class MuPaginator {
     }
 }
 class MuManager extends MuEvent {
-    constructor(opts = {}) {
+    constructor() {
         super()
     }
     add(name,opts = {}) {
