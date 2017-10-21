@@ -36,9 +36,14 @@ class MuTagen {
      *                        .tag('p').text('info').close().close()
      *                .tag('p').text('status')
      * frag.render({class:'foo',status:'online',profile:{ name: 'John Smith',
-     * info: 'age: 34, likes: long walks', class: 'profile'}})
-     * // <div class="foo"><section class="profile"><p>John Smith</p>
-     * // <p>age: 34, likes: long walks</p></section><p>online</p></div>
+     *              info: 'age: 34, likes: long walks', class: 'profile'}})
+     * <div class="foo">
+     *  <section class="profile">
+     *   <p>John Smith</p>
+     *   <p>age: 34, likes: long walks</p>
+     *  </section>
+     *  <p>online</p>
+     * </div>
      */
     tag(name,prefix) {
         /*
