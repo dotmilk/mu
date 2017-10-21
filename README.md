@@ -1581,6 +1581,12 @@ muDom('.foo')
 // shorthand for
 muDom(document).find('foo')
 ```
+<a name="muDom.html"></a>
+
+### muDom.html()
+Sets the innerHTML of matched elements
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
 
 * * *
 

@@ -23,6 +23,7 @@ function muDom(s,c) {
     let proto = {
         /**
          * Sets the innerHTML of matched elements
+         * @memberof muDom
          */
         html(newHtml){
             this.elements.forEach(element => {
