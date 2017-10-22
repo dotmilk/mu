@@ -12,12 +12,16 @@
     "fs-then-native": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
+    "gulp-less": "^3.3.2",
     "gulp-order": "^1.1.1",
     "gulp-remove-empty-lines": "^0.1.0",
     "gulp-strip-comments": "^2.5.1",
+    "http-server": "^0.10.0",
     "jsdoc-to-markdown": "^3.0.0"
   },
-  "dependencies": {
-    "gulp-less": "^3.3.2"
+  "dependencies": {},
+  "scripts": {
+    "examples": "http-server ./examples"
   }
+
 }
