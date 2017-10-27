@@ -12,7 +12,6 @@ class MuCollectionView extends MuWrapperView{
         Object.assign(this.viewOptions,{autoRender: true})
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
-        console.log(this)
     }
 
     init(){
@@ -22,7 +21,14 @@ class MuCollectionView extends MuWrapperView{
                 model: item.on ? item : new this.modelWrapper(item)},
                                                this.viewOptions))
             this.collectionViews[idx] = view
-            this.el.appendChild(view.el)
+            if (this.currentMask) {
+                if (this.currentMask(view.model)){
+                    this.el.appendChild(view.el)
+                }
+            } else {
+                this.el.appendChild(view.el)
+            }
+
         })
         this.collection.on('remove',(idx)=>{
             let view = this.collectionViews[idx]
@@ -33,9 +39,38 @@ class MuCollectionView extends MuWrapperView{
             for (let viewIdx of newOrder ) {
                 let view = this.collectionViews[viewIdx]
                 view.remove()
-                this.el.appendChild(view.el)
+                if (this.currentMask) {
+                    if (this.currentMask(view.model)){
+                        this.el.appendChild(view.el)
+                    }
+                } else {
+                    this.el.appendChild(view.el)
+                }
             }
         })
+        this.collection.on('mask',(fn)=>{
+            let idxs = this.collection.flat ? this.collection.collection : this.collection.idx
+            for (let viewIdx of idxs) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                if (!this.currentMask || (this.currentMask && this.currentMask(view.model))) {
+                    this.el.appendChild(view.el)
+                }
+            }
+        })
+    }
+
+    mask(fn){
+        this.currentMask = fn
+        this.collection.emit('mask')
+    }
+
+    remask(){
+        this.collection.emit('mask')
+    }
+
+    unmask(){
+        this.mask(undefined)
     }
 
     remove(){
