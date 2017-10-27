@@ -111,6 +111,8 @@ class MuPageManager extends MuEvent {
         }
 
         this.currentPage = name
+        this.page = this.getDOM(this.currentPage)
+        this.controller = this.getController(this.currentPage)
         if (! this.loaded.includes(name)) {
             this.emit(`load:${name}`,this.getDOM(this.currentPage))
             this.loaded.push(name)
