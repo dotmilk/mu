@@ -30,13 +30,12 @@ function muDom(s,c) {
             return this
         },
         value(value){
-            if (value) {
+            if (value || value == '') {
                 this.elements.forEach(element => {
                     element.value = value
                 })
                 return this
-            }
-            if (this.count == 1) {
+            } else if (this.count == 1) {
                 return this.elements[0].value
             }
             return this.elements.map((element)=>{
@@ -72,6 +71,18 @@ function muDom(s,c) {
                  { siblings.push(el)} }
             while ((el = el.nextSibling))
             return muDom(siblings,this.context)
+        },
+        focus(){
+            if (this.elements.length == 1) {
+                this.elements[0].focus()
+            }
+            return this
+        },
+        blur(){
+            this.each((e)=>{
+                e.blur()
+            })
+            return this
         },
         toggle(className = 'muHide'){
             this.each((e)=>{
@@ -563,6 +574,8 @@ class MuPageManager extends MuEvent {
             this.root.appendChild(newEl)
         }
         this.currentPage = name
+        this.page = this.getDOM(this.currentPage)
+        this.controller = this.getController(this.currentPage)
         if (! this.loaded.includes(name)) {
             this.emit(`load:${name}`,this.getDOM(this.currentPage))
             this.loaded.push(name)
@@ -700,6 +713,17 @@ class MuView extends MuEvent {
                     }
                     if (render) { changeHandler(this.model[binding]) }
                     break
+                case "class":
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
+                            if (oldVal) {
+                                element.removeClass(oldVal)
+                            }
+                            element.addClass(newVal || '')
+                        })
+                    }
+                    if (render) { element.addClass(this.model[binding]) }
+                    break
                 case "attribute":
                     if (this.model.on) {
                         this.model.on(`change:${binding}`,(newVal,oldVal)=>{
@@ -765,12 +789,18 @@ class MuView extends MuEvent {
             })
         }
     }
-    addCollection({collection, view, target, viewOptions, lookup}) {
+    addCollection({collection, view, target, viewOptions, lookup, name}) {
         let vc
+        let el
+        if (target == '') {
+            el = this.el
+        } else {
+            el = this.rootWrapped.find(target).elements[0]
+        }
         if (collection.paginated) {
             vc = new MuPaginatedCollectionView({
                 collection: collection,
-                el: this.rootWrapped.find(target).elements[0],
+                el: el,
                 view: view,
                 lookup: lookup,
                 viewOptions: viewOptions
@@ -778,11 +808,14 @@ class MuView extends MuEvent {
         } else {
             vc = new MuCollectionView({
                 collection: collection,
-                el: this.rootWrapped.find(target).elements[0],
+                el: el,
                 view: view,
                 lookup: lookup,
                 viewOptions: viewOptions
             })
+        }
+        if (name) {
+            this[name] = this[name] || vc
         }
         this.registerSubview(vc)
     }
@@ -1425,7 +1458,6 @@ class MuCollectionView extends MuWrapperView{
         Object.assign(this.viewOptions,{autoRender: true})
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
-        console.log(this)
     }
     init(){
         this.collection.on('add',(idx)=>{
@@ -1434,7 +1466,13 @@ class MuCollectionView extends MuWrapperView{
                 model: item.on ? item : new this.modelWrapper(item)},
                                                this.viewOptions))
             this.collectionViews[idx] = view
-            this.el.appendChild(view.el)
+            if (this.currentMask) {
+                if (this.currentMask(view.model)){
+                    this.el.appendChild(view.el)
+                }
+            } else {
+                this.el.appendChild(view.el)
+            }
         })
         this.collection.on('remove',(idx)=>{
             let view = this.collectionViews[idx]
@@ -1445,9 +1483,35 @@ class MuCollectionView extends MuWrapperView{
             for (let viewIdx of newOrder ) {
                 let view = this.collectionViews[viewIdx]
                 view.remove()
-                this.el.appendChild(view.el)
+                if (this.currentMask) {
+                    if (this.currentMask(view.model)){
+                        this.el.appendChild(view.el)
+                    }
+                } else {
+                    this.el.appendChild(view.el)
+                }
             }
         })
+        this.collection.on('mask',(fn)=>{
+            let idxs = this.collection.flat ? this.collection.collection : this.collection.idx
+            for (let viewIdx of idxs) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                if (!this.currentMask || (this.currentMask && this.currentMask(view.model))) {
+                    this.el.appendChild(view.el)
+                }
+            }
+        })
+    }
+    mask(fn){
+        this.currentMask = fn
+        this.collection.emit('mask')
+    }
+    remask(){
+        this.collection.emit('mask')
+    }
+    unmask(){
+        this.mask(undefined)
     }
     remove(){
         if (this.el.parentNode) {

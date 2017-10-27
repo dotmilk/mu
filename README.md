@@ -3,14 +3,17 @@
 A few frills anti-framework for use in electron, no thought or care has been given to any other
 environment or use case.
 
-Api of models and views and such inspired by [ampersand.js](https://ampersandjs.com/)
-The statemachine api is somewhat based on the api of [machine.js](http://machina-js.org/)
+Api of models and views and such inspired by [ampersand.js](https://ampersandjs.com/).
+
+The statemachine is somewhat based on the api of [machine.js](http://machina-js.org/).
 
 To take a look at some of the core stuff and some hot widget action
 ```
 npm i
 npm run examples
 ```
+
+Then stroll on over to chrome / chromium and take a look.
 
 * * *
 
@@ -1600,6 +1603,8 @@ muDom(document).find('foo')
     * [.some(fn)](#muDom.some)
     * [.map(fn)](#muDom.map)
     * [.siblings()](#muDom.siblings)
+    * [.focus()](#muDom.focus)
+    * [.blur()](#muDom.blur)
     * [.toggle(className)](#muDom.toggle)
     * [.hide()](#muDom.hide)
     * [.show()](#muDom.show)
@@ -1697,6 +1702,18 @@ Map over matched elements. Not chainable.
 
 ### muDom.siblings()
 Get siblings. Chainable on siblings.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.focus"></a>
+
+### muDom.focus()
+Focus an element. Only works if this has one matching element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.blur"></a>
+
+### muDom.blur()
+Remove focus from matched elements, if one of them happens to have focus. Chainable.
 
 **Kind**: static method of [<code>muDom</code>](#muDom)  
 <a name="muDom.toggle"></a>
