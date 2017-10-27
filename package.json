@@ -21,7 +21,6 @@
   },
   "dependencies": {},
   "scripts": {
-    "examples": "http-server ./examples"
+    "examples": "http-server ./example"
   }
-
 }
