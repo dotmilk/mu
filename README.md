@@ -5,7 +5,7 @@ environment or use case.
 
 Api of models and views and such inspired by [ampersand.js](https://ampersandjs.com/).
 
-The statemachine is somewhat based on the api of [machine.js](http://machina-js.org/).
+The statemachine is somewhat based on the api of [machina.js](http://machina-js.org/).
 
 To take a look at some of the core stuff and some hot widget action
 ```
@@ -14,6 +14,8 @@ npm run examples
 ```
 
 Then stroll on over to chrome / chromium and take a look.
+
+Coming Soon: Full Electron example
 
 * * *
 
