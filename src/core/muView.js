@@ -172,6 +172,17 @@ class MuView extends MuEvent {
                     }
                     if (render) { changeHandler(this.model[binding]) }
                     break
+                case "class":
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
+                            if (oldVal) {
+                                element.removeClass(oldVal)
+                            }
+                            element.addClass(newVal || '')
+                        })
+                    }
+                    if (render) { element.addClass(this.model[binding]) }
+                    break
                 case "attribute":
                     if (this.model.on) {
                         this.model.on(`change:${binding}`,(newVal,oldVal)=>{
@@ -276,12 +287,18 @@ class MuView extends MuEvent {
      * @example
      * myView.addCollection({view: someView, collection someCollection, target: 'div.foo'})
      */
-    addCollection({collection, view, target, viewOptions, lookup}) {
+    addCollection({collection, view, target, viewOptions, lookup, name}) {
         let vc
+        let el
+        if (target == '') {
+            el = this.el
+        } else {
+            el = this.rootWrapped.find(target).elements[0]
+        }
         if (collection.paginated) {
             vc = new MuPaginatedCollectionView({
                 collection: collection,
-                el: this.rootWrapped.find(target).elements[0],
+                el: el,
                 view: view,
                 lookup: lookup,
                 viewOptions: viewOptions
@@ -289,13 +306,15 @@ class MuView extends MuEvent {
         } else {
             vc = new MuCollectionView({
                 collection: collection,
-                el: this.rootWrapped.find(target).elements[0],
+                el: el,
                 view: view,
                 lookup: lookup,
                 viewOptions: viewOptions
             })
         }
-
+        if (name) {
+            this[name] = this[name] || vc
+        }
         this.registerSubview(vc)
     }
     /**
