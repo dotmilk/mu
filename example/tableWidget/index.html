@@ -6,9 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
         <script src="/mu.js"></script>
-        <link rel = "stylesheet"
-              type = "text/css"
-              href = "styles.css" />
+        <link rel="stylesheet" type="text/css" href="../styles.css" />
     </head>
 
     <body mu-root class="foo" data-tag="non">
@@ -40,7 +38,8 @@
           * rows.add({id: 7, firstName: 'Jeff', lastName: 'Brown', age: 19})
           * rows.add({id: 8, firstName: 'Sean', lastName: 'Davis', age: 23})
           * rows.add({id: 9, firstName: 'Jimmy', lastName: 'Miller', age: 22})
-          * rows.add({id: 10, firstName: 'Eric', lastName: 'Wilson', age: 17})*/
+          * rows.add({id: 10, firstName: 'Eric', lastName: 'Wilson', age: 17})
+          */
 
          rows.add([{id: 1, firstName: 'Seth', lastName: 'Smith', age: 23},
                    {id: 2, firstName: 'Jim', lastName: 'Simmons', age: 23},
@@ -54,7 +53,7 @@
                    {id: 10, firstName: 'Eric', lastName: 'Wilson', age: 17}])
          document.querySelector('body').appendChild(tableTest.view.el)
          tableTest.on('selection',(id)=>{
-             console.log(`${id} selected`)
+             console.log(`id:${id} selected ${JSON.stringify(rows.get(id))}`)
          })
         </script>
     </body>
