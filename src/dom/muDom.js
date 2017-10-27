@@ -45,16 +45,14 @@ function muDom(s,c) {
          * @param value - the new value for matched elements.
          */
         value(value){
-            if (value) {
+            if (value || value == '') {
                 this.elements.forEach(element => {
                     element.value = value
                 })
                 return this
-            }
-            if (this.count == 1) {
+            } else if (this.count == 1) {
                 return this.elements[0].value
             }
-
             return this.elements.map((element)=>{
                 return element.value
             })
@@ -119,6 +117,26 @@ function muDom(s,c) {
                  { siblings.push(el)} }
             while ((el = el.nextSibling))
             return muDom(siblings,this.context)
+        },
+        /**
+         * Focus an element. Only works if this has one matching element. Chainable.
+         * @memberof muDom
+         */
+        focus(){
+            if (this.elements.length == 1) {
+                this.elements[0].focus()
+            }
+            return this
+        },
+        /**
+         * Remove focus from matched elements, if one of them happens to have focus. Chainable.
+         * @memberof muDom
+         */
+        blur(){
+            this.each((e)=>{
+                e.blur()
+            })
+            return this
         },
         /**
          * Toggles a class on matched elements. Defaults to '.muHide' which as
