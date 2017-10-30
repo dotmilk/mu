@@ -1151,7 +1151,6 @@ class MuTable extends MuEvent{
                     this.pageCount.value(config.rows.currentPageNumber())
                 },
                 [`click .${this.cfg.tableCfg.tableClass} tbody td`]: (e)=>{
-                    console.log(e.target.parentNode)
                     if (this.cfg.markSelection) {
                         muDom(e.target.parentNode).addClass('selected')
                             .siblings().removeClass('selected')
@@ -1173,7 +1172,6 @@ class MuTable extends MuEvent{
                     if (config.rows.getPageSize != e.target.value) {
                         config.rows.setPageSize(e.target.value)
                         config.rows.currentPage()
-                        console.log(this.pageCount.value())
                         this.pageCount.value(config.rows.currentPageNumber())
                     }
                 }
@@ -1522,7 +1520,6 @@ class MuCollectionView extends MuWrapperView{
 class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)
-        console.log('right view')
         this.lookup = opts.lookup
     }
     init(){

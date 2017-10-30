@@ -129,7 +129,6 @@ class MuCollection extends MuEvent {
      * @param {(String | Number)} id - A string key for idField lookup or number for flat index
      */
     get(id) {
-        //console.log('get',this)
         return this.collection[id]
     }
     /**

@@ -86,7 +86,6 @@ class MuCollectionView extends MuWrapperView{
 class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)
-        console.log('right view')
         this.lookup = opts.lookup
     }
     init(){
