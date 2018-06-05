@@ -22,6 +22,9 @@ Coming Soon: Full Electron example
 ## Classes
 
 <dl>
+<dt><a href="#MuDialogue">MuDialogue</a></dt>
+<dd><p>Abstract dialogue class for use in <a href="MuDialogueManager">MuDialogueManager</a></p>
+</dd>
 <dt><a href="#MuManager">MuManager</a></dt>
 <dd><p>A simple place to store anything if so desired, if an object is stored with
 a property &#39;classDef&#39;, it will be treated as a reference to a class / called with new
@@ -67,6 +70,10 @@ I dunno, you&#39;re the one using it.</p>
 <dt><a href="#MuTagen">MuTagen</a></dt>
 <dd><p>Programmatically create some html fragment template</p>
 </dd>
+<dt><a href="#MuBroker">MuBroker</a></dt>
+<dd><p>Simple Broker for messaging to increase decoupling, supports history in case
+a consumer hasn&#39;t been registered, before messages are published to channel</p>
+</dd>
 <dt><a href="#MuEvent">MuEvent</a></dt>
 <dd><p>Very simple no frills Event Emitter so to speak, might add emitter.once later</p>
 </dd>
@@ -98,6 +105,12 @@ calling result with final options to produce instances.</p>
 </dd>
 </dl>
 
+<a name="MuDialogue"></a>
+
+## MuDialogue
+Abstract dialogue class for use in [MuDialogueManager](MuDialogueManager)
+
+**Kind**: global class  
 <a name="MuManager"></a>
 
 ## MuManager
@@ -323,6 +336,7 @@ keep your beverages cold.
 
 * [MuStateMachine](#MuStateMachine)
     * [new MuStateMachine(options)](#new_MuStateMachine_new)
+    * [.addState(name, stateDef)](#MuStateMachine+addState)
     * [.transition(name)](#MuStateMachine+transition)
     * [.handle(name)](#MuStateMachine+handle)
 
@@ -343,6 +357,20 @@ Every property not under states:{}, becomes a property of the instance.
 | --- | --- | --- |
 | options | <code>Object</code> | options for your stateMachine, everything not under options.state becomes a property of the instance |
 | options.states | <code>Object</code> | defines the states your machine can transition to |
+
+<a name="MuStateMachine+addState"></a>
+
+### muStateMachine.addState(name, stateDef)
+Bare bones ability to add states dynamically after initialization. Will overwrite
+things if that is what you meant to do, or will overwrite them even if you didn't
+mean to do that.
+
+**Kind**: instance method of [<code>MuStateMachine</code>](#MuStateMachine)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | name of the state |
+| stateDef | <code>Object</code> | state definition |
 
 <a name="MuStateMachine+transition"></a>
 
@@ -1294,6 +1322,75 @@ you described previously
 | Param | Type | Description |
 | --- | --- | --- |
 | props | <code>Object</code> | Data shaped as described by your calls to tag and attribute |
+
+<a name="MuBroker"></a>
+
+## MuBroker
+Simple Broker for messaging to increase decoupling, supports history in case
+a consumer hasn't been registered, before messages are published to channel
+
+**Kind**: global class  
+
+* [MuBroker](#MuBroker)
+    * [new MuBroker(config)](#new_MuBroker_new)
+    * [.subscribe(name, receiver, type)](#MuBroker+subscribe)
+    * [.unsubscribe(name, receiver)](#MuBroker+unsubscribe)
+    * [.publish(name, msg, type)](#MuBroker+publish) ⇒ <code>Promise</code>
+
+<a name="new_MuBroker_new"></a>
+
+### new MuBroker(config)
+Requires at least empty object {}
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| config | <code>Object</code> | configuration |
+| config.historyLimit | <code>integer</code> | max messages to store |
+
+**Example**  
+```js
+let broker = new MuBroker({})
+broker.subscribe('test:echo',(msg,success)=>{ console.log(msg); success('it worked')})
+broker.publish('test:echo','this will be echoed').then((result)=>{console.log(result)})
+```
+<a name="MuBroker+subscribe"></a>
+
+### muBroker.subscribe(name, receiver, type)
+Method for consumers to register - will create channel if it doesn't exist
+
+**Kind**: instance method of [<code>MuBroker</code>](#MuBroker)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | channel name to subscribe to |
+| receiver | <code>function</code> | function handling reply |
+| type | <code>String</code> | one of [MuBroker.SINGLE, MuBroker.PROGRESSIVE] if you know or think the channel might not exist already and need to specify type. Defaults to MuBroker.SINGLE |
+
+<a name="MuBroker+unsubscribe"></a>
+
+### muBroker.unsubscribe(name, receiver)
+Stop consuming messages with given receiver on given channel
+
+**Kind**: instance method of [<code>MuBroker</code>](#MuBroker)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | channel name being unsubscribed from |
+| receiver | <code>function</code> | original function handling reply |
+
+<a name="MuBroker+publish"></a>
+
+### muBroker.publish(name, msg, type) ⇒ <code>Promise</code>
+Publish a message to a channel - will create channel if it doesn't exist
+
+**Kind**: instance method of [<code>MuBroker</code>](#MuBroker)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>String</code> | channel name being published to |
+| msg | <code>Object</code> | Anything that you want passed to the consumer. If msg.property is defined and a function then it will be given as callback to consumer. |
+| type | <code>String</code> | one of [MuBroker.SINGLE, MuBroker.PROGRESSIVE] if you know or think the channel might not exist already and NEED to specify type. Defaults to MuBroker.SINGLE |
 
 <a name="MuEvent"></a>
 

@@ -28,6 +28,7 @@ class MuStateMachine extends MuEvent {
      */
     constructor(opts){
         super()
+
         Object.assign(this,opts)
         if (!this.states) {
             throw 'State machine lacking state definitions'
@@ -42,8 +43,22 @@ class MuStateMachine extends MuEvent {
             this.init()
         }
         this.currentState = 'uninitialized'
-        this.initialState = this.initialState || 'unitialized'
+        this.previousState = 'uninitialized'
+        this.initialState = this.initialState || 'uninitialized'
         this.transition(this.initialState)
+    }
+    /**
+     * Bare bones ability to add states dynamically after initialization. Will overwrite
+     * things if that is what you meant to do, or will overwrite them even if you didn't
+     * mean to do that.
+     * @param {String} name - name of the state
+     * @param {Object} stateDef - state definition
+     */
+    addState(name,stateDef) {
+        if (!this.states) {
+            throw 'Initialize state machine before adding states'
+        }
+        this.states[name] = stateDef
     }
     /**
      * Attempt to transition to a state. Should probably be called
@@ -55,6 +70,7 @@ class MuStateMachine extends MuEvent {
         let args = Array.prototype.slice.call(arguments, 1)
         if (old) {
             this.handle('onExit')
+            this.previousState = old
         }
         if (name && this.states[name]) {
             this.currentState = name
@@ -72,9 +88,11 @@ class MuStateMachine extends MuEvent {
         let state = this.states[this.currentState]
         if (typeof state[name] === 'string') {
             this.transition(state[name])
-            return
+            return undefined
         }
         let fn = state[name] || state['*'] || this.catchAll
+        //fn.bind(fn)
+        //return fn(...Array.prototype.slice.call(arguments, 1))
         Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
     }
 

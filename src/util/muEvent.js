@@ -21,6 +21,13 @@ class MuEvent {
         this._events[event] = this._events[event] || []
         this._events[event].push(fn)
     }
+    off(event, fn) {
+        if (this._events[event]) {
+            this._events[event] = this._events[event].filter((x)=>{
+                return x != fn
+            })
+        }
+    }
     /**
      * May or may not work, usually just clear all listeners if anything
      * @param {String} event - Name of event to listen for

@@ -12,13 +12,13 @@
  */
 function muDom(s,c) {
     if (!window.muDomInjected) {
-        let css =`.muHide { display: none} .muSlow { transition: 1s; }}`
-        if (document.readyState != 'interactive') {
+        let css =`.muHide { display: none !important}`
+        if (document.readyState == 'complete' || document.readyState == 'interactive') {
+            muCss(css,'muDom')
+        } else {
             document.addEventListener('DOMContentLoaded',()=>{
                 muCss(css,'muDom')
             })
-        } else {
-            muCss(css,'muDom')
         }
         window.muDomInjected = true
     }
@@ -119,6 +119,15 @@ function muDom(s,c) {
             return muDom(siblings,this.context)
         },
         /**
+         * Fool it's probably like the is() from jquery
+         * @param selector - some selector
+         */
+        is(selector){
+            return this.elements.some((el)=>{
+                return el.matches(selector)
+            })
+        },
+        /**
          * Focus an element. Only works if this has one matching element. Chainable.
          * @memberof muDom
          */
@@ -206,6 +215,14 @@ function muDom(s,c) {
                 element.parentNode.replaceChild(el,element)
             })
             return this
+        },
+        /**
+         * Special case of swap, assumes one match, returns element being swapped out
+         */
+        swap_(el){
+            let element = this.elements[0]
+            element.parentNode.replaceChild(el,element)
+            return element
         },
         /**
          * Listen to some event on matched elements. Chainable.

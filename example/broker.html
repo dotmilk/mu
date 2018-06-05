@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <script src="/mu.js"></script>
+        <link rel = "stylesheet"
+              type = "text/css"
+              href = "styles.css" />
+        <!-- <link rel="stylesheet" href="css/main.css"> -->
+        <!-- <link rel="icon" href="images/favicon.png"> -->
+    </head>
+
+    <body mu-root class="foo" data-tag="non">
+        <script>
+         let broker = new MuBroker({})
+         let dm = new MuDialogueManager(broker)
+         class OkCancelDialogue extends MuDialogue {
+             constructor({name}){
+                 super()
+                 this.name = name
+             }
+             onBeforeShow(){
+                 muDom(this.element).on('click',()=>{console.log('foo')})
+             }
+             onShow(){
+                 muDom(this.element).append(muDom('<p>woop woop</p>').elements[0])
+             }
+             dialogueOutput(){
+                 return muDom(this.element).find('input').value()
+             }
+             render(){
+
+                 this.element = muDom(`<div>${this.name}<button >ok</button></div>`).elements[0]
+                 return this.element
+             }
+         }
+         broker.publish('dialogueManager:register',{name: 'test', constructor: OkCancelDialogue })
+         /* Promise.all([
+          *     broker.publish('dialogueManager:register',{name: 'test', constructor: OkCancelDialogue }),
+          *     broker.publish('dialogueManager:register',{name: 'foo', constructor: MyDialogue })])
+          *        .then(()=>{
+          *            console.log('both should be registered')
+          *        })*/
+        </script>
+    </body>
+
+</html>

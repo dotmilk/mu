@@ -8,13 +8,13 @@ function muCss(style,id) {
 }
 function muDom(s,c) {
     if (!window.muDomInjected) {
-        let css =`.muHide { display: none} .muSlow { transition: 1s; }}`
-        if (document.readyState != 'interactive') {
+        let css =`.muHide { display: none !important}`
+        if (document.readyState == 'complete' || document.readyState == 'interactive') {
+            muCss(css,'muDom')
+        } else {
             document.addEventListener('DOMContentLoaded',()=>{
                 muCss(css,'muDom')
             })
-        } else {
-            muCss(css,'muDom')
         }
         window.muDomInjected = true
     }
@@ -72,6 +72,11 @@ function muDom(s,c) {
             while ((el = el.nextSibling))
             return muDom(siblings,this.context)
         },
+        is(selector){
+            return this.elements.some((el)=>{
+                return el.matches(selector)
+            })
+        },
         focus(){
             if (this.elements.length == 1) {
                 this.elements[0].focus()
@@ -123,6 +128,11 @@ function muDom(s,c) {
                 element.parentNode.replaceChild(el,element)
             })
             return this
+        },
+        swap_(el){
+            let element = this.elements[0]
+            element.parentNode.replaceChild(el,element)
+            return element
         },
         on(event, handler, options){
             this.each((element)=>{
@@ -258,7 +268,7 @@ class MuTagen {
         return this.attribute('class',prop)
     }
     id(prop = 'id') {
-        return this.attributes('id',prop)
+        return this.attribute('id',prop)
     }
     text(prop = 'text') {
         this.innerText = prop
@@ -326,6 +336,92 @@ class MuTagen {
             .children[0].content.children[0]
     }
 }
+class MuBroker {
+    constructor({historyLimit = 20}){
+        this._channels = {}
+        this._historyLimit = historyLimit
+    }
+    createChannel({name = ()=>{ throw 'No name provided'},type}){
+        if (this._channels[name] && !(this._channels[name].type)) {
+            this._channels[name].type = type
+        } else {
+            this._channels[name] = { subscribers: [], type: type, queue: []}
+        }
+        return this._channels[name]
+    }
+    subscribe(name,receiver,type = MuBroker.SINGLE) {
+        let channel = this._channels[name]
+        if (!channel) {
+            channel = this.createChannel({name,type})
+        }
+        if (!channel.subscribers.length && channel.queue.length) {
+            channel.subscribers.push(receiver)
+            let again = ()=> {
+                if (channel.queue.length) {
+                    window.setTimeout(()=>{
+                        let bundle = channel.queue.shift()
+                        this.publish(name,bundle.msg)
+                            .then((x)=>{
+                                bundle.resolve(x)
+                            })
+                        again()},0)
+                }
+            }
+            again()
+        } else {
+            switch(channel.type) {
+            case MuBroker.SINGLE:
+                channel.subscribers[0] = receiver
+                break
+            default:
+                channel.subscribers.push(receiver)
+            }
+        }
+    }
+    unsubscribe(name,receiver) {
+        if (! (name in this._channels)) {return}
+        this._channels[name].splice(this._channels[name].indexOf(receiver),1)
+    }
+    publish(name,msg,type = MuBroker.SINGLE) {
+        let channel = this._channels[name]
+        if (!channel) {
+            channel = this.createChannel({name,type})
+        }
+        if (!channel.subscribers.length) {
+            let p
+            if (channel.queue.length < this._historyLimit) {
+                p = new window.Promise((resolve,reject)=>{
+                    channel.queue.push({
+                        resolve: resolve,
+                        reject: reject,
+                        msg: msg
+                    })
+                })
+            }
+            return p
+        }
+        let sub
+        let promise
+        switch(channel.type) {
+        case MuBroker.SINGLE:
+            sub = channel.subscribers[0]
+            break
+        case MuBroker.PROGRESSIVE:
+            sub = channel.subscribers[channel.subscribers.length - 1]
+            break
+        }
+        if (!msg.resolve || (msg.resolve && typeof msg.resolve != 'function')) {
+            promise = new window.Promise((resolve,reject)=>{
+                sub(msg,resolve)
+            })
+        } else {
+            promise = sub(msg.msg,msg.resolve)
+        }
+        return promise
+    }
+}
+MuBroker.SINGLE = 'single'
+MuBroker.PROGRESSIVE = 'progressive'
 class MuEvent {
     constructor(){
         this._events = {}
@@ -333,6 +429,13 @@ class MuEvent {
     on(event, fn) {
         this._events[event] = this._events[event] || []
         this._events[event].push(fn)
+    }
+    off(event, fn) {
+        if (this._events[event]) {
+            this._events[event] = this._events[event].filter((x)=>{
+                return x != fn
+            })
+        }
     }
     removeListener(event, fn) {
         if (! (event in this._events)) {return}
@@ -474,6 +577,73 @@ class MuPaginator {
         return this.getPage()
     }
 }
+class MuDialogue {
+    constructor(){
+    }
+    onBeforeShow(){}
+    onShow(){}
+    onBeforeClose(){}
+    onClose(){}
+    render(){ return muDom("<div></div>").elements[0] }
+}
+class MuDialogueManager {
+    constructor(broker,div,id) {
+        this.overlay = MuDialogueManager._ensureOverlay(div,id)
+        this.overlayNative = this.overlay.elements[0]
+        this.stack = []
+        this.dialogues = {closed: new MuDialogue()} 
+        this.broker = broker
+        broker.subscribe('dialogueManager:register',this.register.bind(this))
+        broker.subscribe('dialogueManager:open',this.open.bind(this))
+        broker.subscribe('dialogueManager:close',this.close.bind(this))
+    }
+    currentDialogue(){
+        return this.stack.slice(-1)
+    }
+    register(def,success) {
+        this.dialogues[def.name] = def.constructor
+        success()
+    }
+    open(cfg,success) {
+        let dialogue = this.dialogues[cfg.name]
+        if (!dialogue) { throw `No dialogue named ${cfg.name} exists` }
+        dialogue = new dialogue(cfg)
+        let current = {reference: dialogue, callback: success,
+                       name: cfg.name, content: dialogue.render(cfg)}
+        this.stack.push(current)
+        this.overlay.append(current.content)
+        dialogue.onBeforeShow(cfg)
+        this.overlay.addClass('mu-overlay-show')
+        dialogue.onShow(Object.assign({},cfg,{beforeShowResult: result}))
+    }
+    close(cfg,success) {
+        let current = this.stack.pop()
+        if (current) {
+            let dialogueOutput = current.reference.dialogueOutput(cfg)
+            current.reference.onBeforeClose(cfg)
+            this.overlayNative.removeChild(this.overlayNative.lastChild)
+            current.reference.onClose(cfg)
+            current.callback(dialogueOutput)
+        }
+        if (!this.stack.length) {
+            this.overlay.removeClass('mu-overlay-show')
+        }
+        success()
+    }
+    static _ensureOverlay(div,id) {
+        let overlay =  muDom( id || '#mu-overlay')
+        if (overlay.count >= 1) { return overlay }
+        if (!div) {
+            div = new MuTagen()
+                .tag('div')
+                .id()
+                .compile()
+                .render({id: id || 'mu-overlay'})
+        }
+        muDom('body').prepend(div)
+        return  muDom( id || '#mu-overlay')
+    }
+}
 class MuManager extends MuEvent {
     constructor() {
         super()
@@ -582,6 +752,7 @@ class MuPageManager extends MuEvent {
         } else {
             this.emit(`show:${name}`,this.getDOM(this.currentPage))
         }
+        this.emit('pageChange',name)
     }
 }
 class MuState {
@@ -606,14 +777,22 @@ class MuStateMachine extends MuEvent {
             this.init()
         }
         this.currentState = 'uninitialized'
-        this.initialState = this.initialState || 'unitialized'
+        this.previousState = 'uninitialized'
+        this.initialState = this.initialState || 'uninitialized'
         this.transition(this.initialState)
+    }
+    addState(name,stateDef) {
+        if (!this.states) {
+            throw 'Initialize state machine before adding states'
+        }
+        this.states[name] = stateDef
     }
     transition(name) {
         let old = this.currentState
         let args = Array.prototype.slice.call(arguments, 1)
         if (old) {
             this.handle('onExit')
+            this.previousState = old
         }
         if (name && this.states[name]) {
             this.currentState = name
@@ -625,7 +804,7 @@ class MuStateMachine extends MuEvent {
         let state = this.states[this.currentState]
         if (typeof state[name] === 'string') {
             this.transition(state[name])
-            return
+            return undefined
         }
         let fn = state[name] || state['*'] || this.catchAll
         Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
@@ -653,6 +832,9 @@ class MuView extends MuEvent {
         if (typeof this.template === 'function') {
             this.template = this.template.call(this)
         }
+        this.custom = opts.custom
+        this.setup = opts.setup || function (){}
+        this._onRemove = opts.onRemove || function (){}
         this._references = opts.references || {}
         this._bindings = opts.bindings || {}
         this._events = opts.events || {}
@@ -841,6 +1023,7 @@ class MuView extends MuEvent {
                 sv.remove()
             })
         }
+        this._onRemove()
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
         }
@@ -849,6 +1032,7 @@ class MuView extends MuEvent {
         this.events()
         this.bindings()
         this.renderSubviews()
+        this.setup()
     }
 }
 function muView(op) {

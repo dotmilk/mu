@@ -19,6 +19,7 @@ gulp.task('script', function() {
         .pipe(gulp.dest('./dist/'))
         .pipe(gulp.dest('./example/'))
         .pipe(gulp.dest('../conflux/gui/js'))
+        .pipe(gulp.dest('../../silverware/scheme/biwascheme/src/deps'))
 })
 
 gulp.task('muDom',function(){

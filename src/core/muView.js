@@ -64,6 +64,10 @@ class MuView extends MuEvent {
             this.template = this.template.call(this)
         }
 
+        this.custom = opts.custom
+        this.setup = opts.setup || function (){}
+
+        this._onRemove = opts.onRemove || function (){}
         this._references = opts.references || {}
         this._bindings = opts.bindings || {}
         this._events = opts.events || {}
@@ -346,11 +350,13 @@ class MuView extends MuEvent {
      * Attempts to remove first all subviews and then self from the dom
      */
     remove(){
+        //look into a scrub function later to ensure this is can be collected
         if (this.subViews && this.subViews.length) {
             this.subViews.forEach((sv)=>{
                 sv.remove()
             })
         }
+        this._onRemove()
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
         }
@@ -362,6 +368,7 @@ class MuView extends MuEvent {
         this.events()
         this.bindings()
         this.renderSubviews()
+        this.setup()
     }
 
 }

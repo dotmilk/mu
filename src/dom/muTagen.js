@@ -110,7 +110,7 @@ class MuTagen {
      * 'id'
      */
     id(prop = 'id') {
-        return this.attributes('id',prop)
+        return this.attribute('id',prop)
     }
     /**
      * Set the text for this node
