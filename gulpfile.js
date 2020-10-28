@@ -23,7 +23,7 @@ gulp.task('script', function() {
 })
 
 gulp.task('muDom',function(){
-    return gulp.src(['./src/muCss.js','./src/muDom.js'])
+    return gulp.src(['./src/dom/muCss.js','./src/dom/muDom.js','./src/dom/muTagen.js'])
         .pipe(concat('muDom.js'))
         .pipe(gulp.dest('./dist/muDom/'))
 })
@@ -39,8 +39,8 @@ gulp.task('css', function() {
 })
 
 gulp.task('watch', function() {
-    let watcher = gulp.watch('./src/**/*.js',['script','muDom','docs'])
-    gulp.watch('./src/*.less',['css'])
+    let watcher = gulp.watch('./src/**/*.js',gulp.series('script','muDom','docs'))
+    gulp.watch('./src/*.less',gulp.series('css'))
     watcher.on('change',()=>{
         console.log('Change detected')
     })

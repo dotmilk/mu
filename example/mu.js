@@ -739,7 +739,7 @@ class MuPageManager extends MuEvent {
         }
         if (old) {
             old.swap(newEl)
-            this.emit(`hide:${name}`,this.getDOM(this.currentPage))
+            this.emit(`hide:${this.currentPage}`,this.getDOM(this.currentPage))
         } else {
             this.root.appendChild(newEl)
         }
@@ -749,9 +749,8 @@ class MuPageManager extends MuEvent {
         if (! this.loaded.includes(name)) {
             this.emit(`load:${name}`,this.getDOM(this.currentPage))
             this.loaded.push(name)
-        } else {
-            this.emit(`show:${name}`,this.getDOM(this.currentPage))
         }
+        this.emit(`show:${name}`,this.getDOM(this.currentPage))
         this.emit('pageChange',name)
     }
 }

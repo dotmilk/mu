@@ -284,6 +284,7 @@ at the end of your handler for show, depending on how all your shit is setup.
 Method to register a listener
 
 **Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -296,6 +297,7 @@ Method to register a listener
 May or may not work, usually just clear all listeners if anything
 
 **Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -308,12 +310,14 @@ May or may not work, usually just clear all listeners if anything
 Clears all listeners
 
 **Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
 <a name="MuEvent+emit"></a>
 
 ### muPageManager.emit(event)
 Emit event
 
 **Kind**: instance method of [<code>MuPageManager</code>](#MuPageManager)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -532,6 +536,7 @@ Reset internal state to a collection with no items or with items passed in
 Method to register a listener
 
 **Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -544,6 +549,7 @@ Method to register a listener
 May or may not work, usually just clear all listeners if anything
 
 **Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -556,12 +562,14 @@ May or may not work, usually just clear all listeners if anything
 Clears all listeners
 
 **Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
 <a name="MuEvent+emit"></a>
 
 ### muCollection.emit(event)
 Emit event
 
 **Kind**: instance method of [<code>MuCollection</code>](#MuCollection)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -692,6 +700,7 @@ Gets first page
 Convenience function for add(stuff,true)
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>addBulk</code>](#MuCollection+addBulk)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -703,6 +712,7 @@ Convenience function for add(stuff,true)
 Perhaps the most useful method on a collection, adding things to the collection
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>add</code>](#MuCollection+add)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -715,6 +725,7 @@ Perhaps the most useful method on a collection, adding things to the collection
 Sort the collection, may or may not work, haven't tested it in any real manner
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>sort</code>](#MuCollection+sort)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -727,6 +738,7 @@ Sort the collection, may or may not work, haven't tested it in any real manner
 Removes item / items from collection, throws an error if collection is flat
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>remove</code>](#MuCollection+remove)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -738,6 +750,7 @@ Removes item / items from collection, throws an error if collection is flat
 Get Item from collection by idField or by index if flat
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>get</code>](#MuCollection+get)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -749,6 +762,7 @@ Get Item from collection by idField or by index if flat
 Do something with each thing in this collection...duh
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>each</code>](#MuCollection+each)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -760,6 +774,7 @@ Do something with each thing in this collection...duh
 Reset internal state to a collection with no items or with items passed in
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>reset</code>](#MuCollection+reset)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -771,6 +786,7 @@ Reset internal state to a collection with no items or with items passed in
 Method to register a listener
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -783,6 +799,7 @@ Method to register a listener
 May or may not work, usually just clear all listeners if anything
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -795,12 +812,14 @@ May or may not work, usually just clear all listeners if anything
 Clears all listeners
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
 <a name="MuEvent+emit"></a>
 
 ### muPagedCollection.emit(event)
 Emit event
 
 **Kind**: instance method of [<code>MuPagedCollection</code>](#MuPagedCollection)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -818,6 +837,10 @@ Generic view wrapper for a collection
     * [.init()](#MuWrapperView+init)
     * [.render()](#MuWrapperView+render)
     * *[.remove()](#MuWrapperView+remove)*
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="MuWrapperView+init"></a>
 
@@ -832,6 +855,7 @@ Stub function, extending class may implement
 Stub function, extending class may implement
 
 **Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>render</code>](#MuWrapperView+render)  
 <a name="MuWrapperView+remove"></a>
 
 ### *muCollectionView.remove()*
@@ -839,6 +863,51 @@ Stub function, extending class must implement
 
 **Kind**: instance abstract method of [<code>MuCollectionView</code>](#MuCollectionView)  
 **Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
+<a name="MuEvent+on"></a>
+
+### muCollectionView.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muCollectionView.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muCollectionView.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
+<a name="MuEvent+emit"></a>
+
+### muCollectionView.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuCollectionView</code>](#MuCollectionView)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
+
 <a name="MuPaginatedCollectionView"></a>
 
 ## MuPaginatedCollectionView ⇐ [<code>MuCollectionView</code>](#MuCollectionView)
@@ -851,6 +920,10 @@ View wrapper for a paginated collection
     * [.init()](#MuWrapperView+init)
     * [.render()](#MuWrapperView+render)
     * *[.remove()](#MuWrapperView+remove)*
+    * [.on(event, fn)](#MuEvent+on)
+    * [.removeListener(event, fn)](#MuEvent+removeListener)
+    * [.clearListeners()](#MuEvent+clearListeners)
+    * [.emit(event)](#MuEvent+emit)
 
 <a name="MuWrapperView+init"></a>
 
@@ -865,12 +938,59 @@ Stub function, extending class may implement
 Stub function, extending class may implement
 
 **Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>render</code>](#MuWrapperView+render)  
 <a name="MuWrapperView+remove"></a>
 
 ### *muPaginatedCollectionView.remove()*
 Stub function, extending class must implement
 
 **Kind**: instance abstract method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>remove</code>](#MuWrapperView+remove)  
+<a name="MuEvent+on"></a>
+
+### muPaginatedCollectionView.on(event, fn)
+Method to register a listener
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+removeListener"></a>
+
+### muPaginatedCollectionView.removeListener(event, fn)
+May or may not work, usually just clear all listeners if anything
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to listen for |
+| fn | <code>function</code> | Fn to call when event heard |
+
+<a name="MuEvent+clearListeners"></a>
+
+### muPaginatedCollectionView.clearListeners()
+Clears all listeners
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
+<a name="MuEvent+emit"></a>
+
+### muPaginatedCollectionView.emit(event)
+Emit event
+
+**Kind**: instance method of [<code>MuPaginatedCollectionView</code>](#MuPaginatedCollectionView)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| event | <code>String</code> | Name of event to emit |
+
 <a name="MuWrapperView"></a>
 
 ## MuWrapperView ⇐ [<code>MuEvent</code>](#MuEvent)
@@ -925,6 +1045,7 @@ Stub function, extending class must implement
 Method to register a listener
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -937,6 +1058,7 @@ Method to register a listener
 May or may not work, usually just clear all listeners if anything
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -949,12 +1071,14 @@ May or may not work, usually just clear all listeners if anything
 Clears all listeners
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
 <a name="MuEvent+emit"></a>
 
 ### muWrapperView.emit(event)
 Emit event
 
 **Kind**: instance method of [<code>MuWrapperView</code>](#MuWrapperView)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1140,6 +1264,7 @@ Slaps events and model bindings onto this.el and then renders subviews
 Method to register a listener
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
+**Overrides**: [<code>on</code>](#MuEvent+on)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1152,6 +1277,7 @@ Method to register a listener
 May or may not work, usually just clear all listeners if anything
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
+**Overrides**: [<code>removeListener</code>](#MuEvent+removeListener)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1164,12 +1290,14 @@ May or may not work, usually just clear all listeners if anything
 Clears all listeners
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
+**Overrides**: [<code>clearListeners</code>](#MuEvent+clearListeners)  
 <a name="MuEvent+emit"></a>
 
 ### muView.emit(event)
 Emit event
 
 **Kind**: instance method of [<code>MuView</code>](#MuView)  
+**Overrides**: [<code>emit</code>](#MuEvent+emit)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1570,7 +1698,6 @@ console.log(p.nextPage())
 Internal generator function, for the actual paginating, cause why the hell not
 
 **Kind**: instance method of [<code>MuPaginator</code>](#MuPaginator)  
-**Yields**: <code>(Value \| PageDone)</code> Very fancy  
 <a name="MuPaginator+getPage"></a>
 
 ### muPaginator.getPage(pageNumber)

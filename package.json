@@ -4,23 +4,19 @@
   "description": "lightweight frontend 'framework' intended for Electron",
   "main": "mu.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "examples": "http-server ./example"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "fs-then-native": "^2.0.0",
-    "gulp": "^3.9.1",
+    "gulp": "file:../../../n/lib/node_modules/gulp",
     "gulp-concat": "^2.6.1",
     "gulp-less": "^3.3.2",
     "gulp-order": "^1.1.1",
     "gulp-remove-empty-lines": "^0.1.0",
     "gulp-strip-comments": "^2.5.1",
     "http-server": "^0.10.0",
-    "jsdoc-to-markdown": "^3.0.0"
-  },
-  "dependencies": {},
-  "scripts": {
-    "examples": "http-server ./example"
+    "jsdoc-to-markdown": "^6.0.1"
   }
 }
