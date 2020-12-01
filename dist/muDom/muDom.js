@@ -14,6 +14,10 @@ function muCss(style,id) {
     document.body.appendChild(sheet)
 }
 
+export { muCss }
+
+import { muCss } from './muCss.js'
+export { muDom }
 /**
  * A cheap, light weight jquery-ish knockoff
  * @example
@@ -373,6 +377,7 @@ function muDom(s,c) {
 
 }
 
+export { MuTagen }
 /**
  * Programmatically create some html fragment template
  */

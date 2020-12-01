@@ -1,9 +1,5 @@
 import { MuWrapperView } from './muView.js'
 export { MuCollectionView, MuPaginatedCollectionView }
-/**
- * Generic view wrapper for a collection
- * @extends MuWrapperView
- */
 class MuCollectionView extends MuWrapperView{
     constructor({collection,el,view,parent,viewOptions={}}) {
         super({el,parent})
@@ -15,7 +11,6 @@ class MuCollectionView extends MuWrapperView{
         this.collectionViews = {}
         this.modelWrapper = MuObservableObject({})
     }
-
     init(){
         this.collection.on('add',(idx)=>{
             let item = this.collection.get(idx)
@@ -30,7 +25,6 @@ class MuCollectionView extends MuWrapperView{
             } else {
                 this.el.appendChild(view.el)
             }
-
         })
         this.collection.on('remove',(idx)=>{
             let view = this.collectionViews[idx]
@@ -61,30 +55,22 @@ class MuCollectionView extends MuWrapperView{
             }
         })
     }
-
     mask(fn){
         this.currentMask = fn
         this.collection.emit('mask')
     }
-
     remask(){
         this.collection.emit('mask')
     }
-
     unmask(){
         this.mask(undefined)
     }
-
     remove(){
         if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el)
         }
     }
 }
-/**
- * View wrapper for a paginated collection
- * @extends MuCollectionView
- */
 class MuPaginatedCollectionView extends MuCollectionView{
     constructor(opts){
         super(opts)
@@ -94,7 +80,6 @@ class MuPaginatedCollectionView extends MuCollectionView{
         let handler = (page)=>{
             this.rootWrapped.clear()
             page.forEach((idx)=>{
-
                 let item = this.collection.flat ? idx : this.collection.get(idx)
                 item = this.lookup ? this.lookup(item) : item
                 let view = this.view(Object.assign({model: item.on ? item :
@@ -102,7 +87,6 @@ class MuPaginatedCollectionView extends MuCollectionView{
                 this.collectionViews[idx] = view
                 this.el.appendChild(view.el)
             })
-
         }
         this.collection.on('newPage',handler)
         this.collection.on('restructure',handler)

@@ -1,3 +1,4 @@
+export { MuPage }
 /**
  * Abstract class for page controllers
  */

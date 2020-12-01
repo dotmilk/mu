@@ -1,3 +1,4 @@
+export { MuManager }
 /**
  * A simple place to store anything if so desired, if an object is stored with
  * a property 'classDef', it will be treated as a reference to a class / called with new
@@ -5,12 +6,12 @@
  * Use it or don't, I have no feelings either way. Good place to keep shit out of global scope.
  *
  */
-class MuManager extends MuEvent {
+class MuManager {
     /**
      * Make a manager object
      */
     constructor() {
-        super()
+
     }
     /**
      * Add a property

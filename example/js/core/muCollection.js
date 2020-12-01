@@ -1,32 +1,6 @@
 import { MuEvent } from '../util/muEvent.js'
 export { MuCollection, MuPagedCollection }
-/**
- * A collection emitting events on certain actions
- * @extends MuEvent
- */
 class MuCollection extends MuEvent {
-    /**
-     * Create a new collection, in the future will optionally wrap items in a model.
-     * for exceptionally large collections, use flat, so as to not add each 'item' to
-     * this.collection[item.idField] = item. Can be very slow. Flat instead stores
-     * this.collection as an array, no removal of elements, just reset.
-     * @param {Object} options - Options for the collection
-     * @param {Boolean} options.flat - Store as array, not k:v
-     * @param {String} options.idField - The field to use as k when not flat, defaults to 'id'
-     * @param {MuObservableObject} options.model - Future: non instantiated model to wrap each item
-     * @param {Function} options.comparator - Some fn to aid in sorting
-     * @param {Array} options.content - Initial items in collection, will fire add events,
-     * but you will be unable to listen
-     * @example
-     * myCollection = new MuCollection({idField: 'customId'})
-     * // or
-     * myCollection = new MuCollection({flat: true})
-     * myCollection.on('add',someFn)
-     * myCollection.add([{foo: 'a'},{foo: 'b'}])
-     * // someFn called twice with item, or
-     * myCollection.add([{foo: 'a'},{foo: 'b'}],true)
-     * // no add event fired, instead 'bulk' event fired after all items added
-     */
     constructor({flat,idField,model,comparator,contents} = {}){
         super()
         let defaultCompare = (a,b) => {
@@ -50,26 +24,15 @@ class MuCollection extends MuEvent {
         this.idField = idField || 'id'
         this.model = model || MuObservableObject({})
         this.comparator = comparator || defaultCompare
-
         if (contents) {
             this.add(contents)
         }
     }
-    /**
-     * Convenience function for add(stuff,true)
-     * @param {(Array | SingleItem)} items - Stuff to add
-     */
     addBulk(items) {
         this.add(items,true)
     }
-    /**
-     * Perhaps the most useful method on a collection, adding things to the collection
-     * @param {(Array | SingleItem)} items - Stuff to add
-     * @param {Boolean} bulk - Skip emitting add for each item, emit 'bulk'
-     */
     add(items,bulk = false) {
         if (!Array.isArray(items)) { items = [items] }
-
         if (this.flat) {
             if (bulk) {
                 this.collection = this.collection.concat(items)
@@ -81,7 +44,6 @@ class MuCollection extends MuEvent {
             }
         } else {
             for (let item of items) {
-                //item = new this.model(item)
                 let old = this.collection[item[this.idField] || item]
                 this.collection[item[this.idField] || item] = item
                 if (old) {
@@ -93,24 +55,14 @@ class MuCollection extends MuEvent {
                 }
             }
         }
-
         if (bulk) {
             this.emit('bulk')
         }
     }
-    /**
-     * Sort the collection, may or may not work, haven't tested it in any real manner
-     * @param {Function} comparator - Some function that sorts things
-     * @param {Boolean} reverse - Sorting direction
-     */
     sort(comparator = this.comparator, reverse = false) {
         reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
         this.emit('sort',this.idx.slice())
     }
-    /**
-     * Removes item / items from collection, throws an error if collection is flat
-     * @param {(Array | SingleItem)} idxs - A single index/key or array of them
-     */
     remove(idxs) {
         if (this.flat) {throw 'No remove on flat collection, use reset'}
         if (!Array.isArray(idxs)) { idxs = [idxs] }
@@ -126,17 +78,9 @@ class MuCollection extends MuEvent {
             }
         }
     }
-    /**
-     * Get Item from collection by idField or by index if flat
-     * @param {(String | Number)} id - A string key for idField lookup or number for flat index
-     */
     get(id) {
         return this.collection[id]
     }
-    /**
-     * Do something with each thing in this collection...duh
-     * @param {Function} fn - A thing to do to each item in this collection
-     */
     each(fn) {
         if (this.flat) {
             this.collection.forEach(fn)
@@ -145,12 +89,7 @@ class MuCollection extends MuEvent {
                 fn.call(this,this.collection[idx],idx)
             }
         }
-
     }
-    /**
-     * Reset internal state to a collection with no items or with items passed in
-     * @param {(Array | SingleItem)} items - Stuff to add to newly cleared collection
-     */
     reset(items = [],bulk){
         if (this.flat) {
             this.collection = []
@@ -164,23 +103,7 @@ class MuCollection extends MuEvent {
         }
     }
 }
-/**
- * Uses {@link MuPaginator} to paginate a {@link MuCollection}, why would you want to do this?
- * I dunno, you're the one using it.
- * @extends MuCollection
- */
 class MuPagedCollection extends MuCollection {
-    /**
-     * This is where shit gets real, ok that might be an overstatement. Basically this provides
-     * an api for {@link MuPaginator} and special events pertaining to a paged collection
-     * @param {Object} options - Options for the collection
-     * @param {Boolean} options.flat - Store as array, not k:v
-     * @param {String} options.idField - The field to use as k when not flat, defaults to 'id'
-     * @param {MuObservableObject} options.model - Future: non instantiated model to wrap each item
-     * @param {Function} options.comparator - Some fn to aid in sorting
-     * @param {Array} options.content - Initial items in collection, will fire add events,
-     * but you will be unable to listen
-     */
     constructor(opts){
         super(opts)
         this.paginated = true
@@ -190,8 +113,6 @@ class MuPagedCollection extends MuCollection {
         this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
                                           data: this.flat ? this.collection : this.idx})
     }
-
-
     changeHandler(event,data){
         this.paginator.paginate = undefined
         if (this.flat) {
@@ -199,10 +120,6 @@ class MuPagedCollection extends MuCollection {
         }
         this.emit('restructure',this.currentPage())
     }
-    /**
-     * Sets the number of items per 'page'
-     * @param {Integer} n - Number of items per page
-     */
     setPageSize(n) {
         if (n != this.paginator.pageSize) {
             this.paginator.pageSize = n
@@ -210,67 +127,39 @@ class MuPagedCollection extends MuCollection {
             this.changeHandler()
         }
     }
-    /**
-     * Gets the current page size
-     */
     getPageSize() {
         return this.paginator.pageSize
     }
-    /**
-     * Gets maximum possible page number with current collection
-     */
     maxPage() {
         return this.paginator.maxPage()
     }
-    /**
-     * Gets the current page number
-     */
     currentPageNumber() {
         return this.paginator.currentPage
     }
-    /**
-     * Gets a reference to current page
-     */
     currentPage() {
         let page = this.paginator.getPage()
         return page
     }
-    /**
-     * Gets specified page number, if out of range gets first or last page
-     * @param {Integer} n - Page number to get
-     */
     getPage(n){
         let page = this.paginator.getPage(n)
         this.emit('newPage',page)
         return page
     }
-    /**
-     * Gets the next page
-     */
     nextPage(){
         let page = this.paginator.nextPage()
         this.emit('newPage',page)
         return page
     }
-    /**
-     * Gets previous page
-     */
     previousPage(){
         let page = this.paginator.previousPage()
         this.emit('newPage',page)
         return page
     }
-    /**
-     * Gets last page
-     */
     lastPage(){
         let page = this.paginator.lastPage()
         this.emit('newPage',page)
         return page
     }
-    /**
-     * Gets first page
-     */
     firstPage(){
         let page = this.paginator.firstPage()
         this.emit('newPage',page)
