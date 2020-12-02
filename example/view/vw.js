@@ -1,3 +1,4 @@
+import { MuObservableObject, MuTagen, MuView } from '@dotmilk/mu'
 let theModelFactory = new MuObservableObject({
     props: ['aNumber']
 })
@@ -23,3 +24,5 @@ let theView = new MuView({
         }
     }
 })
+
+export { theView }

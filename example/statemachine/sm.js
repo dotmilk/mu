@@ -1,3 +1,5 @@
+import { MuState, MuStateMachine } from '@dotmilk/mu'
+
 class GumballMachineAbstract extends MuState {
     insertCoin(){}
     refundCoin(){}
@@ -9,9 +11,15 @@ class GumballMachineAbstract extends MuState {
 
 class GumballStartup extends GumballMachineAbstract {
     onEnter(){
+        // pass out some info
         this.emit('startup',{coinsNeededToPurchase: this.coinsNeededToPurchase,
-                             coinCount: 0})
-        this.transition('noCoin')
+                             coinCount: this.coinCount })
+        // fancy start state depnding on if we started with coins
+        if (this.coinCount >= 1 ) {
+            this.transition('withCoin')
+        } else {
+            this.transition('noCoin')
+        }
     }
 
 }
@@ -84,7 +92,10 @@ let gumballMachine = new MuStateMachine({
     init(){
         // You can provide an init function to maybe set up some things
         // If you want to that is, i'm not trying to tell you how to code
-        this.coinsNeededToPurchase = 2
+        this.coinsNeededToPurchase = 3
+        // you can start the gumball machine with coins or no coins etc
         this.coinCount = 1
     }
 })
+
+export { gumballMachine }

@@ -1,16 +1,20 @@
 {
-  "name": "mu",
-  "version": "1.0.0",
-  "description": "lightweight frontend 'framework' intended for Electron",
-  "main": "mu.js",
-  "scripts": {
-    "examples": "http-server ./example"
+  "name": "@dotmilk/mu",
+  "version": "1.0.42",
+  "description": "lightweight frontend 'framework'",
+  "browser": "dist/mu-module.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dotmilk/mu.git"
   },
-  "author": "",
+  "scripts": {
+
+  },
+  "author": "dotmilk",
   "license": "ISC",
   "devDependencies": {
     "fs-then-native": "^2.0.0",
-    "gulp": "file:../../../n/lib/node_modules/gulp",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-less": "^3.3.2",
     "gulp-order": "^1.1.1",

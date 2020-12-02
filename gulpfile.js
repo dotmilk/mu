@@ -17,12 +17,11 @@ gulp.task('script', function() {
         .pipe(strip())
         .pipe(removeEmptyLines())
         .pipe(gulp.dest('./dist/'))
-        .pipe(gulp.dest('./example/js/'))
 })
 
 gulp.task('script-module', function() {
-    return gulp.src('./src/**/*.js',{ base: './src'})
-        .pipe(order(['_module.js','dom/*.js',
+    return gulp.src(['./src/**/*.js','./src/*.css'],{ base: './src'})
+        .pipe(order(['_cssStringOpen.js','styles.css','_cssStringClose.js','_module.js','dom/*.js',
                      'util/*.js',
                      'app/*.js',
                      'core/muView.js',
@@ -31,7 +30,6 @@ gulp.task('script-module', function() {
         .pipe(strip())
         .pipe(removeEmptyLines())
         .pipe(gulp.dest('./dist/'))
-        .pipe(gulp.dest('./example/js/'))
 })
 
 gulp.task('muDom',function(){
@@ -45,13 +43,12 @@ gulp.task('css', function() {
         .pipe(less({
             paths: [ path.join(__dirname, 'less', 'includes') ]
         }))
+        .pipe(gulp.dest('./src/'))
         .pipe(gulp.dest('./dist/css/'))
-        .pipe(gulp.dest('./example/'))
-        .pipe(gulp.dest('../conflux/gui/css'))
 })
 
 gulp.task('watch', function() {
-    let watcher = gulp.watch('./src/**/*.js',gulp.series('script','muDom','docs'))
+    let watcher = gulp.watch(['./src/styles.css','./src/**/*.js'],gulp.series('script','script-module','muDom','docs'))
     gulp.watch('./src/*.less',gulp.series('css'))
     watcher.on('change',()=>{
         console.log('Change detected')

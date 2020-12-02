@@ -8,5 +8,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@dotmilk/mu": "^1.0.42"
+  },
+  "devDependencies": {
+    "snowpack": "^2.17.1"
+  }
 }

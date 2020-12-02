@@ -1,3 +1,5 @@
+import { MuTagen, MuCollection, muView, MuView } from '@dotmilk/mu'
+
 function makeId() {
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     let toJoin = []
@@ -6,7 +8,7 @@ function makeId() {
     }
     return toJoin.join('')
 }
-
+// view for the buttons
 let collectionViewFactory = muView({
     autoRender: true,
     template: ()=>{
@@ -33,7 +35,8 @@ let collectionViewFactory = muView({
 // this will store items added by the button
 let theCollection = new MuCollection()
 
-let theView = new MuView({
+// Contains the collection and a button that adds items to it
+let theView = window.theView = new MuView({
     template: ()=>{ return new MuTagen().tag('div')
                     .tag('button').text().close()
                     .tag('ul').class().compile().render({text: 'make new item',class: 'items'})

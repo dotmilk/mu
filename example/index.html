@@ -5,8 +5,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
-        <script src="https://raw.githack.com/dotmilk/mu/main/dist/mu.js"></script>
-        <link rel="stylesheet" href="https://raw.githack.com/dotmilk/mu/main/dist/css/styles.css">
+        <!-- <script type="module" src="https://raw.githack.com/dotmilk/mu/main/dist/mu-module.js"></script> -->
+        <!-- <link rel="stylesheet" href="https://raw.githack.com/dotmilk/mu/main/dist/css/styles.css"> -->
     </head>
 
     <body>
@@ -21,6 +21,9 @@
         <a href="collectionView/">MuCollectionView</a>
         <br>
         <a href="tableWidget/">Table widget</a>
-
+        <script type="module">
+         import { muDom } from '@dotmilk/mu'
+         window.muDom = muDom
+        </script>
     </body>
 </html>
