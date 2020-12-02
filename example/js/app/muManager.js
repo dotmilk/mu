@@ -1,4 +1,3 @@
-export { MuManager }
 class MuManager {
     constructor() {
     }

@@ -1,4 +1,3 @@
-export { MuPage }
 class MuPage {
     constructor({pageName, pageManager}) {
         this.pageName = pageName

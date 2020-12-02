@@ -1,5 +1,3 @@
-import { muCss } from './muCss.js'
-export { muDom }
 /**
  * A cheap, light weight jquery-ish knockoff
  * @example

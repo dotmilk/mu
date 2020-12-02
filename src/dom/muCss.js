@@ -13,5 +13,3 @@ function muCss(style,id) {
     sheet.innerHTML = style
     document.body.appendChild(sheet)
 }
-
-export { muCss }

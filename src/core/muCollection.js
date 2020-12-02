@@ -1,5 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuCollection, MuPagedCollection }
 /**
  * A collection emitting events on certain actions
  * @extends MuEvent

@@ -1,5 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuState, MuStateMachine }
 class MuState {
     constructor(){}
     onEnter(){}

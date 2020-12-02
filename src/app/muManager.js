@@ -1,4 +1,3 @@
-export { MuManager }
 /**
  * A simple place to store anything if so desired, if an object is stored with
  * a property 'classDef', it will be treated as a reference to a class / called with new

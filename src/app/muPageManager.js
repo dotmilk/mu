@@ -1,8 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-import { muDom } from '../dom/muDom.js'
-
-export { MuPageManager }
-
 /**
  * Super fun tool here. Designate by default some element with the attribute
  * mu-root, and one or more elements inside that one mu-page='pagename'

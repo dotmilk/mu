@@ -1,13 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuObservableObject }
-
-function arrayClone(a) {
-    return [].concat[a]
-}
-
-function objectClone(o) {
-    return JSON.parse(JSON.stringify(o))
-}
 /**
  * A mystical thing, uses traps to watch for changes to an object,
  * also has derived properties.
@@ -29,8 +19,14 @@ function objectClone(o) {
  * person.on('change:fullName',doSomething)
  * // can also listen for changes on any property.
  */
-
 function MuObservableObject(opts) {
+    function arrayClone(a) {
+        return [].concat[a]
+    }
+
+    function objectClone(o) {
+        return JSON.parse(JSON.stringify(o))
+    }
 
     let internalProps = Object.keys(MuEvent.__proto__)
 

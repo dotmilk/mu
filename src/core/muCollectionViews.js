@@ -1,5 +1,3 @@
-import { MuWrapperView } from './muView.js'
-export { MuCollectionView, MuPaginatedCollectionView }
 /**
  * Generic view wrapper for a collection
  * @extends MuWrapperView

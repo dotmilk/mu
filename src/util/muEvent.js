@@ -1,4 +1,3 @@
-export { MuEvent }
 /**
  * Very simple no frills Event Emitter so to speak, might add emitter.once later
  * @example

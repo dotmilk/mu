@@ -1,12 +1,10 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuObservableObject }
-function arrayClone(a) {
-    return [].concat[a]
-}
-function objectClone(o) {
-    return JSON.parse(JSON.stringify(o))
-}
 function MuObservableObject(opts) {
+    function arrayClone(a) {
+        return [].concat[a]
+    }
+    function objectClone(o) {
+        return JSON.parse(JSON.stringify(o))
+    }
     let internalProps = Object.keys(MuEvent.__proto__)
     internalProps.push('_eventsCount')
     internalProps.push('_state')

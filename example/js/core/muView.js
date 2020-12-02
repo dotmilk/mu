@@ -1,5 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuWrapperView, MuView, muView }
 class MuWrapperView extends MuEvent{
     constructor({el,parent}) {
         super()

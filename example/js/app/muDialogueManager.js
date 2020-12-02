@@ -1,5 +1,3 @@
-import { muDom } from '../dom/muDom.js'
-export { MuDialogue, MuDialogueManager }
 class MuDialogue {
     constructor(){
     }

@@ -1,5 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-export { MuCollection, MuPagedCollection }
 class MuCollection extends MuEvent {
     constructor({flat,idField,model,comparator,contents} = {}){
         super()

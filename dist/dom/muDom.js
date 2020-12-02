@@ -1,5 +1,3 @@
-import { muCss } from './muCss.js'
-export { muDom }
 function muDom(s,c) {
     if (!window.muDomInjected) {
         let css =`.muHide { display: none !important}`

@@ -1,4 +1,3 @@
-export { MuEvent }
 class MuEvent {
     constructor(){
         this._events = {}

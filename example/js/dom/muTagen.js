@@ -1,4 +1,3 @@
-export { MuTagen }
 class MuTagen {
     constructor(fullPrefix,parent) {
         this.fullPrefix = fullPrefix || []

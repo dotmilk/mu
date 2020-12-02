@@ -1,6 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-
-export { MuWrapperView, MuView, muView }
 /**
  * Abstract class for wrapping more complex constructs.
  * @extends MuEvent

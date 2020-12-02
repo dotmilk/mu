@@ -1,4 +1,3 @@
-export { MuTagen }
 /**
  * Programmatically create some html fragment template
  */

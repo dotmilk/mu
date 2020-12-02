@@ -1,6 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-import { muDom } from '../dom/muDom.js'
-export { MuPageManager }
 class MuPageManager extends MuEvent {
     constructor({context=document,
                  options={},

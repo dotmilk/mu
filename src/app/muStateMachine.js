@@ -1,6 +1,3 @@
-import { MuEvent } from '../util/muEvent.js'
-
-export { MuState, MuStateMachine }
 /**
  * Abstract State class for use in {@link MuStateMachine}
  */

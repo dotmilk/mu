@@ -1,5 +1,3 @@
-import { MuWrapperView } from './muView.js'
-export { MuCollectionView, MuPaginatedCollectionView }
 class MuCollectionView extends MuWrapperView{
     constructor({collection,el,view,parent,viewOptions={}}) {
         super({el,parent})
