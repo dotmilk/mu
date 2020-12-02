@@ -370,7 +370,7 @@ class MuBroker {
             again()
         } else {
             switch(channel.type) {
-            case MuBroker.SINGLE:
+            case MuBroker.SINGLE:v
                 channel.subscribers[0] = receiver
                 break
             default:
@@ -406,7 +406,7 @@ class MuBroker {
         case MuBroker.SINGLE:
             sub = channel.subscribers[0]
             break
-        case MuBroker.PROGRESSIVE:
+        case MuBroker.PROGRESSIVE:v
             sub = channel.subscribers[channel.subscribers.length - 1]
             break
         }
@@ -460,7 +460,7 @@ let muMultiInherit = (baseClass, ...mixins) => {
             });
         }
     }
-    let copyProps = (target, source) => {  
+    let copyProps = (target, source) => {
         Object.getOwnPropertyNames(source)
             .concat(Object.getOwnPropertySymbols(source))
             .forEach((prop) => {
@@ -468,7 +468,7 @@ let muMultiInherit = (baseClass, ...mixins) => {
                     Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop));
             })
     }
-    mixins.forEach((mixin) => { 
+    mixins.forEach((mixin) => {
         copyProps(base.prototype, mixin.prototype);
         copyProps(base, mixin);
     });
@@ -591,7 +591,7 @@ class MuDialogueManager {
         this.overlay = MuDialogueManager._ensureOverlay(div,id)
         this.overlayNative = this.overlay.elements[0]
         this.stack = []
-        this.dialogues = {closed: new MuDialogue()} 
+        this.dialogues = {closed: new MuDialogue()}
         this.broker = broker
         broker.subscribe('dialogueManager:register',this.register.bind(this))
         broker.subscribe('dialogueManager:open',this.open.bind(this))
@@ -864,13 +864,13 @@ class MuView extends MuEvent {
                 toBind.model.on(`change:${toBind.prop}`,onChange)
                 let toModel = []
                 onChange(toBind.model[toBind.prop])
-                bindings[toBind.name] = toBind.action 
+                bindings[toBind.name] = toBind.action
             }
         }
     }
     bindings(bindings = this._bindings){
         if (this.model && bindings) {
-            let render = true 
+            let render = true
             for (let binding in bindings) {
                 if (binding == '*') { continue }
                 let element = bindings[binding].selector == '' ?
