@@ -1825,6 +1825,7 @@ muDom(document).find('foo')
     * [.value(value)](#muDom.value)
     * [.text(newTxt)](#muDom.text)
     * [.setAttribute(name, value)](#muDom.setAttribute)
+    * [.src(src)](#muDom.src)
     * [.each(fn)](#muDom.each)
     * [.some(fn)](#muDom.some)
     * [.map(fn)](#muDom.map)
@@ -1890,6 +1891,17 @@ Sets an attribute of matched elements. Chainable.
 | --- | --- |
 | name | name of attribute to set |
 | value | value of attribute |
+
+<a name="muDom.src"></a>
+
+### muDom.src(src)
+Helper: Sets 'src' of element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+
+| Param | Description |
+| --- | --- |
+| src | value of src attributed desired |
 
 <a name="muDom.each"></a>
 

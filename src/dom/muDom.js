@@ -81,6 +81,14 @@ function muDom(s,c) {
             return this
         },
         /**
+         * Helper: Sets 'src' of element. Chainable.
+         * @memberof muDom
+         * @param src - value of src attributed desired
+         */
+        src(value){
+            return this.setAttribute('src',value)
+        },
+        /**
          * Calls fn for each matched element. Chainable.
          * @memberof muDom
          * @param fn - some function

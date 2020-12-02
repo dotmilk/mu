@@ -54,6 +54,9 @@ function muDom(s,c) {
             })
             return this
         },
+        src(value){
+            return this.setAttribute('src',value)
+        },
         each(fn){
             this.elements.forEach(fn)
             return this
