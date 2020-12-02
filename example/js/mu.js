@@ -1,799 +1,3 @@
-class MuDialogue {
-    constructor(){
-    }
-    onBeforeShow(){}
-    onShow(){}
-    onBeforeClose(){}
-    onClose(){}
-    render(){ return muDom("<div></div>").elements[0] }
-}
-class MuDialogueManager {
-    constructor(broker,div,id) {
-        this.overlay = MuDialogueManager._ensureOverlay(div,id)
-        this.overlayNative = this.overlay.elements[0]
-        this.stack = []
-        this.dialogues = {closed: new MuDialogue()} 
-        this.broker = broker
-        broker.subscribe('dialogueManager:register',this.register.bind(this))
-        broker.subscribe('dialogueManager:open',this.open.bind(this))
-        broker.subscribe('dialogueManager:close',this.close.bind(this))
-    }
-    currentDialogue(){
-        return this.stack.slice(-1)
-    }
-    register(def,success) {
-        this.dialogues[def.name] = def.constructor
-        success()
-    }
-    open(cfg,success) {
-        let dialogue = this.dialogues[cfg.name]
-        if (!dialogue) { throw `No dialogue named ${cfg.name} exists` }
-        dialogue = new dialogue(cfg)
-        let current = {reference: dialogue, callback: success,
-                       name: cfg.name, content: dialogue.render(cfg)}
-        this.stack.push(current)
-        this.overlay.append(current.content)
-        dialogue.onBeforeShow(cfg)
-        this.overlay.addClass('mu-overlay-show')
-        dialogue.onShow(Object.assign({},cfg,{beforeShowResult: result}))
-    }
-    close(cfg,success) {
-        let current = this.stack.pop()
-        if (current) {
-            let dialogueOutput = current.reference.dialogueOutput(cfg)
-            current.reference.onBeforeClose(cfg)
-            this.overlayNative.removeChild(this.overlayNative.lastChild)
-            current.reference.onClose(cfg)
-            current.callback(dialogueOutput)
-        }
-        if (!this.stack.length) {
-            this.overlay.removeClass('mu-overlay-show')
-        }
-        success()
-    }
-    static _ensureOverlay(div,id) {
-        let overlay =  muDom( id || '#mu-overlay')
-        if (overlay.count >= 1) { return overlay }
-        if (!div) {
-            div = new MuTagen()
-                .tag('div')
-                .id()
-                .compile()
-                .render({id: id || 'mu-overlay'})
-        }
-        muDom('body').prepend(div)
-        return  muDom( id || '#mu-overlay')
-    }
-}
-class MuManager {
-    constructor() {
-    }
-    add(name,opts = {}) {
-        if (opts['classDef'] && typeof opts['classDef'] === 'function') {
-            let fn = opts['classDef']
-            delete opts.classDef
-            this[name] = new fn(opts)
-        } else {
-            this[name] = opts
-        }
-    }
-    get(name){
-        return this[name]
-    }
-}
-class MuPage {
-    constructor({pageName, pageManager}) {
-        this.pageName = pageName
-        this.pageManager = pageManager
-    }
-    onLoad() {}
-    onShow() {}
-    onHide() {}
-}
-class MuPageManager extends MuEvent {
-    constructor({context=document,
-                 options={},
-                 root='mu-root',
-                 pageAttribute='mu-page',
-                 controllerAttribute='mu-controller'} = {}) {
-        super()
-        this.pages = {}
-        this.loaded = []
-        this.currentPage = undefined
-        this.rootName = root
-        this.root = muDom(`[${this.rootName}]`).elements[0]
-        this.pageAttributeName = pageAttribute
-        this.pageAttribute = `[${this['pageAttributeName']}]`
-        this.controllerAttributeName = controllerAttribute
-        muDom(this.pageAttribute, this.context).each((el)=>{
-            let name = el.getAttribute(this.pageAttributeName)
-            let controllerName = el.getAttribute(this.controllerAttributeName)
-            let PageClass
-            if (!name || name == '') {
-                throw "Pages must be named"
-            }
-            if (this.pages[name]) {
-                throw `${name} already exists as page name`
-            }
-            this.pages[name] = {}
-            this.pages[name]['dom'] = el.cloneNode(true)
-            el.parentNode.removeChild(el)
-            if (controllerName && window[controllerName]) {
-                PageClass = window[controllerName]
-            } else {
-                PageClass = MuPage
-            }
-            this.pages[name]['controller'] = new PageClass(Object.assign({
-                pageManager: this,
-                pageName: name
-            },options))
-            this.on(`load:${name}`,(page)=>{
-                this.getController(name).onLoad(page)
-            })
-            this.on(`hide:${name}`,(page)=>{
-                let controller = this.getController(name)
-                controller.onHide.call(controller,page)
-            })
-            this.on(`show:${name}`,(page)=>{
-                let controller = this.getController(name)
-                controller.onShow.call(controller,page)
-            })
-        })
-    }
-    getAttributes(name) {
-        let ref = this.getDOM(name)
-        if (!ref) { return ref }
-        return Array.from(ref.attributes)
-    }
-    getDOM(name) {
-        return this.pages[name]['dom']
-    }
-    getController(name){
-        return this.pages[name]['controller']
-    }
-    load(name) {
-        let old
-        let newEl = this.getDOM(name)
-        if (this.currentPage) {
-            old = muDom(`[${this.pageAttributeName}=${this.currentPage}]`,this.context)
-        }
-        if (old) {
-            old.swap(newEl)
-            this.emit(`hide:${this.currentPage}`,this.getDOM(this.currentPage))
-        } else {
-            this.root.appendChild(newEl)
-        }
-        this.currentPage = name
-        this.page = this.getDOM(this.currentPage)
-        this.controller = this.getController(this.currentPage)
-        if (! this.loaded.includes(name)) {
-            this.emit(`load:${name}`,this.getDOM(this.currentPage))
-            this.loaded.push(name)
-        }
-        this.emit(`show:${name}`,this.getDOM(this.currentPage))
-        this.emit('pageChange',name)
-    }
-}
-class MuState {
-    constructor(){}
-    onEnter(){}
-    onExit(){}
-}
-class MuStateMachine extends MuEvent {
-    constructor(opts){
-        super()
-        Object.assign(this,opts)
-        if (!this.states) {
-            throw 'State machine lacking state definitions'
-        }
-        if (!this.catchAll) {
-            this.catchAll = function(){}
-        }
-        if (!this.states['uninitialized']) {
-            this.states['uninitialized'] = new MuState()
-        }
-        if (this.init) {
-            this.init()
-        }
-        this.currentState = 'uninitialized'
-        this.previousState = 'uninitialized'
-        this.initialState = this.initialState || 'uninitialized'
-        this.transition(this.initialState)
-    }
-    addState(name,stateDef) {
-        if (!this.states) {
-            throw 'Initialize state machine before adding states'
-        }
-        this.states[name] = stateDef
-    }
-    transition(name) {
-        let old = this.currentState
-        let args = Array.prototype.slice.call(arguments, 1)
-        if (old) {
-            this.handle('onExit')
-            this.previousState = old
-        }
-        if (name && this.states[name]) {
-            this.currentState = name
-            this.handle('onEnter')
-            this.emit('transition',old,name)
-        }
-    }
-    handle(name) {
-        let state = this.states[this.currentState]
-        if (typeof state[name] === 'string') {
-            this.transition(state[name])
-            return undefined
-        }
-        let fn = state[name] || state['*'] || this.catchAll
-        Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
-    }
-}
-class MuCollection extends MuEvent {
-    constructor({flat,idField,model,comparator,contents} = {}){
-        super()
-        let defaultCompare = (a,b) => {
-            if (this.flat) {
-                if (typeof a === 'string') {
-                    return a < b ? -1 : 1 }
-                else {
-                    return a - b
-                }
-            } else {
-                if (typeof this.collection[a] === 'string') {
-                    return this.collection[a] < this.collection[b] ? -1 : 1 }
-                else {
-                    return this.collection[a] - this.colletion[b]
-                }
-            }
-        }
-        this.flat = flat
-        this.collection = this.flat ? [] : {}
-        this.idx = []
-        this.idField = idField || 'id'
-        this.model = model || MuObservableObject({})
-        this.comparator = comparator || defaultCompare
-        if (contents) {
-            this.add(contents)
-        }
-    }
-    addBulk(items) {
-        this.add(items,true)
-    }
-    add(items,bulk = false) {
-        if (!Array.isArray(items)) { items = [items] }
-        if (this.flat) {
-            if (bulk) {
-                this.collection = this.collection.concat(items)
-            } else {
-                for (let item of items) {
-                    this.collection.push(item)
-                    this.emit('add', item)
-                }
-            }
-        } else {
-            for (let item of items) {
-                let old = this.collection[item[this.idField] || item]
-                this.collection[item[this.idField] || item] = item
-                if (old) {
-                    this.emit('replace',item[this.idField])
-                    this.collection[item[this.idField] || item] = item
-                } else {
-                    this.idx.push(item[this.idField] || item)
-                    if (!bulk) {this.emit('add',item[this.idField] || item)}
-                }
-            }
-        }
-        if (bulk) {
-            this.emit('bulk')
-        }
-    }
-    sort(comparator = this.comparator, reverse = false) {
-        reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
-        this.emit('sort',this.idx.slice())
-    }
-    remove(idxs) {
-        if (this.flat) {throw 'No remove on flat collection, use reset'}
-        if (!Array.isArray(idxs)) { idxs = [idxs] }
-        for (let toRemove of idxs) {
-            let ref = this.collection[toRemove]
-            if (ref) {
-                delete this.collection[toRemove]
-                let idxLocation = this.idx.indexOf(toRemove)
-                if (idxLocation >= 0) {
-                    this.idx.splice(idxLocation,1)
-                }
-                this.emit('remove',toRemove,ref)
-            }
-        }
-    }
-    get(id) {
-        return this.collection[id]
-    }
-    each(fn) {
-        if (this.flat) {
-            this.collection.forEach(fn)
-        } else {
-            for (let idx of this.idx) {
-                fn.call(this,this.collection[idx],idx)
-            }
-        }
-    }
-    reset(items = [],bulk){
-        if (this.flat) {
-            this.collection = []
-            this.emit('reset')
-            this.add(items,bulk)
-        } else {
-            let old = Object.assign({},this.collection)
-            this.remove(this.idx.slice())
-            this.emit('reset',old)
-            this.add(items,bulk)
-        }
-    }
-}
-class MuPagedCollection extends MuCollection {
-    constructor(opts){
-        super(opts)
-        this.paginated = true
-        this.on('add',this.changeHandler)
-        this.on('bulk',this.changeHandler)
-        this.on('remove',this.changeHandler)
-        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
-                                          data: this.flat ? this.collection : this.idx})
-    }
-    changeHandler(event,data){
-        this.paginator.paginate = undefined
-        if (this.flat) {
-            this.paginator.data = this.collection
-        }
-        this.emit('restructure',this.currentPage())
-    }
-    setPageSize(n) {
-        if (n != this.paginator.pageSize) {
-            this.paginator.pageSize = n
-            this.getPage(1)
-            this.changeHandler()
-        }
-    }
-    getPageSize() {
-        return this.paginator.pageSize
-    }
-    maxPage() {
-        return this.paginator.maxPage()
-    }
-    currentPageNumber() {
-        return this.paginator.currentPage
-    }
-    currentPage() {
-        let page = this.paginator.getPage()
-        return page
-    }
-    getPage(n){
-        let page = this.paginator.getPage(n)
-        this.emit('newPage',page)
-        return page
-    }
-    nextPage(){
-        let page = this.paginator.nextPage()
-        this.emit('newPage',page)
-        return page
-    }
-    previousPage(){
-        let page = this.paginator.previousPage()
-        this.emit('newPage',page)
-        return page
-    }
-    lastPage(){
-        let page = this.paginator.lastPage()
-        this.emit('newPage',page)
-        return page
-    }
-    firstPage(){
-        let page = this.paginator.firstPage()
-        this.emit('newPage',page)
-        return page
-    }
-}
-class MuCollectionView extends MuWrapperView{
-    constructor({collection,el,view,parent,viewOptions={}}) {
-        super({el,parent})
-        this.collection = collection
-        this.rootWrapped = muDom(el)
-        this.view = view
-        this.viewOptions = viewOptions
-        Object.assign(this.viewOptions,{autoRender: true})
-        this.collectionViews = {}
-        this.modelWrapper = MuObservableObject({})
-    }
-    init(){
-        this.collection.on('add',(idx)=>{
-            let item = this.collection.get(idx)
-            let view = this.view(Object.assign({
-                model: item.on ? item : new this.modelWrapper(item)},
-                                               this.viewOptions))
-            this.collectionViews[idx] = view
-            if (this.currentMask) {
-                if (this.currentMask(view.model)){
-                    this.el.appendChild(view.el)
-                }
-            } else {
-                this.el.appendChild(view.el)
-            }
-        })
-        this.collection.on('remove',(idx)=>{
-            let view = this.collectionViews[idx]
-            view.remove()
-            delete this.collectionViews[idx]
-        })
-        this.collection.on('sort',(newOrder)=>{
-            for (let viewIdx of newOrder ) {
-                let view = this.collectionViews[viewIdx]
-                view.remove()
-                if (this.currentMask) {
-                    if (this.currentMask(view.model)){
-                        this.el.appendChild(view.el)
-                    }
-                } else {
-                    this.el.appendChild(view.el)
-                }
-            }
-        })
-        this.collection.on('mask',(fn)=>{
-            let idxs = this.collection.flat ? this.collection.collection : this.collection.idx
-            for (let viewIdx of idxs) {
-                let view = this.collectionViews[viewIdx]
-                view.remove()
-                if (!this.currentMask || (this.currentMask && this.currentMask(view.model))) {
-                    this.el.appendChild(view.el)
-                }
-            }
-        })
-    }
-    mask(fn){
-        this.currentMask = fn
-        this.collection.emit('mask')
-    }
-    remask(){
-        this.collection.emit('mask')
-    }
-    unmask(){
-        this.mask(undefined)
-    }
-    remove(){
-        if (this.el.parentNode) {
-            this.el.parentNode.removeChild(this.el)
-        }
-    }
-}
-class MuPaginatedCollectionView extends MuCollectionView{
-    constructor(opts){
-        super(opts)
-        this.lookup = opts.lookup
-    }
-    init(){
-        let handler = (page)=>{
-            this.rootWrapped.clear()
-            page.forEach((idx)=>{
-                let item = this.collection.flat ? idx : this.collection.get(idx)
-                item = this.lookup ? this.lookup(item) : item
-                let view = this.view(Object.assign({model: item.on ? item :
-                                                    new this.modelWrapper(item)},this.viewOptions))
-                this.collectionViews[idx] = view
-                this.el.appendChild(view.el)
-            })
-        }
-        this.collection.on('newPage',handler)
-        this.collection.on('restructure',handler)
-    }
-}
-function MuObservableObject(opts) {
-    function arrayClone(a) {
-        return [].concat[a]
-    }
-    function objectClone(o) {
-        return JSON.parse(JSON.stringify(o))
-    }
-    let internalProps = Object.keys(MuEvent.__proto__)
-    internalProps.push('_eventsCount')
-    internalProps.push('_state')
-    let namedProps = opts.props || []
-    let derivedProps = opts.derived || {}
-    let derivedKeys = Object.keys(derivedProps)
-    class State extends MuEvent {
-        constructor(data) {
-            super()
-            this._state = {}
-            Object.assign(this._state,data)
-            this.on('change',function (changed){
-                this.emit(`change:${changed.key}`,changed.value,changed.old)
-            })
-            let out =  new Proxy(this,{
-                set: (target, key, value) => {
-                    if (internalProps.includes(key)) {
-                        this[key] = value
-                        return true
-                    }
-                    let old
-                    if (Array.isArray(this._state[key])) {
-                        old = arrayClone(this._state[key])
-                    } else if (typeof(this._state[key]) === 'object') {
-                        old = objectClone(this._state[key])
-                    } else {
-                        old = this._state[key]
-                    }
-                    this._state[key] = value
-                    this.emit('change',{key: key, value: value, old: old},target)
-                    return true
-                },
-                get: (target, key, value) => {
-                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
-                        return this[key]
-                    }
-                    return this._state[key] ? this._state[key] : data[key]
-                }
-            })
-            for (let d in derivedProps) {
-                let fn = derivedProps[d]['fn']
-                if (fn && typeof fn === 'function') {
-                    for (let k of derivedProps[d]['deps']) {
-                        out.on(`change:${k}`,(newV,oldV)=>{
-                            if (newV !== oldV) {
-                                out[d] = fn.apply(out._state)
-                            }
-                        })
-                    }
-                    out[d] = fn.apply(out._state)
-                }
-            }
-            return out
-        }
-        static props() {
-            return Reflect.ownKeys(namedProps) || {}
-        }
-        static derivedProps() {
-            return Reflect.ownKeys(derivedProps) || {}
-        }
-        static dump(instance) {
-            return instance._state
-        }
-        toJSON() {
-            return this._state
-        }
-    }
-    return State
-}
-class MuWrapperView extends MuEvent{
-    constructor({el,parent}) {
-        super()
-        this.el = el
-        this.rootWrapped = muDom(el)
-        this.parent = parent
-    }
-    init(){}
-    render(){}
-    remove(){ throw 'Remove not overridden'}
-}
-class MuView extends MuEvent {
-    constructor(opts = {}){
-        super()
-        this.isMuView = true
-        this.template = opts.template
-        if (opts.model) {
-            this.model = opts.model
-        }
-        if (typeof this.template === 'function') {
-            this.template = this.template.call(this)
-        }
-        this.custom = opts.custom
-        this.setup = opts.setup || function (){}
-        this._onRemove = opts.onRemove || function (){}
-        this._references = opts.references || {}
-        this._bindings = opts.bindings || {}
-        this._events = opts.events || {}
-        this._boundEvents = {}
-        this.rootWrapped = muDom(this.template)
-        this.root = this.el = this.rootWrapped.elements[0]
-        this.references()
-        this.parseBindings()
-        if (opts.autoRender) {
-            this.render()
-        }
-    }
-    references(refs = this._references){
-        if (refs) {
-            for (let ref in refs) {
-                this[ref] = muDom(refs[ref],this.root)
-            }
-        }
-    }
-    parseBindings(bindings = this._bindings) {
-        for (let binding in bindings) {
-            if (binding == '*') {
-                let toBind = bindings[binding]
-                let onChange = (newVal)=>{
-                    this.model[toBind.name] = newVal.map((prop)=>{
-                        return this.model[prop]
-                    })
-                }
-                toBind.model.on(`change:${toBind.prop}`,onChange)
-                let toModel = []
-                onChange(toBind.model[toBind.prop])
-                bindings[toBind.name] = toBind.action 
-            }
-        }
-    }
-    bindings(bindings = this._bindings){
-        if (this.model && bindings) {
-            let render = true 
-            for (let binding in bindings) {
-                if (binding == '*') { continue }
-                let element = bindings[binding].selector == '' ?
-                    muDom(this.root) : muDom(bindings[binding].selector,this.root)
-                let options = bindings[binding]
-                let changeHandler
-                if (!options.type) { options.type = 'text'}
-                switch (options.type) {
-                case "text":
-                    changeHandler = (newVal,oldVal)=>{
-                        let theText = newVal || ''
-                        if (options.parse) {
-                            theText = options.parse(theText)
-                        }
-                        theText = `${options.prepend || ''}${theText}${options.append || ''}`
-                        element.text(theText || '')
-                    }
-                    if (this.model.on) {
-                        this.model.on(`change:${binding}`,changeHandler)
-                    }
-                    if (render) { changeHandler(this.model[binding]) }
-                    break
-                case "class":
-                    if (this.model.on) {
-                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
-                            if (oldVal) {
-                                element.removeClass(oldVal)
-                            }
-                            element.addClass(newVal || '')
-                        })
-                    }
-                    if (render) { element.addClass(this.model[binding]) }
-                    break
-                case "attribute":
-                    if (this.model.on) {
-                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
-                            element.setAttribute(options.name,newVal || '')
-                        })
-                    }
-                    if (render) { element.setAttribute(options.name,this.model[binding]) }
-                    break
-                case "value":
-                    if (this.model.on) {
-                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
-                            element.value(newVal || '')
-                        })
-                    }
-                    if (render) { element.value(this.model[binding])  }
-                    break
-                case "html":
-                    changeHandler = (newVal,oldVal)=>{
-                        if (!Array.isArray(newVal)) { newVal = [newVal]}
-                        element.clear()
-                        for (let item of newVal) {
-                            element.append(options.template(item))
-                        }
-                    }
-                    if (this.model.on) {
-                        this.model.on(`change:${binding}`,changeHandler)
-                    }
-                    if (render) { changeHandler(this.model[binding])}
-                    break
-                }
-            }
-        }
-    }
-    events(events = this._events){
-        for (let eventsAndSelectors in events || {}) {
-            let selector = eventsAndSelectors.split(' ')
-            let event = selector.shift()
-            selector = selector.join(' ')
-            let existingEvents = this._boundEvents[event]
-            if (existingEvents) {
-                existingEvents.push({selector: selector,
-                                     handle: events[eventsAndSelectors]})
-            } else {
-                this._boundEvents[event] = [{selector: selector,
-                                             handle: events[eventsAndSelectors]}]
-            }
-        }
-        for (let eventName in this._boundEvents) {
-            this._boundEvents[eventName].reverse()
-            this.rootWrapped.on(eventName,(e)=>{
-                e.stopPropagation()
-                if (e.target && this._boundEvents[e.type]) {
-                    for (let handler of this._boundEvents[e.type]) {
-                        if (handler.selector === '') {
-                            handler.handle.call(this,e)
-                            break
-                        } else if (e.target.matches(handler.selector)) {
-                            handler.handle.call(this,e)
-                            break
-                        }
-                    }
-                }
-            })
-        }
-    }
-    addCollection({collection, view, target, viewOptions, lookup, name}) {
-        let vc
-        let el
-        if (target == '') {
-            el = this.el
-        } else {
-            el = this.rootWrapped.find(target).elements[0]
-        }
-        if (collection.paginated) {
-            vc = new MuPaginatedCollectionView({
-                collection: collection,
-                el: el,
-                view: view,
-                lookup: lookup,
-                viewOptions: viewOptions
-            })
-        } else {
-            vc = new MuCollectionView({
-                collection: collection,
-                el: el,
-                view: view,
-                lookup: lookup,
-                viewOptions: viewOptions
-            })
-        }
-        if (name) {
-            this[name] = this[name] || vc
-        }
-        this.registerSubview(vc)
-    }
-    registerSubview(view) {
-        this.subViews = this.subViews || []
-        this.subViews.push(view)
-        if (!view.parent) { view.parent = this}
-        return view
-    }
-    renderSubviews() {
-        if (this.subViews && this.subViews.length) {
-            this.subViews.forEach((sv)=>{
-                if (sv.init) {
-                    sv.init()
-                }
-                sv.render()
-            })
-        }
-    }
-    remove(){
-        if (this.subViews && this.subViews.length) {
-            this.subViews.forEach((sv)=>{
-                sv.remove()
-            })
-        }
-        this._onRemove()
-        if (this.el.parentNode) {
-            this.el.parentNode.removeChild(this.el)
-        }
-    }
-    render(){
-        this.events()
-        this.bindings()
-        this.renderSubviews()
-        this.setup()
-    }
-}
-function muView(op) {
-    return (o)=>{
-        Object.assign(o,op)
-        return new MuView(o)
-    }
-}
 function muCss(style,id) {
     let sheet = document.createElement('style')
     if (id) {
@@ -1373,6 +577,468 @@ class MuPaginator {
         return this.getPage()
     }
 }
+class MuDialogue {
+    constructor(){
+    }
+    onBeforeShow(){}
+    onShow(){}
+    onBeforeClose(){}
+    onClose(){}
+    render(){ return muDom("<div></div>").elements[0] }
+}
+class MuDialogueManager {
+    constructor(broker,div,id) {
+        this.overlay = MuDialogueManager._ensureOverlay(div,id)
+        this.overlayNative = this.overlay.elements[0]
+        this.stack = []
+        this.dialogues = {closed: new MuDialogue()} 
+        this.broker = broker
+        broker.subscribe('dialogueManager:register',this.register.bind(this))
+        broker.subscribe('dialogueManager:open',this.open.bind(this))
+        broker.subscribe('dialogueManager:close',this.close.bind(this))
+    }
+    currentDialogue(){
+        return this.stack.slice(-1)
+    }
+    register(def,success) {
+        this.dialogues[def.name] = def.constructor
+        success()
+    }
+    open(cfg,success) {
+        let dialogue = this.dialogues[cfg.name]
+        if (!dialogue) { throw `No dialogue named ${cfg.name} exists` }
+        dialogue = new dialogue(cfg)
+        let current = {reference: dialogue, callback: success,
+                       name: cfg.name, content: dialogue.render(cfg)}
+        this.stack.push(current)
+        this.overlay.append(current.content)
+        dialogue.onBeforeShow(cfg)
+        this.overlay.addClass('mu-overlay-show')
+        dialogue.onShow(Object.assign({},cfg,{beforeShowResult: result}))
+    }
+    close(cfg,success) {
+        let current = this.stack.pop()
+        if (current) {
+            let dialogueOutput = current.reference.dialogueOutput(cfg)
+            current.reference.onBeforeClose(cfg)
+            this.overlayNative.removeChild(this.overlayNative.lastChild)
+            current.reference.onClose(cfg)
+            current.callback(dialogueOutput)
+        }
+        if (!this.stack.length) {
+            this.overlay.removeClass('mu-overlay-show')
+        }
+        success()
+    }
+    static _ensureOverlay(div,id) {
+        let overlay =  muDom( id || '#mu-overlay')
+        if (overlay.count >= 1) { return overlay }
+        if (!div) {
+            div = new MuTagen()
+                .tag('div')
+                .id()
+                .compile()
+                .render({id: id || 'mu-overlay'})
+        }
+        muDom('body').prepend(div)
+        return  muDom( id || '#mu-overlay')
+    }
+}
+class MuManager {
+    constructor() {
+    }
+    add(name,opts = {}) {
+        if (opts['classDef'] && typeof opts['classDef'] === 'function') {
+            let fn = opts['classDef']
+            delete opts.classDef
+            this[name] = new fn(opts)
+        } else {
+            this[name] = opts
+        }
+    }
+    get(name){
+        return this[name]
+    }
+}
+class MuPage {
+    constructor({pageName, pageManager}) {
+        this.pageName = pageName
+        this.pageManager = pageManager
+    }
+    onLoad() {}
+    onShow() {}
+    onHide() {}
+}
+class MuPageManager extends MuEvent {
+    constructor({context=document,
+                 options={},
+                 root='mu-root',
+                 pageAttribute='mu-page',
+                 controllerAttribute='mu-controller'} = {}) {
+        super()
+        this.pages = {}
+        this.loaded = []
+        this.currentPage = undefined
+        this.rootName = root
+        this.root = muDom(`[${this.rootName}]`).elements[0]
+        this.pageAttributeName = pageAttribute
+        this.pageAttribute = `[${this['pageAttributeName']}]`
+        this.controllerAttributeName = controllerAttribute
+        muDom(this.pageAttribute, this.context).each((el)=>{
+            let name = el.getAttribute(this.pageAttributeName)
+            let controllerName = el.getAttribute(this.controllerAttributeName)
+            let PageClass
+            if (!name || name == '') {
+                throw "Pages must be named"
+            }
+            if (this.pages[name]) {
+                throw `${name} already exists as page name`
+            }
+            this.pages[name] = {}
+            this.pages[name]['dom'] = el.cloneNode(true)
+            el.parentNode.removeChild(el)
+            if (controllerName && window[controllerName]) {
+                PageClass = window[controllerName]
+            } else {
+                PageClass = MuPage
+            }
+            this.pages[name]['controller'] = new PageClass(Object.assign({
+                pageManager: this,
+                pageName: name
+            },options))
+            this.on(`load:${name}`,(page)=>{
+                this.getController(name).onLoad(page)
+            })
+            this.on(`hide:${name}`,(page)=>{
+                let controller = this.getController(name)
+                controller.onHide.call(controller,page)
+            })
+            this.on(`show:${name}`,(page)=>{
+                let controller = this.getController(name)
+                controller.onShow.call(controller,page)
+            })
+        })
+    }
+    getAttributes(name) {
+        let ref = this.getDOM(name)
+        if (!ref) { return ref }
+        return Array.from(ref.attributes)
+    }
+    getDOM(name) {
+        return this.pages[name]['dom']
+    }
+    getController(name){
+        return this.pages[name]['controller']
+    }
+    load(name) {
+        let old
+        let newEl = this.getDOM(name)
+        if (this.currentPage) {
+            old = muDom(`[${this.pageAttributeName}=${this.currentPage}]`,this.context)
+        }
+        if (old) {
+            old.swap(newEl)
+            this.emit(`hide:${this.currentPage}`,this.getDOM(this.currentPage))
+        } else {
+            this.root.appendChild(newEl)
+        }
+        this.currentPage = name
+        this.page = this.getDOM(this.currentPage)
+        this.controller = this.getController(this.currentPage)
+        if (! this.loaded.includes(name)) {
+            this.emit(`load:${name}`,this.getDOM(this.currentPage))
+            this.loaded.push(name)
+        }
+        this.emit(`show:${name}`,this.getDOM(this.currentPage))
+        this.emit('pageChange',name)
+    }
+}
+class MuState {
+    constructor(){}
+    onEnter(){}
+    onExit(){}
+}
+class MuStateMachine extends MuEvent {
+    constructor(opts){
+        super()
+        Object.assign(this,opts)
+        if (!this.states) {
+            throw 'State machine lacking state definitions'
+        }
+        if (!this.catchAll) {
+            this.catchAll = function(){}
+        }
+        if (!this.states['uninitialized']) {
+            this.states['uninitialized'] = new MuState()
+        }
+        if (this.init) {
+            this.init()
+        }
+        this.currentState = 'uninitialized'
+        this.previousState = 'uninitialized'
+        this.initialState = this.initialState || 'uninitialized'
+        this.transition(this.initialState)
+    }
+    addState(name,stateDef) {
+        if (!this.states) {
+            throw 'Initialize state machine before adding states'
+        }
+        this.states[name] = stateDef
+    }
+    transition(name) {
+        let old = this.currentState
+        let args = Array.prototype.slice.call(arguments, 1)
+        if (old) {
+            this.handle('onExit')
+            this.previousState = old
+        }
+        if (name && this.states[name]) {
+            this.currentState = name
+            this.handle('onEnter')
+            this.emit('transition',old,name)
+        }
+    }
+    handle(name) {
+        let state = this.states[this.currentState]
+        if (typeof state[name] === 'string') {
+            this.transition(state[name])
+            return undefined
+        }
+        let fn = state[name] || state['*'] || this.catchAll
+        Reflect.apply(fn, this, Array.prototype.slice.call(arguments, 1))
+    }
+}
+class MuWrapperView extends MuEvent{
+    constructor({el,parent}) {
+        super()
+        this.el = el
+        this.rootWrapped = muDom(el)
+        this.parent = parent
+    }
+    init(){}
+    render(){}
+    remove(){ throw 'Remove not overridden'}
+}
+class MuView extends MuEvent {
+    constructor(opts = {}){
+        super()
+        this.isMuView = true
+        this.template = opts.template
+        if (opts.model) {
+            this.model = opts.model
+        }
+        if (typeof this.template === 'function') {
+            this.template = this.template.call(this)
+        }
+        this.custom = opts.custom
+        this.setup = opts.setup || function (){}
+        this._onRemove = opts.onRemove || function (){}
+        this._references = opts.references || {}
+        this._bindings = opts.bindings || {}
+        this._events = opts.events || {}
+        this._boundEvents = {}
+        this.rootWrapped = muDom(this.template)
+        this.root = this.el = this.rootWrapped.elements[0]
+        this.references()
+        this.parseBindings()
+        if (opts.autoRender) {
+            this.render()
+        }
+    }
+    references(refs = this._references){
+        if (refs) {
+            for (let ref in refs) {
+                this[ref] = muDom(refs[ref],this.root)
+            }
+        }
+    }
+    parseBindings(bindings = this._bindings) {
+        for (let binding in bindings) {
+            if (binding == '*') {
+                let toBind = bindings[binding]
+                let onChange = (newVal)=>{
+                    this.model[toBind.name] = newVal.map((prop)=>{
+                        return this.model[prop]
+                    })
+                }
+                toBind.model.on(`change:${toBind.prop}`,onChange)
+                let toModel = []
+                onChange(toBind.model[toBind.prop])
+                bindings[toBind.name] = toBind.action 
+            }
+        }
+    }
+    bindings(bindings = this._bindings){
+        if (this.model && bindings) {
+            let render = true 
+            for (let binding in bindings) {
+                if (binding == '*') { continue }
+                let element = bindings[binding].selector == '' ?
+                    muDom(this.root) : muDom(bindings[binding].selector,this.root)
+                let options = bindings[binding]
+                let changeHandler
+                if (!options.type) { options.type = 'text'}
+                switch (options.type) {
+                case "text":
+                    changeHandler = (newVal,oldVal)=>{
+                        let theText = newVal || ''
+                        if (options.parse) {
+                            theText = options.parse(theText)
+                        }
+                        theText = `${options.prepend || ''}${theText}${options.append || ''}`
+                        element.text(theText || '')
+                    }
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,changeHandler)
+                    }
+                    if (render) { changeHandler(this.model[binding]) }
+                    break
+                case "class":
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
+                            if (oldVal) {
+                                element.removeClass(oldVal)
+                            }
+                            element.addClass(newVal || '')
+                        })
+                    }
+                    if (render) { element.addClass(this.model[binding]) }
+                    break
+                case "attribute":
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
+                            element.setAttribute(options.name,newVal || '')
+                        })
+                    }
+                    if (render) { element.setAttribute(options.name,this.model[binding]) }
+                    break
+                case "value":
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,(newVal,oldVal)=>{
+                            element.value(newVal || '')
+                        })
+                    }
+                    if (render) { element.value(this.model[binding])  }
+                    break
+                case "html":
+                    changeHandler = (newVal,oldVal)=>{
+                        if (!Array.isArray(newVal)) { newVal = [newVal]}
+                        element.clear()
+                        for (let item of newVal) {
+                            element.append(options.template(item))
+                        }
+                    }
+                    if (this.model.on) {
+                        this.model.on(`change:${binding}`,changeHandler)
+                    }
+                    if (render) { changeHandler(this.model[binding])}
+                    break
+                }
+            }
+        }
+    }
+    events(events = this._events){
+        for (let eventsAndSelectors in events || {}) {
+            let selector = eventsAndSelectors.split(' ')
+            let event = selector.shift()
+            selector = selector.join(' ')
+            let existingEvents = this._boundEvents[event]
+            if (existingEvents) {
+                existingEvents.push({selector: selector,
+                                     handle: events[eventsAndSelectors]})
+            } else {
+                this._boundEvents[event] = [{selector: selector,
+                                             handle: events[eventsAndSelectors]}]
+            }
+        }
+        for (let eventName in this._boundEvents) {
+            this._boundEvents[eventName].reverse()
+            this.rootWrapped.on(eventName,(e)=>{
+                e.stopPropagation()
+                if (e.target && this._boundEvents[e.type]) {
+                    for (let handler of this._boundEvents[e.type]) {
+                        if (handler.selector === '') {
+                            handler.handle.call(this,e)
+                            break
+                        } else if (e.target.matches(handler.selector)) {
+                            handler.handle.call(this,e)
+                            break
+                        }
+                    }
+                }
+            })
+        }
+    }
+    addCollection({collection, view, target, viewOptions, lookup, name}) {
+        let vc
+        let el
+        if (target == '') {
+            el = this.el
+        } else {
+            el = this.rootWrapped.find(target).elements[0]
+        }
+        if (collection.paginated) {
+            vc = new MuPaginatedCollectionView({
+                collection: collection,
+                el: el,
+                view: view,
+                lookup: lookup,
+                viewOptions: viewOptions
+            })
+        } else {
+            vc = new MuCollectionView({
+                collection: collection,
+                el: el,
+                view: view,
+                lookup: lookup,
+                viewOptions: viewOptions
+            })
+        }
+        if (name) {
+            this[name] = this[name] || vc
+        }
+        this.registerSubview(vc)
+    }
+    registerSubview(view) {
+        this.subViews = this.subViews || []
+        this.subViews.push(view)
+        if (!view.parent) { view.parent = this}
+        return view
+    }
+    renderSubviews() {
+        if (this.subViews && this.subViews.length) {
+            this.subViews.forEach((sv)=>{
+                if (sv.init) {
+                    sv.init()
+                }
+                sv.render()
+            })
+        }
+    }
+    remove(){
+        if (this.subViews && this.subViews.length) {
+            this.subViews.forEach((sv)=>{
+                sv.remove()
+            })
+        }
+        this._onRemove()
+        if (this.el.parentNode) {
+            this.el.parentNode.removeChild(this.el)
+        }
+    }
+    render(){
+        this.events()
+        this.bindings()
+        this.renderSubviews()
+        this.setup()
+    }
+}
+function muView(op) {
+    return (o)=>{
+        Object.assign(o,op)
+        return new MuView(o)
+    }
+}
 class MuSelects {
     constructor(config) {
         this.ensureOverlay()
@@ -1795,4 +1461,338 @@ class MuTable extends MuEvent{
             }
         }
     }
+}
+class MuCollection extends MuEvent {
+    constructor({flat,idField,model,comparator,contents} = {}){
+        super()
+        let defaultCompare = (a,b) => {
+            if (this.flat) {
+                if (typeof a === 'string') {
+                    return a < b ? -1 : 1 }
+                else {
+                    return a - b
+                }
+            } else {
+                if (typeof this.collection[a] === 'string') {
+                    return this.collection[a] < this.collection[b] ? -1 : 1 }
+                else {
+                    return this.collection[a] - this.colletion[b]
+                }
+            }
+        }
+        this.flat = flat
+        this.collection = this.flat ? [] : {}
+        this.idx = []
+        this.idField = idField || 'id'
+        this.model = model || MuObservableObject({})
+        this.comparator = comparator || defaultCompare
+        if (contents) {
+            this.add(contents)
+        }
+    }
+    addBulk(items) {
+        this.add(items,true)
+    }
+    add(items,bulk = false) {
+        if (!Array.isArray(items)) { items = [items] }
+        if (this.flat) {
+            if (bulk) {
+                this.collection = this.collection.concat(items)
+            } else {
+                for (let item of items) {
+                    this.collection.push(item)
+                    this.emit('add', item)
+                }
+            }
+        } else {
+            for (let item of items) {
+                let old = this.collection[item[this.idField] || item]
+                this.collection[item[this.idField] || item] = item
+                if (old) {
+                    this.emit('replace',item[this.idField])
+                    this.collection[item[this.idField] || item] = item
+                } else {
+                    this.idx.push(item[this.idField] || item)
+                    if (!bulk) {this.emit('add',item[this.idField] || item)}
+                }
+            }
+        }
+        if (bulk) {
+            this.emit('bulk')
+        }
+    }
+    sort(comparator = this.comparator, reverse = false) {
+        reverse ? this.idx.sort((a,b)=>{return comparator(a,b) * -1}) : this.idx.sort(comparator)
+        this.emit('sort',this.idx.slice())
+    }
+    remove(idxs) {
+        if (this.flat) {throw 'No remove on flat collection, use reset'}
+        if (!Array.isArray(idxs)) { idxs = [idxs] }
+        for (let toRemove of idxs) {
+            let ref = this.collection[toRemove]
+            if (ref) {
+                delete this.collection[toRemove]
+                let idxLocation = this.idx.indexOf(toRemove)
+                if (idxLocation >= 0) {
+                    this.idx.splice(idxLocation,1)
+                }
+                this.emit('remove',toRemove,ref)
+            }
+        }
+    }
+    get(id) {
+        return this.collection[id]
+    }
+    each(fn) {
+        if (this.flat) {
+            this.collection.forEach(fn)
+        } else {
+            for (let idx of this.idx) {
+                fn.call(this,this.collection[idx],idx)
+            }
+        }
+    }
+    reset(items = [],bulk){
+        if (this.flat) {
+            this.collection = []
+            this.emit('reset')
+            this.add(items,bulk)
+        } else {
+            let old = Object.assign({},this.collection)
+            this.remove(this.idx.slice())
+            this.emit('reset',old)
+            this.add(items,bulk)
+        }
+    }
+}
+class MuPagedCollection extends MuCollection {
+    constructor(opts){
+        super(opts)
+        this.paginated = true
+        this.on('add',this.changeHandler)
+        this.on('bulk',this.changeHandler)
+        this.on('remove',this.changeHandler)
+        this.paginator = new MuPaginator({pageSize: opts.pageSize || 16,
+                                          data: this.flat ? this.collection : this.idx})
+    }
+    changeHandler(event,data){
+        this.paginator.paginate = undefined
+        if (this.flat) {
+            this.paginator.data = this.collection
+        }
+        this.emit('restructure',this.currentPage())
+    }
+    setPageSize(n) {
+        if (n != this.paginator.pageSize) {
+            this.paginator.pageSize = n
+            this.getPage(1)
+            this.changeHandler()
+        }
+    }
+    getPageSize() {
+        return this.paginator.pageSize
+    }
+    maxPage() {
+        return this.paginator.maxPage()
+    }
+    currentPageNumber() {
+        return this.paginator.currentPage
+    }
+    currentPage() {
+        let page = this.paginator.getPage()
+        return page
+    }
+    getPage(n){
+        let page = this.paginator.getPage(n)
+        this.emit('newPage',page)
+        return page
+    }
+    nextPage(){
+        let page = this.paginator.nextPage()
+        this.emit('newPage',page)
+        return page
+    }
+    previousPage(){
+        let page = this.paginator.previousPage()
+        this.emit('newPage',page)
+        return page
+    }
+    lastPage(){
+        let page = this.paginator.lastPage()
+        this.emit('newPage',page)
+        return page
+    }
+    firstPage(){
+        let page = this.paginator.firstPage()
+        this.emit('newPage',page)
+        return page
+    }
+}
+class MuCollectionView extends MuWrapperView{
+    constructor({collection,el,view,parent,viewOptions={}}) {
+        super({el,parent})
+        this.collection = collection
+        this.rootWrapped = muDom(el)
+        this.view = view
+        this.viewOptions = viewOptions
+        Object.assign(this.viewOptions,{autoRender: true})
+        this.collectionViews = {}
+        this.modelWrapper = MuObservableObject({})
+    }
+    init(){
+        this.collection.on('add',(idx)=>{
+            let item = this.collection.get(idx)
+            let view = this.view(Object.assign({
+                model: item.on ? item : new this.modelWrapper(item)},
+                                               this.viewOptions))
+            this.collectionViews[idx] = view
+            if (this.currentMask) {
+                if (this.currentMask(view.model)){
+                    this.el.appendChild(view.el)
+                }
+            } else {
+                this.el.appendChild(view.el)
+            }
+        })
+        this.collection.on('remove',(idx)=>{
+            let view = this.collectionViews[idx]
+            view.remove()
+            delete this.collectionViews[idx]
+        })
+        this.collection.on('sort',(newOrder)=>{
+            for (let viewIdx of newOrder ) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                if (this.currentMask) {
+                    if (this.currentMask(view.model)){
+                        this.el.appendChild(view.el)
+                    }
+                } else {
+                    this.el.appendChild(view.el)
+                }
+            }
+        })
+        this.collection.on('mask',(fn)=>{
+            let idxs = this.collection.flat ? this.collection.collection : this.collection.idx
+            for (let viewIdx of idxs) {
+                let view = this.collectionViews[viewIdx]
+                view.remove()
+                if (!this.currentMask || (this.currentMask && this.currentMask(view.model))) {
+                    this.el.appendChild(view.el)
+                }
+            }
+        })
+    }
+    mask(fn){
+        this.currentMask = fn
+        this.collection.emit('mask')
+    }
+    remask(){
+        this.collection.emit('mask')
+    }
+    unmask(){
+        this.mask(undefined)
+    }
+    remove(){
+        if (this.el.parentNode) {
+            this.el.parentNode.removeChild(this.el)
+        }
+    }
+}
+class MuPaginatedCollectionView extends MuCollectionView{
+    constructor(opts){
+        super(opts)
+        this.lookup = opts.lookup
+    }
+    init(){
+        let handler = (page)=>{
+            this.rootWrapped.clear()
+            page.forEach((idx)=>{
+                let item = this.collection.flat ? idx : this.collection.get(idx)
+                item = this.lookup ? this.lookup(item) : item
+                let view = this.view(Object.assign({model: item.on ? item :
+                                                    new this.modelWrapper(item)},this.viewOptions))
+                this.collectionViews[idx] = view
+                this.el.appendChild(view.el)
+            })
+        }
+        this.collection.on('newPage',handler)
+        this.collection.on('restructure',handler)
+    }
+}
+function MuObservableObject(opts) {
+    function arrayClone(a) {
+        return [].concat[a]
+    }
+    function objectClone(o) {
+        return JSON.parse(JSON.stringify(o))
+    }
+    let internalProps = Object.keys(MuEvent.__proto__)
+    internalProps.push('_eventsCount')
+    internalProps.push('_state')
+    let namedProps = opts.props || []
+    let derivedProps = opts.derived || {}
+    let derivedKeys = Object.keys(derivedProps)
+    class State extends MuEvent {
+        constructor(data) {
+            super()
+            this._state = {}
+            Object.assign(this._state,data)
+            this.on('change',function (changed){
+                this.emit(`change:${changed.key}`,changed.value,changed.old)
+            })
+            let out =  new Proxy(this,{
+                set: (target, key, value) => {
+                    if (internalProps.includes(key)) {
+                        this[key] = value
+                        return true
+                    }
+                    let old
+                    if (Array.isArray(this._state[key])) {
+                        old = arrayClone(this._state[key])
+                    } else if (typeof(this._state[key]) === 'object') {
+                        old = objectClone(this._state[key])
+                    } else {
+                        old = this._state[key]
+                    }
+                    this._state[key] = value
+                    this.emit('change',{key: key, value: value, old: old},target)
+                    return true
+                },
+                get: (target, key, value) => {
+                    if (internalProps.includes(key) || ['on','removeListener','emit','_events','clearListeners'].includes(key)) {
+                        return this[key]
+                    }
+                    return this._state[key] ? this._state[key] : data[key]
+                }
+            })
+            for (let d in derivedProps) {
+                let fn = derivedProps[d]['fn']
+                if (fn && typeof fn === 'function') {
+                    for (let k of derivedProps[d]['deps']) {
+                        out.on(`change:${k}`,(newV,oldV)=>{
+                            if (newV !== oldV) {
+                                out[d] = fn.apply(out._state)
+                            }
+                        })
+                    }
+                    out[d] = fn.apply(out._state)
+                }
+            }
+            return out
+        }
+        static props() {
+            return Reflect.ownKeys(namedProps) || {}
+        }
+        static derivedProps() {
+            return Reflect.ownKeys(derivedProps) || {}
+        }
+        static dump(instance) {
+            return instance._state
+        }
+        toJSON() {
+            return this._state
+        }
+    }
+    return State
 }

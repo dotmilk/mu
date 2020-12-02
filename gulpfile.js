@@ -8,6 +8,11 @@ let order = require('gulp-order')
 
 gulp.task('script', function() {
     return gulp.src('./src/**/*.js',{ base: './src'})
+        .pipe(order(['dom/*.js',
+                     'util/*.js',
+                     'app/*.js',
+                     'core/muView.js',
+                     'widgets/*.js']))
         .pipe(concat('mu.js'))
         .pipe(strip())
         .pipe(removeEmptyLines())
