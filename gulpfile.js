@@ -7,13 +7,27 @@ let removeEmptyLines = require('gulp-remove-empty-lines')
 let order = require('gulp-order')
 
 gulp.task('script', function() {
-    return gulp.src('./src/**/*.js',{ base: './src'})
+    return gulp.src(['./src/**/*.js','!src/_*.js'],{ base: './src'})
         .pipe(order(['dom/*.js',
                      'util/*.js',
                      'app/*.js',
                      'core/muView.js',
                      'widgets/*.js']))
         .pipe(concat('mu.js'))
+        .pipe(strip())
+        .pipe(removeEmptyLines())
+        .pipe(gulp.dest('./dist/'))
+        .pipe(gulp.dest('./example/js/'))
+})
+
+gulp.task('script-module', function() {
+    return gulp.src('./src/**/*.js',{ base: './src'})
+        .pipe(order(['_module.js','dom/*.js',
+                     'util/*.js',
+                     'app/*.js',
+                     'core/muView.js',
+                     'widgets/*.js']))
+        .pipe(concat('mu-module.js'))
         .pipe(strip())
         .pipe(removeEmptyLines())
         .pipe(gulp.dest('./dist/'))

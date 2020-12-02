@@ -1,4 +1,3 @@
-import { MuPage } from "../js/mu.js"
 // classes have to be manually put on 'window' object for the
 // page manager magic to dynamically call them
 window.PageOne = class PageOne extends MuPage {

@@ -1,3 +1,6 @@
+export { muCss,
+         muDom,
+         MuTagen }
 function muCss(style,id) {
     let sheet = document.createElement('style')
     if (id) {
