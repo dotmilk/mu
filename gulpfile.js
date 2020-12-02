@@ -8,6 +8,7 @@ let order = require('gulp-order')
 
 gulp.task('script', function() {
     return gulp.src('./src/**/*.js',{ base: './src'})
+        .pipe(concat('mu.js'))
         .pipe(strip())
         .pipe(removeEmptyLines())
         .pipe(gulp.dest('./dist/'))
@@ -25,7 +26,7 @@ gulp.task('css', function() {
         .pipe(less({
             paths: [ path.join(__dirname, 'less', 'includes') ]
         }))
-        .pipe(gulp.dest('./dist/'))
+        .pipe(gulp.dest('./dist/css/'))
         .pipe(gulp.dest('./example/'))
         .pipe(gulp.dest('../conflux/gui/css'))
 })
