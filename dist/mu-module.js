@@ -326,6 +326,9 @@ function muDom(s,c) {
             }
             return this
         },
+        element(){
+            return this.elements[0]
+        },
         blur(){
             this.each((e)=>{
                 e.blur()

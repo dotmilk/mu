@@ -1830,6 +1830,7 @@ muDom(document).find('foo')
     * [.map(fn)](#muDom.map)
     * [.siblings()](#muDom.siblings)
     * [.focus()](#muDom.focus)
+    * [.element()](#muDom.element)
     * [.blur()](#muDom.blur)
     * [.toggle(className)](#muDom.toggle)
     * [.hide()](#muDom.hide)
@@ -1934,6 +1935,13 @@ Get siblings. Chainable on siblings.
 
 ### muDom.focus()
 Focus an element. Only works if this has one matching element. Chainable.
+
+**Kind**: static method of [<code>muDom</code>](#muDom)  
+<a name="muDom.element"></a>
+
+### muDom.element()
+Get ref to dom element (assumes there is only one match, returning first)
+obviously non-chainable
 
 **Kind**: static method of [<code>muDom</code>](#muDom)  
 <a name="muDom.blur"></a>

@@ -138,6 +138,14 @@ function muDom(s,c) {
             return this
         },
         /**
+         * Get ref to dom element (assumes there is only one match, returning first)
+         * obviously non-chainable
+         * @memberof muDom
+         */
+        element(){
+            return this.elements[0]
+        },
+        /**
          * Remove focus from matched elements, if one of them happens to have focus. Chainable.
          * @memberof muDom
          */
