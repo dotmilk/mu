@@ -1,7 +1,6 @@
 class MuPubSub {
 
     constructor() {
-        console.log('called')
         this.channels = {}
     }
 
