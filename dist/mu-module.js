@@ -829,7 +829,6 @@ class MuPaginator {
 }
 class MuPubSub {
     constructor() {
-        console.log('called')
         this.channels = {}
     }
     sub(name,listener) {
