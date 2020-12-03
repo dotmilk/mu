@@ -6,15 +6,12 @@ class MuPubSub {
     }
 
     sub(name,listener) {
-        console.log('sub')
         let channel = this.ensureChannel(name)
         channel.push(listener)
-        console.log(this)
     }
 
     pub(name,...rest) {
         let channel = this.ensureChannel(name)
-        console.log(this)
         channel.forEach((fn)=>{
             fn(...rest)
         })
