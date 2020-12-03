@@ -40,5 +40,6 @@ export { muInjectCss,
          MuNodeManager,
          MuPaginator,
          MuSelects,
-         MuTable
+         MuTable,
+         MuPubSub
        }

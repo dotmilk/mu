@@ -22,8 +22,29 @@
         <br>
         <a href="tableWidget/">Table widget</a>
         <script type="module">
-         import { muDom } from '@dotmilk/mu'
+         import { muDom, MuPubSub } from '@dotmilk/mu'
          window.muDom = muDom
+
+         let ps = new MuPubSub()
+
+         class A {
+
+             constructor(ps) {
+                 this.foo = "internal test"
+                 ps.sub('foo',this.listener.bind(this))
+                 console.log(ps)
+             }
+
+             listener(msg) {
+                 console.log(`msg: ${msg} and ${this.foo}`)
+             }
+
+         }
+
+         let a = new A(ps)
+         console.log(a)
+         window.ps = ps
+
         </script>
     </body>
 </html>
