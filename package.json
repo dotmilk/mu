@@ -1,15 +1,13 @@
 {
   "name": "@dotmilk/mu",
-  "version": "1.0.53",
+  "version": "1.0.54",
   "description": "lightweight frontend 'framework'",
   "browser": "dist/mu-module.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/dotmilk/mu.git"
   },
-  "scripts": {
-
-  },
+  "scripts": {},
   "author": "dotmilk",
   "license": "ISC",
   "devDependencies": {
