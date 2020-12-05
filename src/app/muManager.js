@@ -27,6 +27,7 @@ class MuManager {
         } else {
             this[name] = opts
         }
+        return this[name]
     }
     /**
      * Retrieve a thing you have stored

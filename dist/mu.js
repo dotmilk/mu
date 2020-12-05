@@ -683,6 +683,7 @@ class MuManager {
         } else {
             this[name] = opts
         }
+        return this[name]
     }
     get(name){
         return this[name]
