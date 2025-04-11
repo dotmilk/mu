@@ -2092,5 +2092,5 @@ Clear the contents of matched elements. Chainable.
 **Kind**: static method of [<code>muDom</code>](#muDom)  
 
 * * *
-
+test
 &copy; 2016-2017 Seth Price
