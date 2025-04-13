@@ -1,4 +1,7 @@
-class MuTable extends MuEvent{
+import { MuEvent } from '../util'
+import { MuObservableObject, muView } from '../app'
+import { muDom, MuTagen } from '../dom'
+export class MuTable extends MuEvent{
     constructor(config){
         super()
         this.cfg = config = Object.assign(this.defaults(),config)

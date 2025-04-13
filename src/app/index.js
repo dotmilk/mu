@@ -1,1 +1,5 @@
 export { MuState, MuStateMachine } from './muStateMachine'
+export { MuPageManager } from './muPageManager'
+export { MuPage } from './muPage'
+export { MuManager } from './muManager'
+export { MuDialogue, MuDialogueManager } from './muDialogueManager'

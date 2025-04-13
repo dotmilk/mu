@@ -20,3 +20,12 @@ export {
     , MuCollectionView
     , MuPaginatedCollectionView
      } from './core'
+export { 
+    MuState
+    , MuStateMachine
+    , MuPageManager
+    , MuPage
+    , MuManager
+    , MuDialogue
+    , MuDialogueManager } from './app'
+export { MuTable, MuSelects  } from './widgets'

@@ -3,7 +3,7 @@ import { muDom, MuTagen } from '../dom'
 /**
  * Abstract dialogue class for use in {@link MuDialogueManager}
  */
-class MuDialogue {
+export class MuDialogue {
     constructor(){
     }
     onBeforeShow(){}
@@ -14,7 +14,7 @@ class MuDialogue {
     render(){ return muDom("<div></div>").elements[0] }
 }
 
-class MuDialogueManager {
+export class MuDialogueManager {
 
     constructor(broker,div,id) {
         this.overlay = MuDialogueManager._ensureOverlay(div,id)

@@ -1,4 +1,7 @@
-class MuSelects {
+import { MuObservableObject, muView } from '../app'
+import { muDom, MuTagen } from '../dom'
+
+export class MuSelects {
     constructor(config) {
 
         this.ensureOverlay()
