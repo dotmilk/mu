@@ -10,9 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@dotmilk/mu": "^1.0.49"
-  },
-  "devDependencies": {
-    "snowpack": "^2.17.1"
+    "vite": "^6.2.6"
   }
 }
