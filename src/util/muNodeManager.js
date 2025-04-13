@@ -2,7 +2,7 @@
  * Name, store and possibly clone / possibly remove arbitrary nodes of
  * your document for later retrieval. Pretty fancy right?
  */
-class MuNodeManager {
+export class MuNodeManager {
     /**
      * Nothing to see here, pretty standard instance constructor...
      */

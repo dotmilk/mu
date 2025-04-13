@@ -1,4 +1,4 @@
-class MuPubSub {
+export class MuPubSub {
 
     constructor() {
         this.channels = {}

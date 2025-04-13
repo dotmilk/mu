@@ -1,8 +1,10 @@
+import { MuWrapperView } from './muView'
+import { MuObservableObject } from './muObservableObject'
 /**
  * Generic view wrapper for a collection
  * @extends MuWrapperView
  */
-class MuCollectionView extends MuWrapperView{
+export class MuCollectionView extends MuWrapperView {
     constructor({collection,el,view,parent,viewOptions={}}) {
         super({el,parent})
         this.collection = collection
@@ -83,7 +85,7 @@ class MuCollectionView extends MuWrapperView{
  * View wrapper for a paginated collection
  * @extends MuCollectionView
  */
-class MuPaginatedCollectionView extends MuCollectionView{
+export class MuPaginatedCollectionView extends MuCollectionView {
     constructor(opts){
         super(opts)
         this.lookup = opts.lookup

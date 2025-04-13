@@ -1,3 +1,5 @@
+import { muDom, MuTagen } from '../dom'
+
 /**
  * Abstract dialogue class for use in {@link MuDialogueManager}
  */

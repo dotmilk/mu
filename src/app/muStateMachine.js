@@ -1,7 +1,9 @@
+import { MuEvent } from '../util'
+
 /**
  * Abstract State class for use in {@link MuStateMachine}
  */
-class MuState {
+export class MuState {
     constructor(){}
     onEnter(){}
     onExit(){}
@@ -11,7 +13,7 @@ class MuState {
  * this is no where near as frilly, this does not have a kitchen sink, nor will it
  * keep your beverages cold.
  */
-class MuStateMachine extends MuEvent {
+export class MuStateMachine extends MuEvent {
     /**
      * So basically you only need to define some states, of which there is
      * one 'special' state you can add 'uninitialized' if you don't add it

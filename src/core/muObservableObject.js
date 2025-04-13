@@ -1,3 +1,4 @@
+import { MuEvent } from '../util'
 /**
  * A mystical thing, uses traps to watch for changes to an object,
  * also has derived properties.
@@ -19,7 +20,7 @@
  * person.on('change:fullName',doSomething)
  * // can also listen for changes on any property.
  */
-function MuObservableObject(opts) {
+export function MuObservableObject(opts) {
     function arrayClone(a) {
         return [].concat[a]
     }

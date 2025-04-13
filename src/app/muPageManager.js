@@ -1,3 +1,6 @@
+import { MuEvent } from '../util'
+import { muDom } from '../dom'
+
 /**
  * Super fun tool here. Designate by default some element with the attribute
  * mu-root, and one or more elements inside that one mu-page='pagename'
@@ -5,7 +8,7 @@
  * 'pagename' bam
  * @extends MuEvent
  */
-class MuPageManager extends MuEvent {
+export class MuPageManager extends MuEvent {
     /**
      * @param {Object} options - Options
      * @param {String} options.root - The name of the attribute denoting the root of your page. Where to find pages, and where page

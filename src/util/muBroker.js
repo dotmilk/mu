@@ -6,7 +6,7 @@
  * broker.subscribe('test:echo',(msg,success)=>{ console.log(msg); success('it worked')})
  * broker.publish('test:echo','this will be echoed').then((result)=>{console.log(result)})
  */
-class MuBroker {
+export class MuBroker {
     /**
      * Requires at least empty object {}
      * @param {Object} config - configuration

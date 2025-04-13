@@ -5,7 +5,7 @@
  * emitter.on('whatever',()=>{console.log(whatever)})
  * emitter.emit('whatever')
  */
-class MuEvent {
+export class MuEvent {
     /**
      * Takes no arguments
      */
