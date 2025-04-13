@@ -28,4 +28,6 @@ export {
     , MuManager
     , MuDialogue
     , MuDialogueManager } from './app'
-export { MuTable, MuSelects  } from './widgets'
+export { 
+    MuTable
+    , MuSelects  } from './widgets'

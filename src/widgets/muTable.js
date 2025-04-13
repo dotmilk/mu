@@ -1,5 +1,5 @@
 import { MuEvent } from '../util'
-import { MuObservableObject, muView } from '../app'
+import { MuObservableObject, muView } from '../core'
 import { muDom, MuTagen } from '../dom'
 export class MuTable extends MuEvent{
     constructor(config){
