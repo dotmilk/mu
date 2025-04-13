@@ -1,4 +1,4 @@
-import { MuObservableObject, MuTagen, MuView } from '@dotmilk/mu'
+import { MuObservableObject, MuTagen, MuView } from '../../src'
 let theModelFactory = new MuObservableObject({
     props: ['aNumber']
 })
