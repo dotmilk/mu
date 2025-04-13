@@ -14,6 +14,10 @@ export function muCss(style,id) {
     document.body.appendChild(sheet)
 }
 
+export function muInjectCss() {
+    muCss(MU_CSS,'muCss')
+}
+
 export const MU_CSS = `
 #mu-overlay > :not(:last-child) {
   display: none !important;

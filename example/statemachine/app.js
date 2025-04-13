@@ -1,5 +1,5 @@
 import { gumballMachine } from './sm.js'
-import { muDom } from '@dotmilk/mu'
+import { muDom } from '../../src'
 
 document.addEventListener('DOMContentLoaded',()=>{
     let totalCoinsNeeded

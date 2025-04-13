@@ -1,4 +1,4 @@
-import { MuState, MuStateMachine } from '@dotmilk/mu'
+import { MuState, MuStateMachine } from '../../src'
 
 class GumballMachineAbstract extends MuState {
     insertCoin(){}
@@ -94,7 +94,7 @@ let gumballMachine = new MuStateMachine({
         // If you want to that is, i'm not trying to tell you how to code
         this.coinsNeededToPurchase = 3
         // you can start the gumball machine with coins or no coins etc
-        this.coinCount = 1
+        this.coinCount = 0
     }
 })
 

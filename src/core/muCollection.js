@@ -1,4 +1,4 @@
-import { MuEvent } from '../util'
+import { MuEvent, MuPaginator } from '../util'
 import { MuObservableObject } from './muObservableObject'
 /**
  * A collection emitting events on certain actions
