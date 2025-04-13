@@ -51,7 +51,7 @@ export class MuDialogueManager {
         this.overlay.append(current.content)
         dialogue.onBeforeShow(cfg)
         this.overlay.addClass('mu-overlay-show')
-        dialogue.onShow(Object.assign({},cfg,{beforeShowResult: result}))
+        //dialogue.onShow(Object.assign({},cfg,{beforeShowResult: result}))
 
     }
 
