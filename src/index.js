@@ -2,8 +2,7 @@ export {
     muCss
     , muInjectCss
     , muDom
-    , MuTagen
-    , MU_CSS } from './dom'
+    , MuTagen } from './dom'
 export { 
     MuBroker
     , MuEvent

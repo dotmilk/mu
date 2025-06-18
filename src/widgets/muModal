@@ -1,0 +1,297 @@
+import { MuEvent } from '../util'
+import { MuObservableObject, muView } from '../core'
+import { muDom, MuTagen } from '../dom'
+
+/**
+ * MuModal - A customizable modal dialog component
+ * 
+ * Features:
+ * - Customizable header, body, and footer
+ * - Show/hide methods with animations
+ * - Backdrop handling with click-to-close
+ * - Escape key to close
+ * - Focus trap for accessibility
+ * - Event emitters for open, close, cancel, and confirm actions
+ * - Promise-based interface for easier async handling
+ */
+/*
+    Event Base Usage:
+    const modal = new MuModal({
+        title: 'Confirmation',
+        content: 'Are you sure you want to proceed?'
+    });
+    
+    modal.on('confirm', () => {
+        console.log('User confirmed the action');
+    });
+    
+    modal.on('cancel', () => {
+        console.log('User cancelled the action');
+    });
+    
+    modal.on('close', (data) => {
+        console.log(`Modal was closed by: ${data.action}`);
+    });
+    
+    modal.show();
+
+    Promise Based Usage:
+    const modal = new MuModal({
+        title: 'Confirmation',
+        content: 'Are you sure you want to proceed?'
+    });
+    
+    // Async/await usage
+    async function showConfirmDialog() {
+        try {
+            const result = await modal.show();
+            
+            if (result.action === 'confirm') {
+                console.log('User confirmed');
+                // Proceed with action
+            } else {
+                console.log(`User dismissed via ${result.action}`);
+                // Handle cancellation
+            }
+        } catch (error) {
+            console.error('Modal error:', error);
+        }
+    }
+    
+    // Or with promise chaining
+    modal.show()
+        .then(result => {
+            if (!result.dismissed) {
+                // User confirmed
+                console.log('Confirmed!');
+            } else {
+                console.log(`Dismissed by: ${result.action}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+*/
+export class MuModal extends MuEvent {
+    /**
+     * Creates a new modal instance
+     * @param {Object} config - Configuration options
+     */
+    constructor(config) {
+        super()
+        this.cfg = config = Object.assign(this.defaults(), config)
+        this.isOpen = false
+        this.resolvePromise = null
+        this.rejectPromise = null
+
+        // Create observable model
+        let modalModelConstructor = MuObservableObject({
+            props: ['title', 'content', 'visible']
+        })
+
+        this.modalModel = new modalModelConstructor({
+            title: config.title || '',
+            content: config.content || '',
+            visible: false
+        })
+
+        // Create view
+        let viewConstructor = muView({
+            template: this.modalTemplate(),
+            references: {
+                dialog: `.${this.cfg.modalCfg.dialogClass}`,
+                closeBtn: `.${this.cfg.modalCfg.closeClass}`,
+                confirmBtn: `.${this.cfg.modalCfg.confirmClass}`,
+                cancelBtn: `.${this.cfg.modalCfg.cancelClass}`,
+                backdrop: `.${this.cfg.modalCfg.backdropClass}`
+            },
+            bindings: {
+                title: {
+                    selector: `.${this.cfg.modalCfg.headerClass}`,
+                    type: 'html'
+                },
+                content: {
+                    selector: `.${this.cfg.modalCfg.bodyClass}`,
+                    type: 'html'
+                },
+                visible: {
+                    selector: '',
+                    type: 'class',
+                    class: this.cfg.modalCfg.visibleClass,
+                    inverse: false
+                }
+            },
+            events: {
+                [`click .${this.cfg.modalCfg.closeClass}`]: () => {
+                    this.emit('close', { action: 'close' })
+                    this.hide('close')
+                },
+                [`click .${this.cfg.modalCfg.cancelClass}`]: () => {
+                    this.emit('cancel', { action: 'cancel' })
+                    this.hide('cancel')
+                },
+                [`click .${this.cfg.modalCfg.confirmClass}`]: (e) => {
+                    this.emit('confirm', { action: 'confirm' })
+                    if (this.cfg.hideOnConfirm) this.hide('confirm')
+                },
+                [`click .${this.cfg.modalCfg.backdropClass}`]: (e) => {
+                    if (e.target === e.currentTarget && this.cfg.closeOnBackdropClick) {
+                        this.emit('close', { action: 'backdrop' })
+                        this.hide('backdrop')
+                    }
+                }
+            }
+        })
+
+        this.view = viewConstructor({ model: this.modalModel })
+        
+        // Handle escape key press
+        if (this.cfg.closeOnEscape) {
+            this.escHandler = (e) => {
+                if (e.key === 'Escape' && this.isOpen) {
+                    this.emit('close', { action: 'escape' })
+                    this.hide('escape')
+                }
+            }
+            document.addEventListener('keydown', this.escHandler)
+        }
+        
+        this.view.render()
+        this.el = this.view.el
+        
+        // Append to container if specified
+        if (this.cfg.appendTo) {
+            muDom(this.cfg.appendTo).append(this.el)
+        }
+    }
+
+    /**
+     * Shows the modal
+     * @param {Object} options - Options for showing (title, content)
+     * @returns {Promise} - Returns a promise that resolves when the modal is closed
+     */
+    show(options = {}) {
+        if (options.title) this.modalModel.title = options.title
+        if (options.content) this.modalModel.content = options.content
+        
+        this.modalModel.visible = true
+        this.isOpen = true
+        
+        // Set focus to the dialog for accessibility
+        setTimeout(() => {
+            this.view.references.dialog.focus()
+        }, 50)
+        
+        this.emit('open')
+        
+        // Return a promise that will resolve when the modal is closed
+        return new Promise((resolve, reject) => {
+            this.resolvePromise = resolve
+            this.rejectPromise = reject
+        })
+    }
+
+    /**
+     * Hides the modal
+     * @param {string} action - The action that caused the hide (close, cancel, confirm, backdrop, escape)
+     * @returns {MuModal} - Returns self for chaining
+     */
+    hide(action = 'close') {
+        this.modalModel.visible = false
+        this.isOpen = false
+        
+        // Resolve the promise if it exists
+        if (this.resolvePromise) {
+            this.resolvePromise({ action, dismissed: action !== 'confirm' })
+            this.resolvePromise = null
+            this.rejectPromise = null
+        }
+        
+        return this
+    }
+
+    /**
+     * Updates modal content
+     * @param {Object} options - Content to update
+     * @returns {MuModal} - Returns self for chaining
+     */
+    update(options = {}) {
+        if (options.title) this.modalModel.title = options.title
+        if (options.content) this.modalModel.content = options.content
+        return this
+    }
+
+    /**
+     * Cleans up event listeners
+     */
+    destroy() {
+        if (this.escHandler) {
+            document.removeEventListener('keydown', this.escHandler)
+        }
+        
+        // Reject any pending promises
+        if (this.rejectPromise) {
+            this.rejectPromise(new Error('Modal was destroyed'))
+            this.resolvePromise = null
+            this.rejectPromise = null
+        }
+        
+        this.el.remove()
+    }
+
+    /**
+     * Modal template
+     * @returns {Function} Template function
+     */
+    modalTemplate() {
+        return () => {
+            return new MuTagen()
+                .tag('div').class('wrapperClass')
+                .tag('div').class('backdropClass').close()
+                .tag('div').class('dialogClass').attribute('tabindex', '-1')
+                .tag('div').class('headerClass')
+                .tag('button').class('closeClass').text('closeText').close()
+                .close()
+                .tag('div').class('bodyClass').close()
+                .tag('div').class('footerClass')
+                .tag('button').class('cancelClass').text('cancelText').close()
+                .tag('button').class('confirmClass').text('confirmText').close()
+                .close()
+                .close()
+                .close()
+                .compile()
+                .render(this.cfg.modalCfg)
+        }
+    }
+
+    /**
+     * Default configuration
+     * @returns {Object} Default config
+     */
+    defaults() {
+        return {
+            title: '',
+            content: '',
+            closeOnBackdropClick: true,
+            closeOnEscape: true,
+            hideOnConfirm: true,
+            appendTo: 'body',
+            modalCfg: {
+                wrapperClass: 'muModal',
+                backdropClass: 'muModalBackdrop', 
+                dialogClass: 'muModalDialog',
+                headerClass: 'muModalHeader',
+                bodyClass: 'muModalBody',
+                footerClass: 'muModalFooter',
+                closeClass: 'muModalClose',
+                cancelClass: 'muModalCancel',
+                confirmClass: 'muModalConfirm',
+                visibleClass: 'visible',
+                closeText: '×',
+                cancelText: 'Cancel',
+                confirmText: 'Confirm'
+            }
+        }
+    }
+}
