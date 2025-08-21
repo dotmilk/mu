@@ -980,6 +980,7 @@ class MuPageManager extends MuEvent {
                 pageName: name
             },options))
             this.on(`load:${name}`,(page)=>{
+                console.log('wtf',name,this.getController(name).onLoad)
                 this.getController(name).onLoad(page)
             })
             this.on(`hide:${name}`,(page)=>{
