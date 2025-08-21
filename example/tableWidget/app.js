@@ -1,4 +1,4 @@
-import { MuPagedCollection, MuTable, muInjectCss } from '@dotmilk/mu'
+import { MuPagedCollection, MuTable, muInjectCss } from '../../src'
 muInjectCss()
 let rows = new MuPagedCollection({
     idField: 'id',

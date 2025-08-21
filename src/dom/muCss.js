@@ -1,3 +1,5 @@
+import stylesString from '../styles.css?raw'
+
 /**
  * Inject a style sheet, if you feel so inclined
  * @param {String} style - some string of css
@@ -5,11 +7,15 @@
  * @example
  * muCss('.someClass {background-color: red}')
  */
-function muCss(style,id) {
+export function muCss(style,id) {
     let sheet = document.createElement('style')
     if (id) {
         sheet.id = id
     }
     sheet.innerHTML = style
     document.body.appendChild(sheet)
+}
+
+export function muInjectCss() {
+    muCss(stylesString,'muCss')
 }

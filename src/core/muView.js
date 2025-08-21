@@ -1,29 +1,6 @@
-/**
- * Abstract class for wrapping more complex constructs.
- * @extends MuEvent
- */
-class MuWrapperView extends MuEvent{
-    /**
-     * Should only be called by super in extending class
-     * @param {Object} options - References to parent and root el
-     * @param options.el - The node this view manipulates
-     * @param options.parent - The view rendering this
-     */
-    constructor({el,parent}) {
-        super()
-        this.el = el
-        this.rootWrapped = muDom(el)
-        this.parent = parent
-    }
-    /** Stub function, extending class may implement*/
-    init(){}
-    /** Stub function, extending class may implement*/
-    render(){}
-    /** Stub function, extending class must implement
-     * @abstract
-     */
-    remove(){ throw 'Remove not overridden'}
-}
+import { MuEvent } from '../util'
+import { MuPaginatedCollectionView, MuCollectionView } from './muCollectionViews'
+import { muDom } from '../dom'
 
 /**
  * Main class for for a 'view', examples in example folder
@@ -40,7 +17,7 @@ class MuWrapperView extends MuEvent{
  * // clicking on element inside view.el with 'some selector that exists within this.el'
  * // calls someFn, someFn might use this.aDomRef to manipulate something
  */
-class MuView extends MuEvent {
+export class MuView extends MuEvent {
     /**
      * @param {Object} options - various options
      * @param {(Function|String)} options.template - Template to become this.el
@@ -382,7 +359,7 @@ class MuView extends MuEvent {
  * let personOne = personView({model: personOneModel })
  * let personTwo = personView({model: personTwoModel })
  */
-function muView(op) {
+export function muView(op) {
     return (o)=>{
         Object.assign(o,op)
         return new MuView(o)

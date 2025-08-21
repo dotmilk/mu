@@ -1,8 +1,39 @@
+import { MuObservableObject } from './muObservableObject'
+import { MuEvent } from '../util'
+import { muDom } from '../dom'
+
+/**
+ * Abstract class for wrapping more complex constructs.
+ * @extends MuEvent
+ */
+export class MuWrapperView extends MuEvent{
+    /**
+     * Should only be called by super in extending class
+     * @param {Object} options - References to parent and root el
+     * @param options.el - The node this view manipulates
+     * @param options.parent - The view rendering this
+     */
+    constructor({el,parent}) {
+        super()
+        this.el = el
+        this.rootWrapped = muDom(el)
+        this.parent = parent
+    }
+    /** Stub function, extending class may implement*/
+    init(){}
+    /** Stub function, extending class may implement*/
+    render(){}
+    /** Stub function, extending class must implement
+     * @abstract
+     */
+    remove(){ throw 'Remove not overridden'}
+}
+
 /**
  * Generic view wrapper for a collection
  * @extends MuWrapperView
  */
-class MuCollectionView extends MuWrapperView{
+export class MuCollectionView extends MuWrapperView {
     constructor({collection,el,view,parent,viewOptions={}}) {
         super({el,parent})
         this.collection = collection
@@ -83,7 +114,7 @@ class MuCollectionView extends MuWrapperView{
  * View wrapper for a paginated collection
  * @extends MuCollectionView
  */
-class MuPaginatedCollectionView extends MuCollectionView{
+export class MuPaginatedCollectionView extends MuCollectionView {
     constructor(opts){
         super(opts)
         this.lookup = opts.lookup

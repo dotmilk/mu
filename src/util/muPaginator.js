@@ -1,7 +1,7 @@
 /**
  * Class for 'paginating' an array
  */
-class MuPaginator {
+export class MuPaginator {
     /**
      * Set a pagesize and pass in some  data, if you reset or change data from outside
      * you should probably go ahead and set instance.paginate to undefined before

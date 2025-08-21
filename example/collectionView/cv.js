@@ -1,4 +1,4 @@
-import { MuTagen, MuCollection, muView, MuView } from '@dotmilk/mu'
+import { MuTagen, MuCollection, muView, MuView } from '../../src'
 
 function makeId() {
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

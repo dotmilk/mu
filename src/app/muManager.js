@@ -5,7 +5,7 @@
  * Use it or don't, I have no feelings either way. Good place to keep shit out of global scope.
  *
  */
-class MuManager {
+export class MuManager {
     /**
      * Make a manager object
      */

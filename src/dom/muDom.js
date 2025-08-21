@@ -1,3 +1,5 @@
+import { muCss } from './muCss.js'
+
 /**
  * A cheap, light weight jquery-ish knockoff
  * @example
@@ -10,7 +12,7 @@
  * @param {DomNode} context - the context find and subsequent operations will be run under
  * defaults to document
  */
-function muDom(s,c) {
+export function muDom(s,c) {
     if (!window.muDomInjected) {
         let css =`.muHide { display: none !important}`
         if (document.readyState == 'complete' || document.readyState == 'interactive') {

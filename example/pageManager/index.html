@@ -1,24 +1,14 @@
 <!doctype html>
 <html lang="en">
-
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
-        <script src="https://raw.githack.com/dotmilk/mu/main/dist/mu.js"></script>
-        <link rel="stylesheet" href="https://raw.githack.com/dotmilk/mu/main/dist/css/styles.css">
-        <script src="pg.js"></script>
     </head>
 
     <body mu-root>
         <div mu-page="pageOne" mu-controller="PageOne"><button>go to page two</button></div>
         <div mu-page="pageTwo" mu-controller="PageTwo"><button>go to page one</button></div>
-        <script>
-         let pm
-         document.addEventListener('DOMContentLoaded',()=>{
-             pm = new MuPageManager()
-             pm.load('pageOne')
-         })
-        </script>
+        <script type="module" src="pg.js"></script>
     </body>
 </html>

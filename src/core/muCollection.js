@@ -1,8 +1,10 @@
+import { MuEvent, MuPaginator } from '../util'
+import { MuObservableObject } from './muObservableObject'
 /**
  * A collection emitting events on certain actions
  * @extends MuEvent
  */
-class MuCollection extends MuEvent {
+export class MuCollection extends MuEvent {
     /**
      * Create a new collection, in the future will optionally wrap items in a model.
      * for exceptionally large collections, use flat, so as to not add each 'item' to
@@ -167,7 +169,7 @@ class MuCollection extends MuEvent {
  * I dunno, you're the one using it.
  * @extends MuCollection
  */
-class MuPagedCollection extends MuCollection {
+export class MuPagedCollection extends MuCollection {
     /**
      * This is where shit gets real, ok that might be an overstatement. Basically this provides
      * an api for {@link MuPaginator} and special events pertaining to a paged collection

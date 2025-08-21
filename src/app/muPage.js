@@ -1,7 +1,8 @@
+import { MuPageManager } from './muPageManager'
 /**
  * Abstract class for page controllers
  */
-class MuPage {
+export class MuPage {
     /**
      * This is always called by super in extending class don't worry about it...
      * @param {Object} options - Just two options

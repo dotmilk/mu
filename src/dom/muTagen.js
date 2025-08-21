@@ -1,7 +1,7 @@
 /**
  * Programmatically create some html fragment template
  */
-class MuTagen {
+export class MuTagen {
     /**
      * Get the party started
      * @example

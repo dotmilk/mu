@@ -1,3 +1,4 @@
+import { MuPage,  MuPageManager, muDom} from '../../dist/mu-module'
 // classes have to be manually put on 'window' object for the
 // page manager magic to dynamically call them
 window.PageOne = class PageOne extends MuPage {
@@ -24,3 +25,9 @@ window.PageTwo = class PageTwo extends MuPage {
         console.log('page two going away')
     }
 }
+
+let pm
+document.addEventListener('DOMContentLoaded',()=>{
+    pm = new MuPageManager()
+    pm.load('pageOne')
+})
