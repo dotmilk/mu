@@ -8,9 +8,10 @@ Api of models and views and such inspired by [ampersand.js](https://ampersandjs.
 The statemachine is somewhat based on the api of [machina.js](http://machina-js.org/).
 
 To take a look at some of the core stuff and some hot widget action
+Clone this repo
 ```
-npm i
-npm run examples
+cd examples
+npx vite
 ```
 
 Then stroll on over to chrome / chromium and take a look.
