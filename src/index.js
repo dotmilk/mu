@@ -27,7 +27,8 @@ export {
     , MuPage
     , MuManager
     , MuDialogue
-    , MuDialogueManager } from './app'
+    , MuDialogueManager
+    , MuContextManager } from './app'
 export { 
     MuTable
     , MuSelects  } from './widgets'
