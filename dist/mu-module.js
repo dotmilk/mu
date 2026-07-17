@@ -1077,7 +1077,7 @@ class w {
     if (i || (i = this.createChannel({ name: e, type: n })), !i.subscribers.length && i.queue.length) {
       i.subscribers.push(t);
       let s = () => {
-        i.queue.length && window.setTimeout(() => {
+        i.queue.length && globalThis.setTimeout(() => {
           let r = i.queue.shift();
           this.publish(e, r.msg).then((o) => {
             r.resolve(o);
@@ -1116,7 +1116,7 @@ class w {
     let i = this._channels[e];
     if (i || (i = this.createChannel({ name: e, type: n })), !i.subscribers.length) {
       let o;
-      return i.queue.length < this._historyLimit && (o = new window.Promise((a, h) => {
+      return i.queue.length < this._historyLimit && (o = new globalThis.Promise((a, h) => {
         i.queue.push({
           resolve: a,
           reject: h,
@@ -1133,7 +1133,7 @@ class w {
         s = i.subscribers[i.subscribers.length - 1];
         break;
     }
-    return !t.resolve || t.resolve && typeof t.resolve != "function" ? r = new window.Promise((o, a) => {
+    return !t.resolve || t.resolve && typeof t.resolve != "function" ? r = new globalThis.Promise((o, a) => {
       s(t, o);
     }) : r = s(t.msg, t.resolve), r;
   }
@@ -1235,7 +1235,7 @@ class A {
     return this.currentPage--, this.currentPage < 1 && (this.currentPage = 1), this.getPage();
   }
 }
-class F {
+class H {
   /**
    * Nothing to see here, pretty standard instance constructor...
    */
@@ -1283,7 +1283,7 @@ class F {
     return () => t ? this.getCloned(e) : this.get(e);
   }
 }
-function H(l, ...e) {
+function F(l, ...e) {
   class t extends l {
     constructor(...s) {
       super(...s), e.forEach((r) => {
@@ -1750,7 +1750,7 @@ class $ extends x {
     }
   }
 }
-class B extends $ {
+class V extends $ {
   /**
    * This is where shit gets real, ok that might be an overstatement. Basically this provides
    * an api for {@link MuPaginator} and special events pertaining to a paged collection
@@ -1847,7 +1847,7 @@ class L {
   onExit() {
   }
 }
-class V extends x {
+class B extends x {
   /**
    * So basically you only need to define some states, of which there is
    * one 'special' state you can add 'uninitialized' if you don't add it
@@ -2266,6 +2266,13 @@ Convert low-level repeated details into higher-level patterns.
 Keep output strictly formatted as JSON under the ACCUMULATOR_TOKEN_BUDGET.
 `;
 class K {
+  /**
+   * @param {Object} options - Options for your context manager.
+   * @param {Object} options.modelSpec - Defines the contextTokens and maxOutputTokens for your model.
+   * @param {Function} options.modelCaller - Your async function that actually hits the LLM API.
+   * @param {Function} options.tokenEstimator - (Optional) How you count tokens. Defaults to length/4.
+   * @param {Function} options.onProgress - (Optional) Hook for UI updates so the user isn't staring at a blank screen during a 5 minute fold.
+   */
   constructor(e = {}) {
     this.modelSpec = e.modelSpec || { contextTokens: 1e5, maxOutputTokens: 4096, name: "default" }, this.tokenEstimator = e.tokenEstimator || ((t) => Math.ceil(t.length / 4)), this.modelCaller = e.modelCaller, this.reducerPrompt = e.reducerPrompt || z, this.compactPrompt = e.compactPrompt || R, this.onProgress = e.onProgress || (() => {
     });
@@ -2273,6 +2280,13 @@ class K {
   _clamp(e, t, n) {
     return Math.min(Math.max(e, t), n);
   }
+  /**
+      * Calculates the token budgets for the sliding window components based on the model's max context.
+      * We slice up the pie into reserved output, system overhead, the accumulator, the world context,
+  * and the actual chunk size.
+      * @param {Object} modelSpec - The model specs you passed into the constructor.
+      * @returns {Object} A highly opinionated set of budgets for the reduction pipeline.
+      */
   computeBudgets(e) {
     const t = e.contextTokens, n = Math.min(e.maxOutputTokens, Math.floor(t * 0.12)), i = Math.floor(t * 0.04), s = Math.floor(t * 0.05), r = t - n - i - s, o = this._clamp(Math.floor(r * 0.12), 1e3, 8e3), a = this._clamp(Math.floor(r * 0.25), 2e3, 16e3), h = 1200, u = r - o - a - h, c = this._clamp(Math.floor(u * 0.08), 256, 2048);
     return {
@@ -2289,17 +2303,15 @@ class K {
       finalOutput: n
     };
   }
-  splitInstructionFromBlob(e) {
-    const t = e.split(`
-`);
-    let n = [], i = [], s = !1;
-    for (let a = 0; a < t.length; a++)
-      s ? i.push(t[a]) : t[a].trim().length === 0 && a > 0 ? s = !0 : t[a].length > 200 ? (s = !0, i.push(t[a])) : n.push(t[a]);
-    const r = n.join(`
-`).trim() || "Ingest and preserve this oversized input.", o = i.join(`
-`).trim() || e;
-    return { outerInstruction: r, blob: o };
-  }
+  /**
+   * Chops the blob into manageable sliding windows.
+   * We don't just hard-split strings because that would cut words and sentences in half.
+   * We try to split by paragraphs (`\n\n`) and keep an overlapping buffer so the reducer
+   * doesn't lose context across boundaries.
+   * @param {String} text - The giant blob
+   * @param {Number} chunkTokenBudget - How many tokens we can fit in one slice
+   * @param {Number} overlapTokenBudget - How many tokens to overlap from the previous slice
+   */
   makeSlidingChunks(e, t, n) {
     const i = e.split(new RegExp("(?<=\\n\\n)")), s = [];
     let r = [], o = 0, a = 0;
@@ -2346,6 +2358,9 @@ class K {
     }
     return s;
   }
+  /**
+   * Scaffolds the initial empty state for the JSON reduction accumulator.
+   */
   initialAccumulator(e, t, n) {
     return {
       globalSummary: "",
@@ -2367,6 +2382,14 @@ class K {
       }
     };
   }
+  /**
+      * The LLM is going to spit out what it claims is JSON. Sometimes it lies.
+      * Sometimes it runs out of output tokens and gives you a half-finished JSON string.
+  * This attempts to parse it safely. If it shits the bed, it returns your fallback
+      * (usually the previous state) so the entire reduction doesn't crash and burn.
+      * @param {String} jsonResp - The raw string from the LLM
+      * @param {Object} fallback - The state to revert to if the LLM betrayed you
+      */
   validateAccumulator(e, t) {
     if (!e) return t;
     if (typeof e == "string")
@@ -2378,6 +2401,10 @@ class K {
       }
     return e;
   }
+  /**
+   * If the accumulator itself grows too fat and exceeds its token budget,
+   * we force it to compress itself. It merges redundancies and drops low-level details.
+   */
   async compactAccumulator(e, t, n, i) {
     this.onProgress({ phase: "compaction", message: "Accumulator exceeding budget. Compacting..." });
     const s = JSON.stringify({
@@ -2392,6 +2419,9 @@ class K {
     });
     return this.validateAccumulator(r, e);
   }
+  /**
+   * Unpacks the accumulator and formats it into the final surrogate object.
+   */
   finalizeReduction(e, t, n) {
     return {
       type: "oversized_user_input_reduction",
@@ -2423,6 +2453,9 @@ ${JSON.stringify(n, null, 2)}`
     };
     return [...e, r];
   }
+  /**
+   * Just takes the last N messages that fit the budget to keep the reducer grounded.
+   */
   async buildWorldContext(e, t, n) {
     this.onProgress({ phase: "world_build", message: "Building compressed world context..." });
     let i = [], s = 0;
@@ -2437,6 +2470,10 @@ ${JSON.stringify(n, null, 2)}`
       recent_messages: i.map((r) => ({ role: r.role, length: r.content.length }))
     };
   }
+  /**
+  * The actual sliding window loop. Feeds chunks to the LLM one by one,
+      * validating and compacting the accumulator along the way.
+      */
   async reduceBlob(e, t, n, i, s) {
     const r = this.makeSlidingChunks(e, i.chunk, i.overlap);
     let o = this.initialAccumulator(t, this.tokenEstimator(e), r.length);
@@ -2470,6 +2507,14 @@ ${JSON.stringify(n, null, 2)}`
     }
     return this.finalizeReduction(o, n, t);
   }
+  /**
+      * The main event. You call this when the user pastes something absurd.
+      * If it fits in the normal context window, it just passes it through ('fast path').
+  * If it doesn't, it fires up the reduction engine, streams through the blob,
+      * and hands you back the final LLM response using the compacted surrogate.
+      * @param {Array} conversation - Your existing message history
+      * @param {String} userMessage - The new incoming message that might be oversized
+      */
   async handleOversizedUserTurn(e, t) {
     if (!this.modelCaller) throw new Error("MuContextManager requires a modelCaller function");
     if (this.tokenEstimator(JSON.stringify(e) + t) < this.modelSpec.contextTokens * 0.85)
@@ -2478,7 +2523,7 @@ ${JSON.stringify(n, null, 2)}`
         messages: [...e, { role: "user", content: t }]
       });
     this.onProgress({ phase: "init", message: "Oversized input detected. Initializing bounded streaming reduction." });
-    const { outerInstruction: i, blob: s } = this.splitInstructionFromBlob(t), r = this.computeBudgets(this.modelSpec), o = await this.buildWorldContext(e, i, r.world), a = await this.reduceBlob(s, i, o, r, this.modelSpec);
+    const i = "Ingest and preserve this oversized input.", s = t, r = this.computeBudgets(this.modelSpec), o = await this.buildWorldContext(e, i, r.world), a = await this.reduceBlob(s, i, o, r, this.modelSpec);
     this.onProgress({ phase: "final_completion", message: "Reduction complete. Generating final response using compact surrogate." });
     const h = this.packFinalMessages(e, o, a, i, this.modelSpec);
     return this.modelCaller({
@@ -2915,17 +2960,17 @@ export {
   T as MuDialogueManager,
   x as MuEvent,
   W as MuManager,
-  F as MuNodeManager,
+  H as MuNodeManager,
   y as MuObservableObject,
   J as MuPage,
   U as MuPageManager,
-  B as MuPagedCollection,
+  V as MuPagedCollection,
   N as MuPaginatedCollectionView,
   A as MuPaginator,
   j as MuPubSub,
   X as MuSelects,
   L as MuState,
-  V as MuStateMachine,
+  B as MuStateMachine,
   Y as MuTable,
   v as MuTagen,
   E as MuView,
@@ -2933,6 +2978,6 @@ export {
   S as muCss,
   d as muDom,
   D as muInjectCss,
-  H as muMultiInherit,
+  F as muMultiInherit,
   k as muView
 };

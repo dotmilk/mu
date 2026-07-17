@@ -50,7 +50,7 @@ export class MuBroker {
             channel.subscribers.push(receiver)
             let again = ()=> {
                 if (channel.queue.length) {
-                    window.setTimeout(()=>{
+                    globalThis.setTimeout(()=>{
                         let bundle = channel.queue.shift()
                         this.publish(name,bundle.msg)
                             .then((x)=>{
@@ -99,7 +99,7 @@ export class MuBroker {
         if (!channel.subscribers.length) {
             let p
             if (channel.queue.length < this._historyLimit) {
-                p = new window.Promise((resolve,reject)=>{
+                p = new globalThis.Promise((resolve,reject)=>{
                     channel.queue.push({
                         resolve: resolve,
                         reject: reject,
@@ -123,7 +123,7 @@ export class MuBroker {
         }
 
         if (!msg.resolve || (msg.resolve && typeof msg.resolve != 'function')) {
-            promise = new window.Promise((resolve,reject)=>{
+            promise = new globalThis.Promise((resolve,reject)=>{
                 sub(msg,resolve)
             })
         } else {

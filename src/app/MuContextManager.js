@@ -105,7 +105,7 @@ export class MuContextManager {
     /**
      * Calculates the token budgets for the sliding window components based on the model's max context.
      * We slice up the pie into reserved output, system overhead, the accumulator, the world context,
-     * and the actual chunk size. 
+ * and the actual chunk size.
      * @param {Object} modelSpec - The model specs you passed into the constructor.
      * @returns {Object} A highly opinionated set of budgets for the reduction pipeline.
      */
@@ -246,7 +246,7 @@ export class MuContextManager {
     /**
      * The LLM is going to spit out what it claims is JSON. Sometimes it lies.
      * Sometimes it runs out of output tokens and gives you a half-finished JSON string.
-     * This attempts to parse it safely. If it shits the bed, it returns your fallback 
+ * This attempts to parse it safely. If it shits the bed, it returns your fallback
      * (usually the previous state) so the entire reduction doesn't crash and burn.
      * @param {String} jsonResp - The raw string from the LLM
      * @param {Object} fallback - The state to revert to if the LLM betrayed you
@@ -352,7 +352,7 @@ ${JSON.stringify(reducedBlob, null, 2)}`
     }
 
     /**
-     * The actual sliding window loop. Feeds chunks to the LLM one by one, 
+ * The actual sliding window loop. Feeds chunks to the LLM one by one,
      * validating and compacting the accumulator along the way.
      */
     async reduceBlob(blob, outerInstruction, worldCtx, budgets, model) {
@@ -404,7 +404,7 @@ ${JSON.stringify(reducedBlob, null, 2)}`
     /**
      * The main event. You call this when the user pastes something absurd.
      * If it fits in the normal context window, it just passes it through ('fast path').
-     * If it doesn't, it fires up the reduction engine, streams through the blob, 
+ * If it doesn't, it fires up the reduction engine, streams through the blob,
      * and hands you back the final LLM response using the compacted surrogate.
      * @param {Array} conversation - Your existing message history
      * @param {String} userMessage - The new incoming message that might be oversized
