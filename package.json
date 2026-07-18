@@ -9,9 +9,17 @@
     "url": "git://github.com/dotmilk/mu.git"
   },
   "type": "module",
+  "engines": {
+    "node": ">=26.0.0 <27"
+  },
   "scripts": {
+    "node:check": "node ./scripts/require_node_26.cjs",
+    "preinstall": "node ./scripts/require_node_26.cjs",
+    "predev": "node ./scripts/require_node_26.cjs",
     "dev": "vite",
+    "prebuild": "node ./scripts/require_node_26.cjs",
     "build": "vite build",
+    "prepreview": "node ./scripts/require_node_26.cjs",
     "preview": "vite preview"
   },
   "devDependencies": {
